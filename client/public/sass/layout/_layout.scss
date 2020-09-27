@@ -1,0 +1,26 @@
+html {
+  font-size: 15px;
+
+  body {
+    margin-top: pxem(70);
+    background: $color-lightest-gray;
+
+    .inner {
+      margin: auto;
+      max-width:100%;
+      padding: $pad-md 0;
+      color: $color-black;
+      padding-bottom: 0px;
+      background-color: $color-white;
+
+      @media #{$break-medium} {
+        max-width: 96%;
+        padding: $pad-md 2%;
+      }
+    }
+
+    #vue {
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  }
+}

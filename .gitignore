@@ -1,0 +1,9 @@
+env
+.env
+venv/lib
+__pycache__/
+api_errors.log
+node_modules
+.DS_Store
+public/dist/*
+docker-compose.yml

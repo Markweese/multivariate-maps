@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  div(id='account' data-jscript='account' data-checkusername=checkusername)
+    form.form(action='/account/update-basic' method='POST')
+      h2 Edit your account
+      label(for="name") Name
+      input(type='text' name='name' value=user.name required)
+      p.inputerr(id='nameErr')
+      label(for="origin") Home State
+      select#state-select(type='text' value=user.state name='origin')
+        option.placeholder #{user.origin}
+        for state in states
+          option(value=`${state.abbr}`) #{state.name}
+      button.button.button-blue.button-medium(type='submit') Update Information
+    form.form(action='/account/update-email' method='POST')
+      label(for='email') Email
+      input(type='email' name='email' autocomplete='email' value=user.email required)
+      p.inputerr(id='emailErr')
+      button.button.button-blue.button-medium(type='submit') Update Email
+    form.form(action='/account/update-password' method='POST')
+      label(for='new-password') New Password
+      input(type='password' name='new-password' autocomplete="new-password" placeholder='password' required)
+      p.inputerr(id='passwordErr')
+      div.password-strength
+        p.password-strength__text(id='passwordStrengthText')
+        div.password-strength__bar(id='passwordStrengthBar')
+      label(for='confirm-password') Confirm Password
+      input(type='password' name='confirm-password' autocomplete="confirm-password" placeholder='confirm password' required)
+      p.inputerr(id='confirmErr')
+      button.button.button-blue.button-medium(type='submit') Update Password

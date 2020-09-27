@@ -1,0 +1,119 @@
+.timeseries {
+  padding: pxem(20);
+  background-color: $color-white;
+
+  &__chart-container {
+    display: flex;
+    position: relative;
+  }
+
+  &__chart {
+    width: 95%;
+    z-index: 100;
+    border: none;
+    display: inline-block;
+
+    @media #{$break-medium} {
+      border-left: 2px solid $color-light-gray;
+      border-bottom: 2px solid $color-light-gray;
+    }
+
+    .data-frame {
+
+      .path-group {
+
+        &__blue {
+
+          &--point {
+
+            .percentile-display {
+
+              &__positive {
+                stroke: none;
+
+                @media #{$break-medium} {
+                  stroke: $color-green;
+                }
+              }
+
+              &__negative {
+                stroke: none;
+
+                @media #{$break-medium} {
+                  stroke: $color-red;
+                }
+              }
+            }
+
+            line {
+              fill: none;
+            }
+
+            rect {
+              stroke: none;
+              fill-opacity: 0;
+
+              &.--ice {
+                fill-opacity: 1;
+                fill:url(#_Linear1);
+              }
+            }
+
+            circle {
+              stroke: none;
+              fill: $color-blue;
+
+              &.--active {
+                fill:url(#_Radial1);
+
+                @media #{$break-medium} {
+                  fill: $color-blue;
+                }
+              }
+            }
+          }
+
+          path {
+            fill: none;
+            stroke: $color-blue;
+          }
+        }
+
+        &__gray {
+
+          path, line {
+            fill: none;
+            stroke: none;
+
+            @media #{$break-medium} {
+              stroke: $color-light-gray;
+            }
+          }
+
+          circle {
+            fill: none;
+            stroke: none;
+
+            @media #{$break-medium} {
+              fill: $color-light-gray;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &__affordance {
+    display: block;
+    padding: $pad-lg;
+
+    @media #{$break-medium} {
+      display: none;
+    }
+
+    p {
+      text-align: center;
+      font-size: pxem(14);
+    }
+  }
+}

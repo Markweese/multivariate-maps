@@ -1,0 +1,15 @@
+@mixin headerText(){
+  font-size: 14pt;
+  text-align:left;
+  color: $color-blue;
+  letter-spacing: 2px;
+  font-family: $font-main;
+}
+
+@mixin buttonText(){
+  color:black;
+  font-size: 12pt;
+  text-align:center;
+  background-color:white;
+  font-family:$font-main;
+}

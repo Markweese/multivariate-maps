@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: web
+  template:
+    metadata:
+      labels:
+        component: web
+    spec:
+      containers:
+        - name: client
+          image: markweldonbrewer/checktheflows_client
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: MAIL_USER
+              value: checktheflowsapp@gmail.com
+            - name: MAIL_CLIENT_ID
+              value: 31795599734-8gl69sgcnlmbn17ubgnhaa92qa3q170v.apps.googleusercontent.com
+            - name: MAIL_HOST
+              value: smtp.gmail.com
+            - name: MAIL_PORT
+              value: '465'
+            - name: PORT
+              value: '7777'
+            - name: DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: DATABASE
+            - name: MAIL_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: mailclientsecret
+                  key: MAIL_CLIENT_SECRET
+            - name: MAIL_REFRESH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mailrefreshtoken
+                  key: MAIL_REFRESH_TOKEN
+            - name: MAIL_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mailaccesstoken
+                  key: MAIL_ACCESS_TOKEN
+            - name: MAP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mapkey
+                  key: MAP_KEY
+            - name: SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sessionsecret
+                  key: SECRET
+            - name: KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sessionkey
+                  key: KEY
+          ports:
+            - containerPort: 7777

@@ -1,0 +1,9 @@
+.toggle {
+  display: inline-block;
+
+  &.--toggle-active {
+    color: $color-white;
+    background-color: $color-blue;
+    border-bottom: 2px solid $color-blue;
+  }
+}

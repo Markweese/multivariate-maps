@@ -1,0 +1,85 @@
+form {
+  &.form {
+    background: white;
+    font-family: $font-main;
+    padding: 2rem;
+    box-shadow: $color-main;
+
+    h2 {
+      margin: 0;
+      font-size: 2rem;
+      padding-bottom: 2rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid $color-black;
+    }
+
+    select {
+      border: 1px solid $color-alt;
+    }
+  }
+
+  input, textarea {
+    width:100%;
+    color: black;
+    padding: pxem(10);
+    background: white;
+    font-size: pxem(16);
+    border-radius: pxem(3);
+    font-family: $font-main;
+    border: 1px solid $color-alt;
+
+    &:focus {
+      outline: none;
+      border: 2px solid $color-main;
+    }
+
+    &::placeholder {
+      font-size: pxem(16);
+      font-family: $font-main;
+    }
+
+    &.input {
+      &--error {
+        border-color: red;
+      }
+    }
+
+    @media #{$break-medium} {
+      width: 70%;
+    }
+  }
+
+  label {
+    padding: 10px 0;
+    display: block;
+  }
+
+  button {
+    width: 100%;
+    margin-top: pxem(10);
+    display: block !important;
+
+    @media #{$break-medium} {
+      width: initial;
+    }
+  }
+
+  .inputerr {
+    color: $color-red;
+    font-size: pxem(16);
+    margin-top: pxem(5);
+  }
+
+  .password-strength {
+    width: 70%;
+
+    &__text {
+      margin: pxem(5);
+      color: $color-black;
+      font-size: pxem(16);
+    }
+    &__bar {
+      height: pxem(5);
+    }
+  }
+}

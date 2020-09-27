@@ -1,0 +1,15 @@
+.y-labels {
+  width: 5%;
+  display: none;
+  align-items: flex-end;
+  flex-direction: column;
+  justify-content: space-between;
+
+  @media #{$break-medium} {
+    display: flex;
+  }
+
+  .y-label {
+    padding-right: pxem(5);
+  }
+}

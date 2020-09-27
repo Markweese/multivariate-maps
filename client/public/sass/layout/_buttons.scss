@@ -1,0 +1,155 @@
+.button {
+  display: block;
+  text-align: center;
+  border-radius: pxem(3);
+  font-size: pxem(18);
+  font-family: $font-main;
+  padding-top: pxem(15);
+  padding-left: pxem(20);
+  padding-right: pxem(20);
+  padding-bottom: pxem(15);
+
+  @media #{$break-medium} {
+    display: inline;
+  }
+
+  &-red {
+    color: $color-white;
+    background-color: $color-red;
+    transition: background-color 300ms;
+
+    &.--hollow {
+      color: $color-red;
+      border: 2px solid $color-red;
+      background-color: $color-white;
+
+      &:hover, &.-active {
+        color: $color-white;
+        background-color: $color-red;
+        transition: background-color 300ms, color 300ms;
+      }
+    }
+
+    &:hover {
+      background-color: darken($color-red, 10%);
+      transition: background-color 300ms;
+    }
+  }
+
+  &-blue {
+    color: $color-white;
+    background-color: $color-blue;
+    transition: background-color 300ms;
+
+    &.--hollow {
+      color: $color-blue;
+      border: 2px solid $color-blue;
+      background-color: $color-white;
+      transition: background-color 300ms, color 300ms;
+
+      &:hover, &.-active {
+        color: $color-white;
+        background-color: $color-main;
+        transition: background-color 300ms, color 300ms;
+      }
+    }
+
+    &:hover {
+      background-color: darken($color-blue, 10%);
+      transition: background-color 300ms;
+    }
+  }
+
+  &-green {
+    color: $color-white;
+    background-color: $color-green;
+    transition: background-color 300ms;
+
+    &.--hollow {
+      color: $color-green;
+      border: 2px solid $color-green;
+      background-color: $color-white;
+
+      &:hover, &.-active {
+        color: $color-white;
+        background-color: $color-green;
+        transition: background-color 300ms, color 300ms;
+      }
+    }
+
+    &:hover {
+      background-color: darken($color-green, 10%);
+      transition: background-color 300ms;
+    }
+  }
+
+  &-orange {
+    color: $color-white;
+    background-color: $color-orange;
+    transition: background-color 300ms;
+
+    &.--hollow {
+      color: $color-orange;
+      border: 2px solid $color-orange;
+      background-color: $color-white;
+
+      &:hover, &.-active {
+        color: $color-white;
+        background-color: $color-orange;
+        transition: background-color 300ms, color 300ms;
+      }
+    }
+
+    &:hover {
+      background-color: darken($color-orange, 10%);
+      transition: background-color 300ms;
+    }
+  }
+
+  &-small {
+    padding: pxem(10) pxem(30);
+  }
+
+  &-medium {
+    padding: pxem(10) pxem(40);
+  }
+
+  &-large {
+    padding: pxem(10) pxem(50);
+  }
+
+  &-full {
+    width: 100%;
+    display: block;
+    text-align: center;
+    padding: pxem(10) 0;
+  }
+
+  &-infowindow {
+    width: 100%;
+    display: block;
+    margin-bottom: pxem(10);
+
+    @media #{$break-medium} {
+      width: 33%;
+      margin-bottom: 0px;
+      margin-right: pxem(10);
+      display: inline-block;
+    }
+  }
+
+  &-checkbox {
+    padding: pxem(10) pxem(10);
+  }
+}
+
+.button-inactive {
+  background-color: $color-light-gray;
+  border: 2px solid $color-gray;
+  color: black;
+  transition: background-color 300ms;
+
+  &:hover {
+    background-color: $color-gray;
+  }
+}

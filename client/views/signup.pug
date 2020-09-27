@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  form.form(id='signup' action='/signup' method='POST' data-checkusername=checkusername data-jscript='signup')
+    h2 Sign Up
+    label(for='name') Username
+    input(type='text' name='name' placeholder='username' required)
+    p.inputerr(id='nameErr')
+    label(for='email') Email
+    input(type='email' name='email' autocomplete='email' Emailplaceholder='you@example.com' required)
+    p.inputerr(id='emailErr')
+    label(for='origin') Home State
+    select#state-select(type='text' placeholder='Select State' name='origin' required)
+      option.placeholder Select Your State
+      for state in states
+        option(value=`${state.abbr}`) #{state.name}
+    label(for='new-password') Password
+    input(type='password' name='new-password' autocomplete="current-password" placeholder='password' required)
+    p.inputerr(id='passwordErr')
+    div.password-strength
+      p.password-strength__text(id='passwordStrengthText')
+      div.password-strength__bar(id='passwordStrengthBar')
+    label(for='confirm-password') Confirm Password
+    input(type='password' name='confirm-password' autocomplete="confirm-password" placeholder='confirm password' required)
+    p.inputerr(id='confirmErr')
+    button.button.button-blue.button-medium(type='submit') Sign Up

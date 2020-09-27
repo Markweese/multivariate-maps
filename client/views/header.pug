@@ -1,0 +1,22 @@
+include ./mobileNav
+mixin header
+  div.nav-bar
+    +mobileNav
+    div.container
+      div.nav
+        a.dropbtn(href="/list") My List
+      div.nav
+        a.dropbtn(href="/explorer") Find Stations
+    a.logo-block(href='/')
+    if user
+      div.container
+        div.nav
+          a.dropbtn(href="/account") Account
+        div.nav
+          a.dropbtn(href="/logout") Logout
+    else
+      div.container
+        div.nav
+          a.dropbtn(href="/login") Login
+        div.nav
+          a.dropbtn(href="/signup") Sign Up

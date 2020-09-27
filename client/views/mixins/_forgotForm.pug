@@ -1,0 +1,9 @@
+mixin forgotForm()
+  form.form(id='forgotPassword' action="/account/forgot" method="POST")
+    h2 Forgot Password?
+    label(for="email") Email
+    if prepopulate
+      input(type='email' name='email' value=prepopulate)
+    else
+      input(type="email" name="email")
+    button.button.button-blue.button-medium(type='submit') Send
