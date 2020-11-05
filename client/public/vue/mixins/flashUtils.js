@@ -22,7 +22,7 @@ const FlashUtils = {
       return `<div class="flash flash--success">
                 <div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div>
                 <p class="flash__text --loading">
-                  Compiling station data, this may take a moment
+                  Compiling, this may take a moment
                 </p>
                 <button class="flash__remove" onclick="this.parentElement.remove()">×</button>
               </div>`
