@@ -1,13 +1,5 @@
 <template>
   <div class='station-page'>
-    <div class='info-box'>
-      <div class='info-box__content info-box__content--success'>
-        <div class='info-box__inner info-box__inner--info'>
-          <p>If you see any incorrect or missing information, please email our data management team at <a href="mailto:checktheflowsqa@gmail.com">checktheflowsqa@gmail.com</a>.</p>
-          <button class='info-box__remove' onclick='this.parentElement.parentElement.remove()'>×</button>
-        </div>
-      </div>
-    </div>
     <div class='station-page__header'>
       <h1>{{usgsData.name}}</h1>
       <p>
@@ -52,6 +44,7 @@ import Timeseries from '../components/Timeseries.vue';
 export default {
   data() {
 		return {
+      user: null,
 			usgsData: null,
       snotelData: null,
       reservoirData: null,
@@ -98,6 +91,7 @@ export default {
 	methods: {
 		fetchData() {
       let dataElement = document.querySelector('#dataPasser')
+      let user = dataElement.dataset.user;
 			let usgs = dataElement.dataset.cfs;
       let snotel = dataElement.dataset.snotel;
       let reservoir = dataElement.dataset.reservoir;

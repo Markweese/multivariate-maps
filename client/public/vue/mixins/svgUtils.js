@@ -14,10 +14,9 @@ const SvgUtils = {
       this.configureSpacing(points);
 
       // if return raw is true, don't return svg points
-
       return points.map((point, i) => {
-        let parsedDate = point.date.match(re);
-        let date = `${parsedDate[0]}/${[parsedDate[1]]}`;
+        let parsedDate = point.date ? point.date.match(re) : null;
+        let date = parsedDate ? `${parsedDate[0]}/${[parsedDate[1]]}` : `${point.month}/${point.year}`;
 
         if(this.dataset === 'cfsInstantaneous') {
           let historic = this.todaysHistoric;
@@ -138,6 +137,7 @@ const SvgUtils = {
 
     // if a desired value needs to load, this will wait one second then try again
     configureSpacing(points) {
+      console.log(points);
       if(points[0].max) {
         let max = this.getMax(points,'max');
 
