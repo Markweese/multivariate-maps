@@ -137,7 +137,7 @@ const SvgUtils = {
 
     // if a desired value needs to load, this will wait one second then try again
     configureSpacing(points) {
-      console.log(points);
+
       if(points[0].max) {
         let max = this.getMax(points,'max');
 
