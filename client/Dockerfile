@@ -12,5 +12,5 @@ RUN npm install
 # copy over everything else
 COPY . .
 
-# run start
+# run webpack and prod scripts
 CMD ["npm", "run", "prod"]
