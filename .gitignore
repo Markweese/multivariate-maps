@@ -5,6 +5,6 @@ __pycache__/
 api_errors.log
 node_modules
 .DS_Store
-docker-compose.yml
+public/dist/App*
 public/dist/style*
-public/dist/App.bundle.js*
+docker-compose.yml
