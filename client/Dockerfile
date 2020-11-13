@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:12.19.0-alpine
 
 # set /app as working directory on the VM
 WORKDIR "/app"

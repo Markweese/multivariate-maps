@@ -1,8 +1,6 @@
 docker build -t markweldonbrewer/checktheflows_client:latest -t markweldonbrewer/checktheflows_client:$SHA -f ./client/Dockerfile ./client
 docker build -t markweldonbrewer/checktheflows_api:latest -t markweldonbrewer/checktheflows_api:$SHA -f ./api/Dockerfile ./api
 
-echo markweldonbrewer/checktheflows_client:$SHA
-
 docker push markweldonbrewer/checktheflows_client:latest
 docker push markweldonbrewer/checktheflows_api:latest
 
