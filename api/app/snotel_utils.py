@@ -345,9 +345,11 @@ class snotel_utils:
                 else:
                     # if not, remove the oldest object and add the new one
                     swe_object = list(self.aggregate_day(id['stationNumber'], date_clean, row[1]))
-                    self.client[os.environ['MONGO_DB']].snowpacks.update_one({'stationNumber':id['stationNumber']}, {'$push':{'swe': swe_object[0]}})
-                    self.client[os.environ['MONGO_DB']].snowpacks.update_one({'stationNumber':id['stationNumber']}, {'$pop':{'swe': -1}})
-                    self.compile_month(id, date_clean.split('/')[0])
+
+                    if len(swe_object) > 0:
+                        self.client[os.environ['MONGO_DB']].snowpacks.update_one({'stationNumber':id['stationNumber']}, {'$push':{'swe': swe_object[0]}})
+                        self.client[os.environ['MONGO_DB']].snowpacks.update_one({'stationNumber':id['stationNumber']}, {'$pop':{'swe': -1}})
+                        self.compile_month(id, date_clean.split('/')[0])
 
 
             if len(row) > 0 and row[0] == 'Date':

@@ -5,6 +5,7 @@ mongoose.connect(process.env.DATABASE, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 mongoose.connection.on('error', (err) => {
   console.error(`error connecting to mongodb in start.js`);
+  console.log(err);
 });
 
 //import all models
