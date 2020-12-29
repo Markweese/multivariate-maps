@@ -14,7 +14,7 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 logging.basicConfig(filename='api_errors.log',level=logging.ERROR, format='%(asctime)s %(message)s')
-connection_string='mongodb://{}:{}@ds129946.mlab.com:{}/{}?retryWrites=false'.format(os.environ['MONGO_USERNAME'], os.environ['MONGO_PASSWORD'], os.environ['MONGO_PORT'], os.environ['MONGO_DB'])
+connection_string='mongodb+srv://{}:{}@river-collective.f0lz3.mongodb.net/{}?retryWrites=true&w=majority'.format(os.environ['MONGO_USERNAME'], os.environ['MONGO_PASSWORD'], os.environ['MONGO_DB'])
 
 success_res = dict(
     code=1,
