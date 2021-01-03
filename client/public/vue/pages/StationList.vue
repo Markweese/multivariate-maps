@@ -25,6 +25,9 @@
 					</p>
 					<p v-bind:class="historicComparisonClass(station.temp)" v-if="station.temp.length > 2 && station.temp[station.temp.length-1] && !isNaN(station.temp[station.temp.length-1].reading)">
 						 	<span aria-label='current temperature'>{{toFarenheit(station.temp[(station.temp.length)-1].reading)}}</span><span class='stats-summary__unit'>°F</span>
+							<span v-if='compareHistoric(station.temp)' aria-label='stats-summary__change'>
+								({{compareHistoric(station.temp)}})
+							</span>
 					</p>
 					<a class='button button-blue button-medium' :href="generateUrl(station, 'local')" role="button" :aria-label="`view full report for ${station.name}`">View Page</a>
 				</div>

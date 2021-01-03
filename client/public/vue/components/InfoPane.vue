@@ -6,11 +6,11 @@
       </h3>
       <h3 v-if='active.y === null || active.y === undefined'>Issue with meter</h3>
       <h3 class='--ice' v-if='active.y == 0 && units == "CFS"'>Iced</h3>
-      <div v-if='(active.y && active.y > 1) || (units !== "CFS" && !isNaN(active.y))' class='reading-wrapper'>
+      <div v-if='(active.y && active.y > 0) || (units !== "CFS" && !isNaN(active.y))' class='reading-wrapper'>
         <span class='reading' v-if='overview || units !== "CFS"'>Reading: {{round(active.y, 2)}} {{units}}</span>
         <span class='average' v-if='overview || units !== "CFS"'>Average: {{round(active.fifty, 2)}} {{units}}</span>
       </div>
-      <div v-if='active.y && active.y > 1' class='overview-wrapper'>
+      <div v-if='active.y && active.y > 0' class='overview-wrapper'>
         <span v-bind:class='overview.class' v-if='overview'>{{overview.title}}</span>
         <span class='overview' v-if='overview'>
           {{overview.description}}

@@ -153,7 +153,7 @@ exports.updateAccountEmail = async (req, res) => {
       res.redirect('/account');
     } catch(e) {
       // Notify of duplicate emails
-      if(e.errors.email && e.errors.email.kind === 'duplicate') {
+      if(e.errors && e.errors.email && e.errors.email.kind === 'duplicate') {
         req.flash('error', `${req.body.email} is already in use.`);
         res.redirect('/account');
         return;

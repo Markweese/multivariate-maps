@@ -19,7 +19,7 @@
       <tbody>
         <tr v-for="row in data" role="row">
           <td v-for="(cell, i) in Object.keys(row)" role="cell">
-            {{row[cell]}}
+            {{i === 1 ? correctDate(row[cell]) : row[cell]}}
           </td>
         </tr>
       </tbody>
@@ -36,6 +36,15 @@
       'context',
       'duration'
     ],
+
+    methods: {
+      correctDate(date) {
+        date = new Date(date);
+        date.setFullYear(new Date().getFullYear());
+
+        return date;
+      }
+    },
 
     mixins: [
       DateUtils

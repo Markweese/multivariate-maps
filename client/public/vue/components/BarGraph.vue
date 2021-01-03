@@ -22,6 +22,9 @@
           </g>
         </svg>
       </div>
+      <div class='bargraph__affordance'>
+        <p>Slide highlighter along chart to select date</p>
+      </div>
       <XLabels v-bind:labels='convertXLabels'/>
     </div>
     <div class='insufficient-data' v-else>
