@@ -18,7 +18,7 @@ exports.map = ([lat, long]) => `https://maps.googleapis.com/maps/api/js?key=${pr
 exports.icon = (name) => fs.readFileSync(`./public/images/icons/${name}.svg`);
 
 // Some details about the site
-exports.siteName = `Check The Flows`;
+exports.siteName = `River Collective`;
 
 exports.menu = [
   { slug: '/flows', title: 'Flows' },

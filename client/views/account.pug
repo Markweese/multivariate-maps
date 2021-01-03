@@ -13,11 +13,11 @@ block content
         for state in states
           option(value=`${state.abbr}`) #{state.name}
       button.button.button-blue.button-medium(type='submit') Update Information
-    form.form(action='/account/update-email' method='POST')
-      label(for='email') Email
-      input(type='email' name='email' autocomplete='email' value=user.email required)
-      p.inputerr(id='emailErr')
-      button.button.button-blue.button-medium(type='submit') Update Email
+    //form.form(action='/account/update-email' method='POST')
+    //  label(for='email') Email
+    //  input(type='email' name='email' autocomplete='email' value=user.email required)
+    //  p.inputerr(id='emailErr')
+    //  button.button.button-blue.button-medium(type='submit') Update Email
     form.form(action='/account/update-password' method='POST')
       label(for='new-password') New Password
       input(type='password' name='new-password' autocomplete="new-password" placeholder='password' required)

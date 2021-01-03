@@ -29,7 +29,7 @@ exports.send = async (options) => {
   const text = htmlToText.fromString(html);
 
   const mailOptions = {
-    from:'Check The Flows <checktheflowsapp@gmail.com>',
+    from:'River Collective <checktheflowsapp@gmail.com>',
     to: options.user.email,
     subject: options.subject,
     html,

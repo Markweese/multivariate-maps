@@ -48,6 +48,20 @@
     }
   }
 
+  &__affordance {
+    display: block;
+    padding: $pad-lg;
+
+    @media #{$break-medium} {
+      display: none;
+    }
+
+    p {
+      text-align: center;
+      font-size: pxem(14);
+    }
+  }
+
   .x-labels {
     width: 90%;
   }

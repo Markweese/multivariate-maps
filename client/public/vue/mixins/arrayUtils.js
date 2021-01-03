@@ -1,42 +1,26 @@
 const ArrayUtils = {
   methods: {
     chunkArray(array, breakpoint) {
-      let bps = [];
       let arrs = [];
+      let currentArr = [];
 
       array.forEach((item, i) => {
-        if(!item[breakpoint]) {
-          bps.push(i)
+        if(item[breakpoint]) {
+          currentArr.push(item);
+
+          if (i + 1 === array.length) {
+            arrs.push(currentArr);
+          }
+        } else {
+          if (currentArr.length) {
+            arrs.push(currentArr);
+          }
+
+          currentArr = [];
         }
       });
 
-      // if there is no empty items, return the array unchanged
-      if(!bps.length) {
-        return [array];
-      }
-
-      // if the there are multiple fragments loop over them
-      if(bps.length > 1) {
-        bps.forEach((bp,i) => {
-          if(i === 0) {
-            arrs.push(array.slice(0, bp));
-          } else if(i === bps.length - 1) {
-            arrs.push(array.slice(bp + 1, array.length - 1));
-          } else {
-            arrs.push(array.slice(bps[i - 1] + 1, bp));
-          }
-        });
-
-        // return multi-chunked array
-        return arrs;
-
-      } else if(bps.length === 1) {
-        arrs.push(array.slice(0, bps[0]));
-        arrs.push(array.slice(bps[0] + 1, array.length - 1));
-
-        // return chunked array
-        return arrs;
-      }
+      return arrs;
     },
 
     getMax(arr, field) {

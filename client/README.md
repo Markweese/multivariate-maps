@@ -1,6 +1,6 @@
 ## What is this?
 
-Check the flows application
+River Collective front end application
 
 ## Sample Data
 

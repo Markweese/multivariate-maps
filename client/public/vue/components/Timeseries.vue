@@ -30,7 +30,7 @@
                 </g>
               </g>
               <circle v-if='point.y' v-bind:class='isActive(point.x).class' v-bind:cx='point.x' v-bind:cy='point.y' v-bind:r='isActive(point.x).radius'/>
-              <rect v-if='point.y == 0' class='--ice' v-bind:x='point.rectX - (pointSpacing/2)' y='0' v-bind:width='pointSpacing' v-bind:height='svgSetup.xMax'></rect>
+              <rect v-if='point.y == 0' class='--ice' v-bind:x='point.rectX - (pointSpacing/2)' y='0' v-bind:width='pointSpacing * 2' v-bind:height='svgSetup.xMax'></rect>
               <rect ref='touchArea' v-bind:data-point='JSON.stringify(point)' v-on:mouseover='updateDisplay($event, point)' v-bind:x='point.rectX' y='0' v-bind:width='pointSpacing' v-bind:height='svgSetup.yMax'></rect>
             </g>
           </g>
