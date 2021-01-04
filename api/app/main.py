@@ -102,9 +102,9 @@ def station_refresh_all():
                 station.populate_month(id)
                 station.populate_day(id)
 
-                reservoir.populate_historic(id, True)
-                reservoir.populate_daily(id, True)
-                reservoir.populate_year(id, True)
+                # reservoir.populate_historic(id, True)
+                # reservoir.populate_daily(id, True)
+                # reservoir.populate_year(id, True)
 
                 snotel.populate_historic(id, True)
                 snotel.populate_daily(id, True)
