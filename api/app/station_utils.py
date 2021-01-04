@@ -7,6 +7,7 @@ import csv
 import json
 import numpy as np
 from io import StringIO
+from pytz import timezone
 from datetime import date, datetime
 from collections import defaultdict
 from urllib.request import urlopen, Request
@@ -17,11 +18,6 @@ class station_utils:
         ssl._create_default_https_context = ssl._create_unverified_context
     # Dev only
 
-    # today: todays date
-    # date_compare: formats the date for comparison in populate_month
-    # client: the mongodb client instance
-    today = date.today()
-    date_compare = "{}/{}".format(today.month, today.day)
 
     # Init
     def __init__(self, db_connect):
@@ -139,13 +135,17 @@ class station_utils:
     # data: the parsed rdb file
     def parse_day(self, data):
         output = []
+
         for row in data:
             if len(row) > 1 and row[0] == 'USGS':
+                timezone_map = {'PST': 'US/Pacific', 'CST': 'US/Central', 'EST': 'EST', 'MST': 'MST', 'AKST': 'US/Alaska'}
+                today = datetime.now(timezone(timezone_map[row[3]]))
+                date_compare = '{}/{}'.format(today.month, today.day)
                 date_object = datetime.strptime(row[2], '%Y-%m-%d %H:%M')
                 date_string = ('{}/{}'.format(date_object.month, date_object.day))
                 time = date_object.strftime('%I:%M')
 
-                if date_string == self.date_compare:
+                if date_string == date_compare:
                     try:
                         if row[4] == 'Ice':
                             row[4] = 0

@@ -7,3 +7,4 @@ Jinja2==2.10.1
 numpy==1.18.2
 pymongo[tls,srv]==3.10.1
 Werkzeug==0.16.0
+pytz

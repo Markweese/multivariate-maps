@@ -21,7 +21,7 @@ class station:
     # date_compare: formats the date for comparison in populate_month
     # client: the mongodb client instance
     today = date.today()
-    date_compare = "{}/{}".format(today.month, today.day)
+    date_compare = "{}/{}".format(today.month, today.day + 1)
     params = [{'code': '00060', 'name': 'cfs'}, {'code': '00010', 'name': 'temp'}, {'code': '00095', 'name': 'conductance'}, {'code': '00400', 'name': 'ph'}]
 
     # Init
