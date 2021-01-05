@@ -1,0 +1,11 @@
+mixin heroBand(item)
+  div.hero-band(style="background-image: url(" + item.bgimage + ")")
+    div.hero-band__card
+      if item.icon
+        div.hero-band__card-icon(style="background-image: url(" + item.icon + ")")
+      if item.title
+        h1.hero-band__card-header= item.title
+      if item.body
+        p.hero-band__card-body= item.body
+      if item.link
+        a.button.button-blue.button-medium(href= item.link.url)= item.link.text

@@ -16,13 +16,7 @@
  }
 
  exports.checkThenLoad = (req, res) => {
-
-   if(req.user){
-     res.redirect('/list');
-   } else {
-     res.redirect('/explorer');
-   }
-
+   res.render('homepage');
  }
 
  exports.loadMap = async (req,res) => {

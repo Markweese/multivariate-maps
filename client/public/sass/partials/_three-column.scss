@@ -1,0 +1,42 @@
+.three-column {
+  margin: $component;
+  
+  &__columns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  &__icon {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 15px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  &__col {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    background-color: #FFFFFF;
+
+    &.--space-top {
+      margin-top: 60px;
+    }
+  }
+
+  &__header {
+    margin-bottom: 15px;
+  }
+
+  &__body {
+    margin-bottom: 30px;
+  }
+
+  &__link {
+    margin-top: auto;
+  }
+}

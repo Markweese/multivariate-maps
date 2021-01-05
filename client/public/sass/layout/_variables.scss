@@ -25,6 +25,9 @@ $pad-sm: pxem(5);
 $pad-md: pxem(10);
 $pad-lg: pxem(20);
 
+// component spacing
+$component: 30px 0;
+
 //breakpoints
 $break-small: "only screen and (min-width: 640px)";
 $break-medium: "only screen and (min-width: 725px)";
