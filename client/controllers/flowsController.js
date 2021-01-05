@@ -20,11 +20,7 @@
  }
 
  exports.loadMap = async (req,res) => {
-   let stationsFull;
-   let stations = [];
-
-   stationsFull = await Station.find({});
-   res.render('stationExplorer', { stationsFull });
+   res.render('stationExplorer');
 
  }
 

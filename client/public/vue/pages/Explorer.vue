@@ -29,17 +29,19 @@
         </ul>
       </div>
     </div>
-    <div v-if="subset" class="data-display">
+    <div v-if="subset && !isLoading" class="data-display">
       <ExplorerMap v-if="isMap" v-bind:user="user" v-bind:selection="selection" v-bind:subset="subset"/>
       <ExplorerList v-if="!isMap" v-bind:user="user" v-bind:selection="selection" v-bind:subset="subset"/>
     </div>
     <div v-else class="instruction-prompt">
-      <p>Please select a state to continue</p>
+      <p v-if="isLoading">Fetching results...</p>
+      <p v-else>Please select a state to continue</p>
     </div>
   </div>
 </template>
 <script>
   // import map and list components for the explorer
+  import axios from 'axios';
   import states from '../../data/states';
   import ExplorerMap from '../components/ExplorerMap.vue';
   import ExplorerList from '../components/ExplorerList.vue';
@@ -52,6 +54,7 @@
         states: states,
         stations: null,
         selection: null,
+        isLoading: false,
         currentView: 'map',
         activeState: null,
         stateDropdownOpen: false,
@@ -82,10 +85,7 @@
     methods: {
       fetchData() {
         let user = document.querySelector('#dataPasser').dataset.user;
-        let stations = document.querySelector('#dataPasser').dataset.stations;
-
         this.user = user ? JSON.parse(user) : null;
-        this.stations = stations ? JSON.parse(stations) : null;
       },
 
       toggleView(view) {
@@ -101,9 +101,14 @@
       },
 
       filterByState(state) {
-        this.subset = this.stations.filter(station => station.state === state.fip);
-        this.selection = this.subset;
+        this.isLoading = true;
         this.activeState = state.name;
+
+        axios.get(`/api/stations/state/${state.fip}`).then(res => {
+          this.isLoading = false;
+          this.subset = res.data;
+          this.selection = this.subset;
+        });
       },
 
       filterByText(event) {

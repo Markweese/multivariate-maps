@@ -1,6 +1,7 @@
 .three-column {
-  margin: $component;
-  
+  margin: $c-space;
+  padding: $c-pad;
+
   &__columns {
     display: flex;
     flex-wrap: wrap;

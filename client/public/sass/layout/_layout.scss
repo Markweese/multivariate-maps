@@ -2,21 +2,17 @@ html {
   font-size: 15px;
 
   body {
-    margin-top: pxem(70);
-    background: $color-lightest-gray;
+    margin-top: 90px;
+
+    @media #{$break-medium} {
+      margin-top: 79px;
+    }
 
     .inner {
       margin: auto;
       max-width:100%;
-      padding: $pad-md 0;
       color: $color-black;
-      padding-bottom: 0px;
       background-color: $color-white;
-
-      @media #{$break-medium} {
-        max-width: 96%;
-        padding: $pad-md 2%;
-      }
     }
 
     #vue {

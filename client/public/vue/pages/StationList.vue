@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class='station-list'>
 		<div class='station-list__search'>
 			<input v-on:input="filterByText($event)" v-on:keyup="executeByText($event)" class="search__input" type="text" placeholder="Search Rivers..." name="search" id="searchRiver" aria-expanded="false"/>
 			<ul v-if="textDropdownResults" class="search__results">

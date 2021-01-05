@@ -83,3 +83,10 @@ class station:
         for station in stations:
             self.populate_day(station)
             self.utils.update_cfs(station)
+
+######################## Begin general GET routes for Node app ##########################
+    # get_by_state
+    # get and return all stations in a state
+    def get_by_state(self, fip):
+        stations = list(self.client[os.environ['MONGO_DB']].stations.find({'state': fip}))
+        return stations
