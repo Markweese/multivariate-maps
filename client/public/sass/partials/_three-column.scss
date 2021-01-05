@@ -1,6 +1,7 @@
 .three-column {
-  margin: $component;
-  
+  margin: $c-space;
+  padding: $c-pad;
+
   &__columns {
     display: flex;
     flex-wrap: wrap;
@@ -17,14 +18,24 @@
   }
 
   &__col {
-    width: 32%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     padding: 30px;
-    background-color: #FFFFFF;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+
+    @media #{$break-large} {
+      width: 32%;
+      margin-bottom: 0px;
+    }
 
     &.--space-top {
-      margin-top: 60px;
+      margin-top: 0px;
+
+      @media #{$break-large} {
+        margin-top: 60px;
+      }
     }
   }
 

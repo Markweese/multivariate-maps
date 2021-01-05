@@ -3,6 +3,7 @@ import flask
 import logging
 from flask import request
 from pymongo import MongoClient
+from bson.json_util import dumps
 from flask import request, render_template
 from snotel_module import snotel as snotel_module
 from station_module import station as station_module
@@ -180,6 +181,22 @@ def reservoir_refresh():
         reservoir.refresh_reservoirs()
 
         return success_res
+    except Exception as e:
+        logging.error(request.path, exc_info=True)
+        return fail_res
+
+    client.close()
+
+######################## Begin Non-cron job API routes for application consumption ##########################
+
+@app.route('/stations/state/<fip>', methods=['GET'])
+def get_state(fip):
+    client = MongoClient(connection_string)
+    station = station_module(client)
+
+    try:
+        output = station.get_by_state(fip)
+        return dumps(output)
     except Exception as e:
         logging.error(request.path, exc_info=True)
         return fail_res

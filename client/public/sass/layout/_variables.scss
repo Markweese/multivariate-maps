@@ -3,7 +3,7 @@ $color-alt: #BAC2FA;
 $color-main: #4B8BF7;
 $color-blue: #4B8BF7;
 $color-green: #119933;
-$color-white: #efefef;
+$color-white: #FFFFFF;
 $color-black: #333333;
 $color-yellow: #ecf972;
 $top-dot-color: #4B8BF7;
@@ -26,7 +26,11 @@ $pad-md: pxem(10);
 $pad-lg: pxem(20);
 
 // component spacing
-$component: 30px 0;
+$c-pad: 0 15px;
+$c-space: 0 0 60px 0;
+
+// page level spacing
+$p-pad: 15px 0;
 
 //breakpoints
 $break-small: "only screen and (min-width: 640px)";

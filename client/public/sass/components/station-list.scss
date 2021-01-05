@@ -4,14 +4,20 @@
     height: 0px !important;
   }
 
-  &__title {
+  &__loader {
+    display: flex;
+    padding: 30px;
+    justify-content: center;
 
+    p {
+      margin-right: 10px;
+    }
   }
 
   &__search {
     position: relative;
-    padding: pxem(10) 0;
-    border-top: 1px solid $color-light-gray;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 
     .search__results {
       padding: 10px;
