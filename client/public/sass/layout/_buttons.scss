@@ -1,4 +1,5 @@
 .button {
+  border: none;
   display: block;
   text-align: center;
   border-radius: pxem(3);
@@ -8,6 +9,7 @@
   padding-left: pxem(20);
   padding-right: pxem(20);
   padding-bottom: pxem(15);
+  background-color: $color-white;
 
   @media #{$break-medium} {
     display: inline;

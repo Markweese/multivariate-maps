@@ -1,5 +1,6 @@
 .toggle {
   display: inline-block;
+  border: 2px solid $color-blue;
 
   &.--toggle-active {
     color: $color-white;
