@@ -18,14 +18,24 @@
   }
 
   &__col {
-    width: 32%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     padding: 30px;
+    margin-bottom: 30px;
     background-color: #FFFFFF;
 
+    @media #{$break-large} {
+      width: 32%;
+      margin-bottom: 0px;
+    }
+
     &.--space-top {
-      margin-top: 60px;
+      margin-top: 0px;
+
+      @media #{$break-large} {
+        margin-top: 60px;
+      }
     }
   }
 
