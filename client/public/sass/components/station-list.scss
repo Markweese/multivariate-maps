@@ -4,8 +4,14 @@
     height: 0px !important;
   }
 
-  &__title {
+  &__loader {
+    display: flex;
+    padding: 30px;
+    justify-content: center;
 
+    p {
+      margin-right: 10px;
+    }
   }
 
   &__search {

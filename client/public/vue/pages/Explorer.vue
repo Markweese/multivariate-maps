@@ -29,12 +29,12 @@
         </ul>
       </div>
     </div>
-    <div v-if="subset && !isLoading" class="data-display">
+    <div v-if="subset && !loading" class="data-display">
       <ExplorerMap v-if="isMap" v-bind:user="user" v-bind:selection="selection" v-bind:subset="subset"/>
       <ExplorerList v-if="!isMap" v-bind:user="user" v-bind:selection="selection" v-bind:subset="subset"/>
     </div>
     <div v-else class="instruction-prompt">
-      <p v-if="isLoading">Fetching results...</p>
+      <div v-if='loading' class='station-list__loader'><p>Loading Results</p><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div></div>
       <p v-else>Please select a state to continue</p>
     </div>
   </div>
@@ -54,7 +54,7 @@
         states: states,
         stations: null,
         selection: null,
-        isLoading: false,
+        loading: false,
         currentView: 'map',
         activeState: null,
         stateDropdownOpen: false,
@@ -101,11 +101,11 @@
       },
 
       filterByState(state) {
-        this.isLoading = true;
+        this.loading = true;
         this.activeState = state.name;
 
         axios.get(`/api/stations/state/${state.fip}`).then(res => {
-          this.isLoading = false;
+          this.loading = false;
           this.subset = res.data;
           this.selection = this.subset;
         });

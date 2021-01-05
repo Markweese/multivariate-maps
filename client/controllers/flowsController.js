@@ -46,7 +46,7 @@
  exports.findUserStations = async (req, res, next) => {
    //if they're not a user, return them
    if(!req.user){
-     req.flash('info', '<a href="/login">LOG IN</a> or <a href="signup">REGISTER</a> to make lists');
+     req.flash('info', '<a href="/login">Log in</a> or <a href="signup">REGISTER</a> to make lists');
      res.redirect('back');
      return;
    }
@@ -56,12 +56,8 @@
      res.redirect('/explorer');
      return;
    }
-   //fetch stations from user model
-   const user = await User.findOne( {_id: req.user._id} );
-   const stations = user.stations;
 
-   req.params.stations = stations;
-   next();
+   res.render('stationList');
  }
 
 //fetch the station data from usgs

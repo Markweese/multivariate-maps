@@ -8,6 +8,7 @@
 				</li>
 			</ul>
 		</div>
+		<div v-if='loading' class='station-list__loader'><p>Loading Stations</p><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div></div>
 		<div v-for='station in selection' class='station-list__item'>
 			<div class='station-list__item-left'>
 				<h2>{{station.name}}</h2>
@@ -44,27 +45,34 @@
 <script>
 
 //import necessary mixins
+import axios from 'axios';
 import { HistoricComparisons, MathUtils } from '../mixins/generalUtils.js';
 
 export default {
 
 	data() {
 		return {
+			loading: false,
 			selection: null,
-			cfsStations: null,
+			cfsStations: [],
       textDropdownResults: null
 		}
 	},
 
 	created: function(){
 		this.fetchData();
-		this.selection = this.cfsStations;
 	},
 
 	methods: {
 		fetchData() {
-			let cfs = document.querySelector('#dataPasser').dataset.stations;
-			this.cfsStations = cfs ? JSON.parse(cfs) : null;
+			this.loading = true;
+			let user = JSON.parse(document.querySelector('#dataPasser').dataset.user);
+
+			axios.get(`/api/stations/user/${user._id}`).then(res => {
+				this.cfsStations = res.data;
+				this.selection = this.cfsStations;
+				this.loading = false;
+			});
 		},
 
 		generateUrl(station, context) {
