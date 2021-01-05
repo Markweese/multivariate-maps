@@ -17,7 +17,11 @@ exports.registerForm = async (req, res) => {
     });
   });
 
-  res.render('signup', { title: 'Sign Up', states, checkusername });
+  if (!req.user) {
+    res.render('signup', { title: 'Sign Up', states, checkusername });
+  } else {
+    res.redirect('/list');
+  }
 };
 
 exports.validateRegister = (req, res, next) => {
