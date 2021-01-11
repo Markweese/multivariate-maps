@@ -6,6 +6,7 @@ import os
 import csv
 import numpy as np
 from io import StringIO
+from bson.objectid import ObjectId
 from datetime import date, datetime
 from collections import defaultdict
 from urllib.request import urlopen, Request
@@ -81,6 +82,7 @@ class station:
         stations = self.utils.get_user_stations()
 
         for station in stations:
+            print('populating: {}'.format(station))
             self.populate_day(station)
             self.utils.update_cfs(station)
 
@@ -88,5 +90,15 @@ class station:
     # get_by_state
     # get and return all stations in a state
     def get_by_state(self, fip):
-        stations = list(self.client[os.environ['MONGO_DB']].stations.find({'state': fip}))
+        # strip instantaneous, historic etc from object before sending back, supposedly will load faster
+        stations = list(self.client[os.environ['MONGO_DB']].stations.find({'state': fip}, {'name': 1, 'stationNumber': 1, 'coordinates': 1, 'cfs': 1}))
+        return stations
+
+    # get_station
+    # get and return station by id
+    def get_stations(self, id):
+        # paginate response by processing ?p= parameter, this should speed up pageload
+        user = list(self.client[os.environ['MONGO_DB']].users.find({'_id': ObjectId(id)}))
+        stations = list(self.client[os.environ['MONGO_DB']].stations.find({'stationNumber': {'$in': user[0]['stations']}}, {'name': 1, 'stationNumber': 1, 'coordinates': 1, 'cfs': 1, 'temp': 1}))
+
         return stations

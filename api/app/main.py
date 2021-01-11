@@ -203,5 +203,19 @@ def get_state(fip):
 
     client.close()
 
+@app.route('/stations/user/<id>', methods=['GET'])
+def get_stations(id):
+    client = MongoClient(connection_string)
+    station = station_module(client)
+
+    try:
+        output = station.get_stations(id)
+        return dumps(output)
+    except Exception as e:
+        logging.error(request.path, exc_info=True)
+        return fail_res
+
+    client.close()
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
