@@ -61,7 +61,7 @@ exports.register = async (req, res) => {
     res.redirect('/');
   } catch(e) {
     if(e.name === 'UserExistsError'){
-      req.flash('error', `${req.body.email} is already in use. Please <a href='/login?user=${req.body.email}'>LOG IN</a> if you already have an account, or <a href='/login?user=${req.body.email}#forgotPassword'>RESET YOUR PASSWORD</a>`);
+      req.flash('error', `${req.body.email} is already in use. Please <a href='/login?user=${req.body.email}'>log in</a> if you already have an account, or <a href='/login?user=${req.body.email}#forgotPassword'>reset your password</a>`);
       res.redirect('back');
       return;
     } else {

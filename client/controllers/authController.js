@@ -33,7 +33,7 @@ exports.isLoggedIn = (req, res, next) => {
     next(); // carry on! They are logged in!
     return;
   }
-  req.flash('error', 'You have to <a href="/login">LOG IN</a> to visit this page');
+  req.flash('error', 'You have to <a href="/login">log in</a> to visit this page');
   res.redirect('/login');
 };
 

@@ -75,6 +75,10 @@ def station_new(id):
 def station_refresh():
     client = MongoClient(connection_string)
     station = station_module(client)
+    authentication = authentication_module(client)
+
+    if authentication.is_super_admin(request) == False:
+        return auth_failure_res
 
     try:
         station.refresh_stations()
@@ -93,6 +97,10 @@ def station_refresh_all():
     station = station_module(client)
     reservoir = reservoir_module(client)
     utils = station_utils(client)
+    authentication = authentication_module(client)
+
+    if authentication.is_super_admin(request) == False:
+        return auth_failure_res
 
     try:
         stations = utils.get_user_stations()
@@ -143,6 +151,10 @@ def snotel_new(id):
 def snotel_refresh():
     client = MongoClient(connection_string)
     snotel = snotel_module(client)
+    authentication = authentication_module(client)
+
+    if authentication.is_super_admin(request) == False:
+        return auth_failure_res
 
     try:
         snotel.refresh_snotel()
@@ -176,6 +188,10 @@ def reservoir_new(id):
 def reservoir_refresh():
     client = MongoClient(connection_string)
     reservoir = reservoir_module(client)
+    authentication = authentication_module(client)
+
+    if authentication.is_super_admin(request) == False:
+        return auth_failure_res
 
     try:
         reservoir.refresh_reservoirs()

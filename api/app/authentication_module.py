@@ -25,3 +25,20 @@ class authentication:
                 return False
         else:
             return False
+
+    # is super admin
+    # authenticate the gcloud cron job
+    # id: takes the user email
+    # token: takes the user token
+    def is_super_admin(self, request):
+        if 'user' in request.headers and 'token' in request.headers:
+            user = request.headers.get('user')
+            reqToken = request.headers.get('token')
+            sessionToken = self.client[os.environ['MONGO_DB']].users.find_one({'email': user}, {'_id': 0, 'sessionToken': 1})
+
+            if reqToken == sessionToken['sessionToken'] and request.headers.get('user') == 'checktheflows@gmail.com':
+                return True
+            else:
+                return False
+        else:
+            return False
