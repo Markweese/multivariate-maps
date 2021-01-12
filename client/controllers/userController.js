@@ -1,6 +1,7 @@
 const states = require('../data/states');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const crypto = require('crypto');
 const promisify = require('es6-promisify');
 const fs = require('fs');
 
@@ -49,12 +50,14 @@ exports.validateRegister = (req, res, next) => {
 };
 
 exports.register = async (req, res) => {
-  const user = new User({ email: req.body.email, name: req.body.name, origin: req.body.origin.toLowerCase()});
+  const sessionToken = crypto.randomBytes(20).toString('hex')
+  const user = new User({ email: req.body.email, name: req.body.name, origin: req.body.origin.toLowerCase(), sessionToken});
   const register = promisify(User.register, User);
 
   try {
     const newUser = await register(user, req.body['new-password']);
     req.login(newUser);
+    req.flash('success', 'You are now registered. <a href="/explorer">Visit the explorer</a> to begin adding stations.');
     res.redirect('/');
   } catch(e) {
     if(e.name === 'UserExistsError'){
