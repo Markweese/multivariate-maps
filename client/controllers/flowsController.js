@@ -46,7 +46,7 @@
  exports.findUserStations = async (req, res, next) => {
    //if they're not a user, return them
    if(!req.user){
-     req.flash('info', '<a href="/login">Log in</a> or <a href="signup">REGISTER</a> to make lists');
+     req.flash('info', '<a href="/login">Log in</a> or <a href="signup">register</a> to make lists');
      res.redirect('back');
      return;
    }
