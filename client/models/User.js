@@ -24,7 +24,11 @@ const userSchema = new Schema({
   stations: [String],
   sessionToken: String,
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+  activity: {
+    type: String,
+    enum: ['float', 'fish', 'other']
+  }
 });
 
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
