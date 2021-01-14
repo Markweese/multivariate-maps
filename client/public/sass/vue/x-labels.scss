@@ -1,0 +1,14 @@
+.x-labels {
+  width: 95%;
+  display: none;
+  margin-left: auto;
+  justify-content: space-between;
+
+  @media #{$break-medium} {
+    display: flex;
+  }
+
+  .x-label {
+    padding-top: pxem(5);
+  }
+}

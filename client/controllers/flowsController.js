@@ -12,7 +12,7 @@
    let snotel = await Snowpack.find({huc: cfs.huc});
    let reservoir = await Reservoir.find({huc: cfs.huc});
 
-   res.render('stationPage', {cfs, snotel, reservoir});
+   res.render('stationPage', {cfs, snotel, reservoir, user: req.user});
  }
 
  exports.checkThenLoad = (req, res) => {

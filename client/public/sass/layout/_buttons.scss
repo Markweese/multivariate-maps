@@ -20,6 +20,11 @@
     background-color: $color-red;
     transition: background-color 300ms;
 
+    &.--narrow {
+        padding: 10px;
+        border-radius: 15px;
+    }
+
     &.--hollow {
       color: $color-red;
       border: 2px solid $color-red;
@@ -66,6 +71,11 @@
     color: $color-white;
     background-color: $color-green;
     transition: background-color 300ms;
+
+    &.--narrow {
+        padding: 10px;
+        border-radius: 15px;
+    }
 
     &.--hollow {
       color: $color-green;

@@ -1,0 +1,77 @@
+.infopane {
+  top: 0;
+  z-index: 200;
+  display: none;
+  max-width: 45%;
+  position: absolute;
+
+  @media #{$break-medium} {
+    display: block;
+  }
+
+  &.--right {
+    right: 0;
+  }
+
+  &.--left {
+    left: 6%;
+  }
+
+  &--wrapper {
+    padding: $pad-lg;
+    border-radius: pxem(3);
+    background-color: $color-white;
+    border: 2px solid $color-blue;
+    background-color: $color-white;
+
+    .date-label {
+      color: $color-gray;
+      margin-bottom: $pad-md;
+
+      &__year {
+        display: inline;
+      }
+    }
+
+    .reading-wrapper {
+      margin-bottom: $pad-md;
+      padding-bottom: $pad-md;
+      border-bottom: 1px solid $color-light-gray;
+
+      .reading {
+        color: $color-blue;
+        margin-bottom: $pad-sm;
+      }
+
+      .average {
+        color: $color-gray;
+      }
+    }
+
+    .overview-wrapper {
+      .overview {
+        margin-bottom: $pad-sm;
+
+        &.--normal {
+          color: $color-blue;
+        }
+
+        &.--negative {
+          color: $color-red;
+        }
+
+        &.--positive {
+          color: $color-green;
+        }
+      }
+    }
+
+    .--ice {
+      color: $color-blue;
+    }
+
+    span {
+      display: block;
+    }
+  }
+}

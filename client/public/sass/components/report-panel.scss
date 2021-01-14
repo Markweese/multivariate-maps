@@ -1,0 +1,22 @@
+.report-panel {
+  padding: $c-pad;
+  margin: $c-space;
+
+  &__header {
+
+    h2 {
+      color: $color-gray;
+    }
+  }
+
+  &__button-wrapper {
+    padding: 10px 0;
+    margin-top: 5px;
+    border-top: 1px solid $color-light-gray;
+
+    button {
+      display: block;
+      margin-left: auto;
+    }
+  }
+}

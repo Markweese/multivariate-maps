@@ -34,6 +34,7 @@ const reportSchema = new Schema({
       enum: ['nymph', 'emerger', 'fly', 'terrestrial', 'streamer']
     },
     size: Number,
+    color: String,
     name: String
   }],
   waterCraft: {
@@ -49,7 +50,7 @@ const reportSchema = new Schema({
   comment: String
 });
 
-stationSchema.index({
+reportSchema.index({
   stationNumber: 'text',
   state: 'text'
 });

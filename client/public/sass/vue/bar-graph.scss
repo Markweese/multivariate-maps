@@ -1,0 +1,111 @@
+.bargraph {
+  padding: pxem(20);
+  background-color: $color-white;
+
+  &__title {
+    color: $color-gray;
+    margin-bottom: pxem(30);
+  }
+
+  &__chart-container {
+    display: flex;
+    position: relative;
+
+    .y-labels {
+      width: 10%;
+    }
+  }
+
+  &__chart {
+    width: 90%;
+    z-index: 100;
+    border: none;
+    display: inline-block;
+
+    @media #{$break-medium} {
+      border-left: 2px solid $color-light-gray;
+      border-bottom: 2px solid $color-light-gray;
+    }
+
+    &--bars {
+
+      .bar {
+        stroke-width: 0;
+
+        &.--dark {
+          fill: $color-main;
+        }
+
+         &.--light {
+          fill: $color-alt;
+         }
+
+         &.--opaque {
+           fill-opacity: .5;
+           fill: $color-alt;
+         }
+      }
+    }
+  }
+
+  &__affordance {
+    display: block;
+    padding: $pad-lg;
+
+    @media #{$break-medium} {
+      display: none;
+    }
+
+    p {
+      text-align: center;
+      font-size: pxem(14);
+    }
+  }
+
+  .x-labels {
+    width: 90%;
+  }
+
+  .touch-rect {
+    fill: #ffffff;
+    fill-opacity: 0;
+  }
+
+  .insufficient-data {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    padding: pxem(60);
+    height: pxem(350);
+    background-color: rgba(75, 140, 250, .25);
+
+    &--image {
+      padding: pxem(30) 0;
+      max-width: pxem(100);
+
+      img {
+        width: 100%;
+      }
+    }
+
+    &--info, h3 {
+      color: $color-gray;
+      text-align: center;
+    }
+  }
+
+  .bar-highlighter {
+    fill: none;
+    fill-opacity: .5;
+
+    @media #{$break-medium} {
+      fill-opacity: 0;
+    }
+  }
+
+  .--active {
+    fill: $color-yellow;
+  }
+}

@@ -27,7 +27,7 @@
     </div>
 
     <Timeseries v-if='activePanel === "usgs"' v-bind:data='usgsData' v-bind:context='"cfs"' units='CFS'/>
-
+    <ReportPanel v-if='activePanel === "usgs"' v-bind:data='usgsData' v-bind:user='user'/>
     <div v-if='activePanel === "snotel"' v-for='item in snotelData'>
       <BarGraph v-if='item.swe.length' v-bind:data='item' v-bind:context='"swe"' units='IN'/>
     </div>
@@ -40,6 +40,7 @@
 // import the base pages for visualization
 import BarGraph from '../components/BarGraph.vue';
 import Timeseries from '../components/Timeseries.vue';
+import ReportPanel from '../components/ReportPanel.vue';
 
 export default {
   data() {
@@ -96,6 +97,7 @@ export default {
       let snotel = dataElement.dataset.snotel;
       let reservoir = dataElement.dataset.reservoir;
 
+      this.user = user ? JSON.parse(user) : null;
 			this.usgsData = usgs ? JSON.parse(usgs) : null;
       this.snotelData = snotel ? JSON.parse(snotel) : null;
       this.reservoirData = reservoir ? JSON.parse(reservoir) : null;
@@ -122,7 +124,8 @@ export default {
 
   components: {
     BarGraph,
-    Timeseries
+    Timeseries,
+    ReportPanel
   }
 }
 </script>
