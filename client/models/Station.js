@@ -21,7 +21,7 @@ const stationSchema = new mongoose.Schema({
   },
   //georeferences the station on Google Map
   coordinates: [{
-  type: Number
+    type: Number
   }],
   //short term array to hold all readings for the current day
   cfsInstantaneous: [{

@@ -8,10 +8,10 @@ const reportSchema = new Schema({
   stationNumber: {
     type: String
   },
-  activity: {
+  activity: [{
     type: String,
     enum: ['float', 'fish', 'other']
-  },
+  }],
   conditions: {
     cfs: Number,
     temp: Number,
@@ -38,12 +38,25 @@ const reportSchema = new Schema({
     name: String
   }],
   waterCraft: {
-    type: String,
-    enum: ['drift', 'raft', 'kayak', 'motorized', 'sup']
+    category: String,
+    predefined: Boolean,
+    make: String,
+    model: String,
+    length: String
   },
+  obstacles: [
+    {
+      obstacle: String,
+      predefined: Boolean,
+      coordinates: [{
+        type: Number
+      }]
+    }
+  ],
   creel: Number,
   fish: [{
     species: String,
+    predefined: Boolean,
     length: Number,
     weight: Number
   }],
