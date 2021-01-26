@@ -9,30 +9,30 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 spec:
   tls:
-    - hosts:
-        - rivercollective.com
-        - www.rivercollective.com
-      secretName: rivercollective-com
+  - hosts:
+      - rivercollective.com
+      - www.rivercollective.com
+    secretName: rivercollective-com
   rules:
-    - host: rivercollective.com
-      http:
-        paths:
-          - path: /?(.*)
-            backend:
-              serviceName: client-cluster-ip-service
-              servicePort: 7777
-          - path: /api/?(.*)
-            backend:
-              serviceName: api-cluster-ip-service
-              servicePort: 5000
+  - host: rivercollective.com
+    http:
+      paths:
+      - path: /?(.*)
+        backend:
+          serviceName: client-cluster-ip-service
+          servicePort: 7777
+      - path: /api/?(.*)
+        backend:
+          serviceName: api-cluster-ip-service
+          servicePort: 5000
     - host: www.rivercollective.com
       http:
         paths:
-          - path: /?(.*)
-            backend:
-              serviceName: client-cluster-ip-service
-              servicePort: 7777
-          - path: /api/?(.*)
-            backend:
-              serviceName: api-cluster-ip-service
-              servicePort: 5000
+        - path: /?(.*)
+          backend:
+            serviceName: client-cluster-ip-service
+            servicePort: 7777
+        - path: /api/?(.*)
+          backend:
+            serviceName: api-cluster-ip-service
+            servicePort: 5000
