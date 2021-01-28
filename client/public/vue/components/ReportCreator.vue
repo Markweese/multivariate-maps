@@ -24,7 +24,6 @@
             <button class="button button-red" v-on:click="removeFish(index)" type="button">x</button>
             <label for="species">Species</label>
             <select name="species" v-on:input="setFishField(index, 'species', $event)">
-              <option value="other">write in species</option>
               <option v-for="s in species" v-bind:value="s.name">{{s.name}}</option>
             </select>
             <label for="length">Length</label>
@@ -68,6 +67,8 @@
         <input v-if="watercraft === 'other'" type="watercraftwritein" name="watercraftwritein" placeholder="write boat type here (EG: kayak, canoe, raft)" v-model="watercraftwritein">
         <label v-if="activity.includes('float')" for="watercraftmake">Boat Make</label>
         <input v-if="activity.includes('float')" type="watercraftmake" name="watercraftmake" placeholder="write boat make here (EG: NRS, Clackacraft, Kokatat)" v-model="watercraftmake">
+        <label v-if="activity.includes('float')" for="watercraftmake">Boat Make</label>
+        <input v-if="activity.includes('float')" type="watercraftmodel" name="watercraftmodel" placeholder="write boat model here" v-model="watercraftmodel">
         <label for="comments">Comments</label>
         <textarea name="comments" rows="8" cols="80" maxlength="255" v-model="comment"></textarea>
         <button class="button button-blue --narrow" type="submit" name="submit" v-on:click="submitReport">Log Your Report</button>
@@ -95,6 +96,7 @@
         watercraft: null,
         watercraftwritein: null,
         watercraftmake: null,
+        watercraftmodel: null,
         activity: [],
         activitywritein: null,
         numCaught: null,
@@ -136,7 +138,9 @@
           fish: this.allFish,
           flys: this.allFlys,
           comment: this.comment,
-          watercraft: this.watercraftwritein ? this.watercraftwritein : this.watercraft
+          watercraft: this.watercraftwritein ? this.watercraftwritein : this.watercraft;
+          watercraftmake,
+          watercraftmodel
         })
       }
     }
