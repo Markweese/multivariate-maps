@@ -77,8 +77,8 @@ def station_refresh():
     station = station_module(client)
     authentication = authentication_module(client)
 
-    # if authentication.is_super_admin(request) == False:
-    #     return auth_failure_res
+    if authentication.is_super_admin(request) == False:
+        return auth_failure_res
 
     try:
         station.refresh_stations()
