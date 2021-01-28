@@ -143,13 +143,10 @@ class station_utils:
                 date_compare = '{}/{}'.format(today.month, today.day)
                 date_object = datetime.strptime(row[2], '%Y-%m-%d %H:%M')
                 date_string = ('{}/{}'.format(date_object.month, date_object.day))
-                time = date_object.strftime('%I:%M')
+                time = date_object.strftime('%I:%M %p')
 
                 if date_string == date_compare:
                     try:
-                        if row[4] == 'Ice':
-                            row[4] = 0
-
                         output.append({
                                         'reading': float(row[4]),
                                         'date': date_string,
@@ -157,7 +154,12 @@ class station_utils:
                                         })
 
                     except Exception as e:
-                        print(e)
+                        output.append({
+                                        'reading': -1,
+                                        'errorCode': row[4],
+                                        'date': date_string,
+                                        'time': time
+                                        })
 
         return output
 
@@ -176,24 +178,38 @@ class station_utils:
                     date_object = datetime.strptime(row[2], '%Y-%m-%d')
                     date = '{}/{}'.format(date_object.month, date_object.day)
                 if row[0] == 'USGS' and not headers['cfs'] == None:
-                    if row[headers['cfs']] == 'Ice':
-                        row[headers['cfs']] = 0
-
                     historic = self.client[os.environ['MONGO_DB']].stations.find_one({'stationNumber': id}, {'_id':0, 'historicDaily':{'$elemMatch':{'day': date}}})
 
-                    output['cfs'].append({
-                                 'reading': row[headers['cfs']],
-                                 'date': date,
-                                  'min': historic['historicDaily'][0]['zero'] ,
-                                  'ten': historic['historicDaily'][0]['ten'] ,
-                                  'twenty': historic['historicDaily'][0]['twenty'] ,
-                                  'thirty': historic['historicDaily'][0]['thirty'] ,
-                                  'fifty': historic['historicDaily'][0]['fifty'] ,
-                                  'seventy': historic['historicDaily'][0]['seventy'] ,
-                                  'eighty': historic['historicDaily'][0]['eighty'] ,
-                                  'ninety': historic['historicDaily'][0]['ninety'] ,
-                                  'max': historic['historicDaily'][0]['hundred']
-                                 })
+                    try:
+                        output['cfs'].append({
+                                     'reading': float(row[headers['cfs']]),
+                                     'errorCode': None,
+                                     'date': date,
+                                      'min': historic['historicDaily'][0]['zero'] ,
+                                      'ten': historic['historicDaily'][0]['ten'] ,
+                                      'twenty': historic['historicDaily'][0]['twenty'] ,
+                                      'thirty': historic['historicDaily'][0]['thirty'] ,
+                                      'fifty': historic['historicDaily'][0]['fifty'] ,
+                                      'seventy': historic['historicDaily'][0]['seventy'] ,
+                                      'eighty': historic['historicDaily'][0]['eighty'] ,
+                                      'ninety': historic['historicDaily'][0]['ninety'] ,
+                                      'max': historic['historicDaily'][0]['hundred']
+                                     })
+                    except:
+                        output['cfs'].append({
+                                     'reading': -1,
+                                     'errorCode': row[headers['cfs']],
+                                     'date': date,
+                                      'min': historic['historicDaily'][0]['zero'] ,
+                                      'ten': historic['historicDaily'][0]['ten'] ,
+                                      'twenty': historic['historicDaily'][0]['twenty'] ,
+                                      'thirty': historic['historicDaily'][0]['thirty'] ,
+                                      'fifty': historic['historicDaily'][0]['fifty'] ,
+                                      'seventy': historic['historicDaily'][0]['seventy'] ,
+                                      'eighty': historic['historicDaily'][0]['eighty'] ,
+                                      'ninety': historic['historicDaily'][0]['ninety'] ,
+                                      'max': historic['historicDaily'][0]['hundred']
+                                     })
                 if row[0] == 'USGS' and not headers['temp'] == None:
                     output['temp'].append({'reading': row[headers['temp']], 'date': date})
                 if row[0] == 'USGS' and not headers['ph'] == None:
@@ -224,11 +240,18 @@ class station_utils:
         if cfs_instantaneous is not None and 'cfsInstantaneous' in cfs_instantaneous:
             if len(cfs_instantaneous['cfsInstantaneous']) > 0:
                 cfs_instantaneous_date = cfs_instantaneous['cfsInstantaneous'][0]['date']
-                cfs_instantaneous_mean = np.mean([item['reading'] for item in cfs_instantaneous['cfsInstantaneous']])
+                cfs_instantaneous_clean = [item['reading'] for item in cfs_instantaneous['cfsInstantaneous'] if isinstance(item['reading'], float)]
                 cfs_object = self.client[os.environ['MONGO_DB']].stations.find_one({'stationNumber':id}, {'_id':0, 'cfs':{'$elemMatch':{'date': cfs_instantaneous_date}}})
 
+                if len(cfs_instantaneous_clean) > 0:
+                    cfs_instantaneous_error_code = None
+                    cfs_instantaneous_mean = np.mean([item['reading'] for item in cfs_instantaneous['cfsInstantaneous'] if isinstance(item['reading'], float)])
+                else:
+                    cfs_instantaneous_mean = -1
+                    cfs_instantaneous_error_code = cfs_instantaneous['cfsInstantaneous'][0]['errorCode']
+
                 if 'cfs' in cfs_object and len(cfs_object['cfs']) > 0:
-                    self.client[os.environ['MONGO_DB']].stations.update_one({'stationNumber':id, 'cfs.date':cfs_instantaneous_date}, {'$set':{'cfs.$.reading':cfs_instantaneous_mean}})
+                    self.client[os.environ['MONGO_DB']].stations.update_one({'stationNumber':id, 'cfs.date':cfs_instantaneous_date}, {'$set':{'cfs.$.reading': cfs_instantaneous_mean, 'cfs.$.errorCode': cfs_instantaneous_error_code}})
                 else:
                     historic = self.client[os.environ['MONGO_DB']].stations.find_one({'stationNumber': id}, {'_id':0, 'historicDaily':{'$elemMatch':{'day': cfs_instantaneous_date}}})
 
@@ -236,6 +259,7 @@ class station_utils:
                         # Add new daily object to cfs
                         self.client[os.environ['MONGO_DB']].stations.update_one({'stationNumber':id}, {'$push': {'cfs':{
                             'reading': cfs_instantaneous_mean,
+                            'errorCode': cfs_instantaneous_error_code,
                             'date': cfs_instantaneous_date,
                             'min': historic['historicDaily'][0]['zero'],
                             'ten': historic['historicDaily'][0]['ten'],

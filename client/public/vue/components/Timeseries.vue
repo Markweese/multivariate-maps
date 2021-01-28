@@ -29,8 +29,10 @@
                   <line v-bind:x1='point.x - circleRadius' v-bind:y1='point.twenty' v-bind:x2='point.x + circleRadius' v-bind:y2='point.twenty' v-bind:stroke-width='svgSetup.axisStroke'></line>
                 </g>
               </g>
-              <circle v-if='point.y' v-bind:class='isActive(point.x).class' v-bind:cx='point.x' v-bind:cy='point.y' v-bind:r='isActive(point.x).radius'/>
-              <rect v-if='point.y == 0' class='--ice' v-bind:x='point.rectX - (pointSpacing/2)' y='0' v-bind:width='pointSpacing * 2' v-bind:height='svgSetup.xMax'></rect>
+              <circle v-if='point.y !== -1' v-bind:class='isActive(point.x).class' v-bind:cx='point.x' v-bind:cy='point.y' v-bind:r='isActive(point.x).radius'/>
+              <circle v-if='point.errorCode === "Ssn"' class='--seasonal' v-bind:cx='point.x' v-bind:cy='point.y' v-bind:r='isActive(point.x).radius'/>
+              <circle v-if='point.errorCode === "Eqt"' class='--equipment' v-bind:cx='point.x' v-bind:cy='point.y' v-bind:r='isActive(point.x).radius'/>
+              <rect v-if='point.errorCode === "Ice"' class='--ice' v-bind:x='point.rectX - (pointSpacing/2)' y='0' v-bind:width='pointSpacing * 2' v-bind:height='svgSetup.xMax'></rect>
               <rect ref='touchArea' v-bind:data-point='JSON.stringify(point)' v-on:mouseover='updateDisplay($event, point)' v-bind:x='point.rectX' y='0' v-bind:width='pointSpacing' v-bind:height='svgSetup.yMax'></rect>
             </g>
           </g>

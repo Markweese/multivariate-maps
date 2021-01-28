@@ -76,6 +76,7 @@ class reservoir:
     # fetch the most recent data for reservoirs
     # id: takes either a usgs or usbr id
     def refresh_reservoirs(self):
+        print('refresh reservoirs: {}'.format(datetime.now()))
         reservoirs = self.utils.get_user_reservoirs()
 
         for reservoir in reservoirs:

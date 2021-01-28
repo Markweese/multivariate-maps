@@ -16,7 +16,11 @@
     }
 
     & .__popup {
-      width: 300px;
+      width: initial;
+
+      @media #{$break-medium} {
+          width: 300px;
+      }
 
       &--view-button {
         margin-bottom: pxem(10);

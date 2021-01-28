@@ -66,6 +66,7 @@ class snotel:
     # refresh_snotel
     # fetch the most recent data for snotel
     def refresh_snotel(self):
+        print('refresh snotel: {}'.format(datetime.now()))
         snowpacks = self.utils.get_user_snowpacks()
 
         for snowpack in snowpacks:

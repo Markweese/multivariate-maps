@@ -6,15 +6,15 @@
       </div>
       <div class="station-list__item-right">
         <div class="stats-summary">
-          <div v-if="station.cfs.length > 0">
+          <div v-if="checkCFS(station.cfs)">
             <a class="button button-blue button-medium" v-bind:href="`/site/${station.stationNumber}`" v-bind:aria-label="`${station.name}`" tabindex="-1">View Page</a>
-            <a class="button button-green button-medium stats-summary__add-button" v-bind:href="`/explorer/${station.stationNumber}`" v-bind:aria-label="`${station.name}`" tabindex="-1">+ Add To List</a>
+            <a v-if="!isTracked(station.stationNumber)" class="button button-green button-medium stats-summary__add-button" v-bind:href="`/explorer/${station.stationNumber}`" v-bind:aria-label="`${station.name}`" tabindex="-1">+ Add To List</a>
           </div>
-          <div v-if="!station.cfs.length && user">
+          <div v-if="!checkCFS(station.cfs) && user">
             <p class="stats-summary__inactive --no-icon"> We're not currently tracking this station. Would you like us to?</p>
             <a v-on:click="trackStation(station)" class="button button-green button-medium" v-bind:aria-label="`Begin tracking ${station.name}`" tabindex="-1">+ Begin Tracking</a>
           </div>
-          <div v-if="!station.cfs.length && !user">
+          <div v-if="!checkCFS(station.cfs) && !user">
             <p class="stats-summary__inactive --no-icon">Our system is not currently tracking this station. Please <a href="/login">log in</a> or <a href="/signup">sign up</a> to request tracking, or visit the <a v-bind:href="`https://waterdata.usgs.gov/nwis/uv?site_no=${station.stationNumber}&agency_cd=USGS`">USGS page</a> for more information</p>
           </div>
         </div>
@@ -60,6 +60,16 @@
             compileMessage.remove();
             this.flashMessages.appendChild(errorMessage);
           });
+      },
+
+      checkCFS(cfs) {
+        let today = new Date;
+        let dateCompare = `${today.getMonth() + 1}/${today.getDate()}`;
+        return cfs.length > 0 && cfs[cfs.length - 1].date === dateCompare;
+      },
+
+      isTracked(station) {
+        return this.user && this.user.stations.includes(station);
       }
     },
 

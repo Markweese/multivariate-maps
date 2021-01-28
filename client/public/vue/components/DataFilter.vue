@@ -1,7 +1,7 @@
 <template>
   <div class='datafilter'>
     <div class='datafilter__left'>
-      <h2 v-if='data[data.length - 1].reading' v-bind:class='historicComparisonClass(data)' v-bind:aria-label='`most recent ${context} reading`'>{{round(data[data.length - 1].reading, 2)}}
+      <h2 v-if='data[data.length - 1].reading >= 0' v-bind:class='historicComparisonClass(data)' v-bind:aria-label='`most recent ${context} reading`'>{{round(data[data.length - 1].reading, 2)}}
         <span aria-label='measurement units' class='stats-summary__unit'>
           {{units}}
         </span>
@@ -9,14 +9,23 @@
           ({{compareHistoric(data)}} <span class='stats-summary__unit'>{{units}}</span>)
         </span>
       </h2>
-      <h2 v-if='context === "cfs" && data[data.length - 1].reading == 0'>
-        Iced
-      </h2>
-      <h2 v-if='!data[data.length - 1].reading && data[data.length - 1].reading !== 0'>
+      <h2 v-if='!data[data.length - 1].reading && data[data.length - 1].reading >= 0'>
         {{getLastReading(data)}}
         <span aria-label='measurement units' class='stats-summary__unit'>
           {{units}}
         </span>
+      </h2>
+      <h2 v-if='data[data.length - 1].errorCode == "Ice"'>
+        Iced
+      </h2>
+      <h2 v-else-if='data[data.length - 1].errorCode == "Ssn"'>
+        Seasonally Inactive
+      </h2>
+      <h2 v-else-if='data[data.length - 1].errorCode == "Eqp"'>
+        Equipment Malfunction
+      </h2>
+      <h2 v-else-if='typeof data[data.length - 1].errorCode == "string"'>
+        Issue with meter
       </h2>
     </div>
     <div class='datafilter__right'>

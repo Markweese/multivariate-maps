@@ -10,6 +10,7 @@ mongoose.connection.on('error', (err) => {
 
 //import all models
 require('./models/User');
+require('./models/Report');
 require('./models/Station');
 require('./models/Snowpack');
 require('./models/Reservoir');

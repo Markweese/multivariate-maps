@@ -11,14 +11,14 @@
       </caption>
       <thead>
         <tr role="row">
-          <th role="columnheader" v-for="key in Object.keys(data[0])">
+          <th role="columnheader" v-for="(key, i) in Object.keys(data[0])" v-if="i !== 1">
             {{key}}
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="row in data" role="row">
-          <td v-for="(cell, i) in Object.keys(row)" role="cell">
+          <td v-for="(cell, i) in Object.keys(row)" role="cell" v-if="i !== 2">
             {{i === 1 ? correctDate(row[cell]) : row[cell]}}
           </td>
         </tr>
