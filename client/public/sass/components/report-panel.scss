@@ -1,12 +1,39 @@
 .report-panel {
   padding: $c-pad;
   margin: $c-space;
+  border-top: 1px solid $color-light-gray;
 
   &__header {
+    padding-top: 15px;
+    margin-bottom: 15px;
 
     h2 {
+      display: block;
       color: $color-gray;
+
+      @media #{$break-medium} {
+        display: inline;
+      }
     }
+
+    button {
+      display: block;
+      margin-left: 0;
+
+      @media #{$break-medium} {
+        display: inline;
+        margin-left: 10px;
+      }
+    }
+  }
+
+  &__list {
+    padding: 15px 0;
+    background-color: $color-light-gray;
+  }
+
+  &__no-reports {
+    text-align: center;
   }
 
   &__button-wrapper {

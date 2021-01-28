@@ -31,7 +31,7 @@
 						<span aria-label='current cfs'>Seasonally Inactive</span>
 					</p>
 					<p v-else-if="station.cfs.length > 0 && typeof station.cfs[(station.cfs.length)-1].errorCode === 'string'">
-						<span aria-label='current cfs'>Meter Issue (<a href="https://help.waterdata.usgs.gov/codes-and-parameters/instantaneous-and-daily-value-status-codes" target="_blank">USGS Code: {{station.cfs[(station.cfs.length)-1].errorCode}}</a>)</span>
+						<span aria-label='current cfs'>Issue with meter</span>
 					</p>
 					<p v-bind:class="historicComparisonClass(station.temp)" v-if="station.temp.length > 2 && station.temp[station.temp.length-1] && !isNaN(station.temp[station.temp.length-1].reading)">
 						 	<span aria-label='current temperature'>{{toFarenheit(station.temp[(station.temp.length)-1].reading)}}</span><span class='stats-summary__unit'>°F</span>

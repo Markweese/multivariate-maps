@@ -11,7 +11,7 @@
         <p v-else-if='point.y <= 0 && point.errorCode === "Ice"' class='--ice'>Iced</p>
         <p v-else-if='point.y <= 0 && point.errorCode === "Eqp"'>Equipment Malfunction</p>
         <p v-else-if='point.y <= 0 && point.errorCode === "Ssn"'>Seasonally Inactive</p>
-        <p v-else-if='point.y <= 0 && typeof point.errorCode === "string"'>Meter Issue (<a href="https://help.waterdata.usgs.gov/codes-and-parameters/instantaneous-and-daily-value-status-codes" target="_blank">{{point.errorCode}}</a>)</p>
+        <p v-else-if='point.y <= 0 && typeof point.errorCode === "string"'>Issue with meter</p>
         <div v-if='point.y > 0 || point.fifty > 0' class='mobile-chart__bars--current' v-bind:style='calcWidth.current'></div>
       </div>
       <div class='mobile-chart__bars--bar'>

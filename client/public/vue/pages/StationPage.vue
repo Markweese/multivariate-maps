@@ -7,7 +7,7 @@
       <p>
         <a :href='googleUrl(usgsData.coordinates)' target='blank' aria-label='view on google map'>{{round(usgsData.coordinates[0], 3)}}, {{round(usgsData.coordinates[1], 3)}}</a>
       </p>
-      <div v-if="checkCFS(usgsData.cfs) && user">
+      <div v-if="!checkCFS(usgsData.cfs) && user">
         <a v-on:click="trackStation(usgsData)" style="color: white; text-decoration: none; margin-top: 10px;" class="button button-green button-medium" v-bind:aria-label="`Begin tracking ${usgsData.name}`">+ Begin Tracking</a>
       </div>
     </div>
@@ -39,7 +39,7 @@
     <!-- <div v-if='activePanel === "reservoir"' v-for='item in reservoirData'>
       <BarGraph v-if='item.storage.length' v-bind:data='item' v-bind:context='"storage"' units='M³'/>
     </div> -->
-    <a  v-on:click="addStation(usgsData)" class="button button-green button-medium station-page__add-station" v-bind:aria-label="`Add ${usgsData.name} to list`">+ Add To List</a>
+    <a v-if="checkCFS(usgsData.cfs) && !isTracked(usgsData.stationNumber)" v-bind:href="`/explorer/${usgsData.stationNumber}`" class="button button-green button-medium --button-shadow station-page__add-station" v-bind:aria-label="`Add ${usgsData.name} to list`">+ Add To List</a>
   </div>
 </template>
 <script>
@@ -159,8 +159,11 @@ export default {
 
     checkCFS(cfs) {
       let today = new Date;
+      let cfsDate = new Date(cfs[cfs.length - 1].date);
+      let cfsClean = `${cfsDate.getMonth() + 1}/${cfsDate.getDate() + 1}`;
       let dateCompare = `${today.getMonth() + 1}/${today.getDate()}`;
-      return cfs.length > 0 && cfs[cfs.length - 1].date === dateCompare;
+
+      return cfs.length > 0 && cfsClean === dateCompare;
     },
   },
 

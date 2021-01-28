@@ -20,6 +20,17 @@
     }
   }
 
+  &__add-station {
+    top: 100px;
+    left: 15px;
+    z-index: 500;
+    position: fixed;
+
+    @media #{$break-medium} {
+      top: 90px;
+    }
+  }
+
   &__filters {
     display: flex;
     justify-content: space-evenly;

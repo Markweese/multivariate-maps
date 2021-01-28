@@ -25,7 +25,7 @@
         Equipment Malfunction
       </h2>
       <h2 v-else-if='typeof data[data.length - 1].errorCode == "string"'>
-        Meter Issue (<a href="https://help.waterdata.usgs.gov/codes-and-parameters/instantaneous-and-daily-value-status-codes" target="_blank">USGS Code: {{data[data.length - 1].errorCode}}</a>)
+        Issue with meter
       </h2>
     </div>
     <div class='datafilter__right'>
