@@ -9,10 +9,15 @@
  exports.loadStationDashboard = async (req,res) => {
    let stationNumber = req.params.station;
    let cfs = await Station.findOne({stationNumber});
-   let snotel = await Snowpack.find({huc: cfs.huc});
-   let reservoir = await Reservoir.find({huc: cfs.huc});
 
-   res.render('stationPage', {cfs, snotel, reservoir, user: req.user});
+   if (cfs) {
+     let snotel = await Snowpack.find({huc: cfs.huc});
+     let reservoir = await Reservoir.find({huc: cfs.huc});
+
+     res.render('stationPage', {cfs, snotel, reservoir, user: req.user});
+   } else {
+     res.render('error');
+   }
  }
 
  exports.checkThenLoad = (req, res) => {

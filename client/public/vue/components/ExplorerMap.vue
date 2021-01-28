@@ -82,11 +82,11 @@
         this.allMarkers.forEach(marker => marker.addListener('click', () => {
           let html;
 
-          if(marker.place.cfs.length > 0) {
+          if(this.checkCFS(marker.place.cfs)) {
             html = `<div class="__popup">
                   <h2> ${marker.place.name} </h2>
                   <a class="button button-blue button-full __popup--view-button" href="/site/${marker.place.stationNumber}">View Page</a>
-                  <a class="button button-green button-full" href="/explorer/${marker.place.stationNumber}" class="button"/>+ Add To List</a>
+                  ${ this.isTracked(marker.place.stationNumber) ? '' : `<a class="button button-green button-full" href="/explorer/${marker.place.stationNumber}" class="button"/>+ Add To List</a>`}
                 </div>`;
           } else if (this.user) {
             html = `<div class="__popup">
@@ -147,6 +147,16 @@
             compileMessage.remove();
             this.flashMessages.appendChild(errorMessage);
           });
+      },
+
+      checkCFS(cfs) {
+        let today = new Date;
+        let dateCompare = `${today.getMonth() + 1}/${today.getDate()}`;
+        return cfs.length > 0 && cfs[cfs.length - 1].date === dateCompare;
+      },
+
+      isTracked(station) {
+        return this.user && this.user.stations.includes(station);
       }
     },
 

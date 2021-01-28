@@ -49,6 +49,7 @@ const SvgUtils = {
           time: point.time,
           month: point.month,
           date,
+          errorCode: point.errorCode,
           year: point.year ? point.year : null
         };
       });

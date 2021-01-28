@@ -4,8 +4,11 @@
       <h3 class='date-label'>
         {{active.time ? active.time : active.month ? parseMonth(active.month) : active.date}}<span class='date-label__year' v-if='active.year'> ({{active.year}})</span>
       </h3>
-      <h3 v-if='active.y === null || active.y === undefined'>Issue with meter</h3>
-      <h3 class='--ice' v-if='active.y == 0 && units == "CFS"'>Iced</h3>
+      <h3 class='--ice' v-if='active.errorCode === "Ice"'>Iced</h3>
+      <h3 v-if='active.y === -1 && active.errorCode === "Ice"'>Iced</h3>
+      <h3 v-else-if='active.y === -1 && active.errorCode === "Eqp"'>Equipment Failure</h3>
+      <h3 v-else-if='active.y === -1 && active.errorCode === "Ssn"'>Seasonally Inactive</h3>
+      <h3 v-else-if='active.y === -1 && typeof active.errorCode === "string"'>Meter Issue (<a href="https://help.waterdata.usgs.gov/codes-and-parameters/instantaneous-and-daily-value-status-codes" target="_blank">{{active.errorCode}}</a>)</h3>
       <div v-if='(active.y && active.y > 0) || (units !== "CFS" && !isNaN(active.y))' class='reading-wrapper'>
         <span class='reading' v-if='overview || units !== "CFS"'>Reading: {{round(active.y, 2)}} {{units}}</span>
         <span class='average' v-if='overview || units !== "CFS"'>Average: {{round(active.fifty, 2)}} {{units}}</span>

@@ -54,9 +54,9 @@ def station_new(id):
         station.populate_month(id)
         station.populate_day(id)
 
-        reservoir.populate_historic(id, True)
-        reservoir.populate_daily(id, True)
-        reservoir.populate_year(id, True)
+        # reservoir.populate_historic(id, True)
+        # reservoir.populate_daily(id, True)
+        # reservoir.populate_year(id, True)
 
         snotel.populate_historic(id, True)
         snotel.populate_daily(id, True)
@@ -77,8 +77,8 @@ def station_refresh():
     station = station_module(client)
     authentication = authentication_module(client)
 
-    if authentication.is_super_admin(request) == False:
-        return auth_failure_res
+    # if authentication.is_super_admin(request) == False:
+    #     return auth_failure_res
 
     try:
         station.refresh_stations()
@@ -105,7 +105,9 @@ def station_refresh_all():
     try:
         stations = utils.get_user_stations()
 
-        for id in stations:
+        for i, id in enumerate(stations):
+            print('build {} of {}'.format(i,len(stations)))
+
             try:
                 station.populate_historic(id)
                 station.populate_month(id)

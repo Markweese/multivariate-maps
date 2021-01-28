@@ -2,7 +2,7 @@
 
   &__header {
     padding: pxem(40);
-    background-color: $color-white;
+    background-color: $color-blue;
     border-bottom: 2px solid $color-blue;
 
     h1, a {
@@ -17,6 +17,16 @@
     a {
       display: block;
       text-decoration: underline;
+    }
+  }
+
+  &__add-station {
+    top: 90px;
+    left: 15px;
+    position: fixed;
+
+    @media #{$break-medium} {
+      top: 79px;
     }
   }
 

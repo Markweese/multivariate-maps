@@ -15,21 +15,18 @@
           <option value="other">Other</option>
         </select>
         <label v-if="activity.includes('other')" for="activitywritein">Activity</label>
-        <input v-if="activity.includes('other')" type="activitywritein" name="activitywritein" placeholder="write activity here..." v-model="activitywritein">
+        <input v-if="activity.includes('other')" type="activitywritein" name="activitywritein" placeholder="write activity here" v-model="activitywritein">
         <label v-if="activity.includes('fish')" for="numcaught">Number of Fish Caught</label>
         <input v-if="activity.includes('fish')" type="number" name="numcaught" min="0" value="0" v-model="numCaught">
         <div v-if="activity.includes('fish')" class="item-editor">
           <button class="button button-green --narrow --hollow" v-on:click="addFish" type="button" name="add fish">+ Add Fish Description</button>
           <div v-for="(fish, index) in allFish" :key="fish.id" class="item-editor__inputs">
             <button class="button button-red" v-on:click="removeFish(index)" type="button">x</button>
-            <div class="item-editor--writein-block">
-              <label for="species">Species</label>
-              <select name="species" v-on:input="setFishField(index, 'species', $event)">
-                <option value="other">write in species</option>
-                <option v-for="s in species" v-bind:value="s.name">{{s.name}}</option>
-              </select>
-              <input v-if="allFish[index].species && allFish[index].species === 'other'" type="text" name="specieswritein" placeholder="write species here..." v-on:input="setFishField(index, 'species', $event)">
-            </div>
+            <label for="species">Species</label>
+            <select name="species" v-on:input="setFishField(index, 'species', $event)">
+              <option value="other">write in species</option>
+              <option v-for="s in species" v-bind:value="s.name">{{s.name}}</option>
+            </select>
             <label for="length">Length</label>
             <input type="number" min="0" name="length" v-on:input="setFishField(index, 'length', $event)">
             <label for="weight">Weight</label>
@@ -68,9 +65,9 @@
           <option value="other">Other</option>
         </select>
         <label v-if="watercraft === 'other'" for="watercraftwritein">Boat Type</label>
-        <input v-if="watercraft === 'other'" type="watercraftwritein" name="watercraftwritein" placeholder="write activity here..." v-model="watercraftwritein">
+        <input v-if="watercraft === 'other'" type="watercraftwritein" name="watercraftwritein" placeholder="write boat type here (EG: kayak, canoe, raft)" v-model="watercraftwritein">
         <label v-if="activity.includes('float')" for="watercraftmake">Boat Make</label>
-        <input v-if="activity.includes('float')" type="watercraftmake" name="watercraftmake" placeholder="write boat make here (EG: NRS, Clackacraft, Kokatat)..." v-model="watercraftmake">
+        <input v-if="activity.includes('float')" type="watercraftmake" name="watercraftmake" placeholder="write boat make here (EG: NRS, Clackacraft, Kokatat)" v-model="watercraftmake">
         <label for="comments">Comments</label>
         <textarea name="comments" rows="8" cols="80" maxlength="255" v-model="comment"></textarea>
         <button class="button button-blue --narrow" type="submit" name="submit" v-on:click="submitReport">Log Your Report</button>

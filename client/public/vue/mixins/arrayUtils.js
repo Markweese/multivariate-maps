@@ -5,7 +5,7 @@ const ArrayUtils = {
       let currentArr = [];
 
       array.forEach((item, i) => {
-        if(item[breakpoint]) {
+        if(item[breakpoint] !== -1) {
           currentArr.push(item);
 
           if (i + 1 === array.length) {

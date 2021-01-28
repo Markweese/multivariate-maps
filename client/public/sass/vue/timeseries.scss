@@ -71,6 +71,14 @@
                   fill: $color-blue;
                 }
               }
+
+              &.--seasonal {
+                fill: $color-green;
+              }
+
+              &.--equipment {
+                fill: $color-red;
+              }
             }
           }
 

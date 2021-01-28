@@ -15,14 +15,23 @@
 			</div>
 			<div class='station-list__item-right'>
 				<div v-if="station.cfs.length >= 2" class='stats-summary'>
-					<p v-bind:class="historicComparisonClass(station.cfs)" v-if="station.cfs.length > 0 && station.cfs[(station.cfs.length)-1].reading">
+					<p v-bind:class="historicComparisonClass(station.cfs)" v-if="station.cfs.length > 0 && station.cfs[(station.cfs.length)-1].reading >= 0">
 						<span aria-label='current cfs'>{{round(station.cfs[(station.cfs.length)-1].reading, 1)}}</span><span class='stats-summary__unit'> CFS</span>
 						<span v-if='compareHistoric(station.cfs)' aria-label='stats-summary__change'>
 							({{compareHistoric(station.cfs)}})
 						</span>
 					</p>
-					<p v-if="station.cfs.length > 0 && station.cfs[(station.cfs.length)-1].reading == 0">
+					<p v-else-if="station.cfs.length > 0 && station.cfs[(station.cfs.length)-1].errorCode === 'Ice'">
 						<span aria-label='current cfs'>Iced</span>
+					</p>
+					<p v-else-if="station.cfs.length > 0 && station.cfs[(station.cfs.length)-1].errorCode === 'Eqp'">
+						<span aria-label='current cfs'>Equipment Malfunction</span>
+					</p>
+					<p v-else-if="station.cfs.length > 0 && station.cfs[(station.cfs.length)-1].errorCode === 'Ssn'">
+						<span aria-label='current cfs'>Seasonally Inactive</span>
+					</p>
+					<p v-else-if="station.cfs.length > 0 && typeof station.cfs[(station.cfs.length)-1].errorCode === 'string'">
+						<span aria-label='current cfs'>Meter Issue (<a href="https://help.waterdata.usgs.gov/codes-and-parameters/instantaneous-and-daily-value-status-codes" target="_blank">USGS Code: {{station.cfs[(station.cfs.length)-1].errorCode}}</a>)</span>
 					</p>
 					<p v-bind:class="historicComparisonClass(station.temp)" v-if="station.temp.length > 2 && station.temp[station.temp.length-1] && !isNaN(station.temp[station.temp.length-1].reading)">
 						 	<span aria-label='current temperature'>{{toFarenheit(station.temp[(station.temp.length)-1].reading)}}</span><span class='stats-summary__unit'>°F</span>

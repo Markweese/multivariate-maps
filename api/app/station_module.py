@@ -75,16 +75,17 @@ class station:
         rdb_parsed = self.utils.parse_day(rdb)
 
         self.client[os.environ['MONGO_DB']].stations.update({'stationNumber': station},{'$set': {'cfsInstantaneous':rdb_parsed}})
+        self.utils.update_cfs(station)
 
     # refresh_stations
     # get most recent reading for all user stations
     def refresh_stations(self):
+        print('refresh stations start: {}'.format(datetime.now()))
         stations = self.utils.get_user_stations()
 
         for station in stations:
             print('populating: {}'.format(station))
             self.populate_day(station)
-            self.utils.update_cfs(station)
 
 ######################## Begin general GET routes for Node app ##########################
     # get_by_state

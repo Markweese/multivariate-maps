@@ -27,7 +27,8 @@ const stationSchema = new mongoose.Schema({
   cfsInstantaneous: [{
     reading: Number,
     date: Date,
-    time: String
+    time: String,
+    errorCode: String
   }],
   //stores usgs cfs reading to make only one call every few hours to USGS
   //transfers server demand to our db
@@ -43,6 +44,7 @@ const stationSchema = new mongoose.Schema({
     ninety: Number,
     max: Number,
     reading: Number,
+    errorCode: String,
     date: Date
   }],
   temp: [{

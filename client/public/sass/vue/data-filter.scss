@@ -103,7 +103,15 @@
       }
     }
 
-    button {
+    h2 {
+      display: none;
+
+      @media #{$break-medium} {
+        display: block;
+      }
+    }
+
+    button, a {
       margin-right: pxem(5);
       display: inline-block;
 
