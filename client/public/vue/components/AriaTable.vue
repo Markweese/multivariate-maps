@@ -27,8 +27,6 @@
   </div>
 </template>
 <script>
-  import { DateUtils } from '../mixins/generalUtils.js';
-
   export default {
     props: [
       'name',
@@ -44,10 +42,6 @@
 
         return date;
       }
-    },
-
-    mixins: [
-      DateUtils
-    ]
+    }
  }
 </script>

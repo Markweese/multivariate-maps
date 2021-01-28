@@ -24,7 +24,6 @@
             <button class="button button-red" v-on:click="removeFish(index)" type="button">x</button>
             <label for="species">Species</label>
             <select name="species" v-on:input="setFishField(index, 'species', $event)">
-              <option value="other">write in species</option>
               <option v-for="s in species" v-bind:value="s.name">{{s.name}}</option>
             </select>
             <label for="length">Length</label>

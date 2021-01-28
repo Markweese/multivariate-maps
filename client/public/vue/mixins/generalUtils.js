@@ -143,20 +143,7 @@ const MathUtils = {
   }
 }
 
-const DateUtils = {
-  methods : {
-    parseMMDD(d) {
-      const re = /(?<=-)[0-9]*/g;
-      let parsedDate = d.match(re);
-      let date = `${parsedDate[0]}/${[parsedDate[1]]}`;
-
-      return date;
-    }
-  }
-}
-
 export {
-  DateUtils,
   MathUtils,
   TouchUtils,
   HistoricComparisons

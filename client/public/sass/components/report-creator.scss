@@ -83,8 +83,12 @@
     font-family: 'Courier New', serif;
   }
 
-  input, textarea, input::placeholder {
+  input, textarea {
     font-family: 'Courier New', serif;
     border: 1px dashed $color-light-gray;
+  }
+
+  input::placeholder {
+    font-family: 'Courier New', serif;
   }
 }

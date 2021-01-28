@@ -1,6 +1,13 @@
 <template>
   <div class='tooltip' v-bind:style='computeOffset'>
-    <p class='tooltip__overview'><span class='tooltip__overview--reading'>{{active.y ? round(active.y, 2) : 'Iced'}}</span><span class='--unit'>{{active.y ? context : ''}}</span></p>
+    <p class='tooltip__overview'>
+      <span class='tooltip__overview--reading' v-if='active.y >= 0'>{{round(active.y, 2)}}</span>
+      <span class='tooltip__overview--reading' v-else-if='active.y < 0 && active.errorCode === "Ice"'>Ice</span>
+      <span class='tooltip__overview--reading' v-else-if='active.y < 0 && active.errorCode === "Ssn"'>Seasonally Inactive</span>
+      <span class='tooltip__overview--reading' v-else-if='active.y < 0 && active.errorCode === "Eqp"'>Equipment Malfunction</span>
+      <span class='tooltip__overview--reading' v-else>Issue with meter</span>
+      <span class='--unit' v-if='active.y >= 0'>{{context}}</span>
+    </p>
     <p v-if='previous' v-bind:class='comparePoint'>{{Math.abs(active.y - previous) > 0 ? Math.abs(round((active.y - previous), 2)) : 'no change'}}</p>
     <p v-if='active.time' class='tooltip__label'>{{active.time}}</p>
   </div>
