@@ -14,8 +14,7 @@ const SvgUtils = {
 
       // if return raw is true, don't return svg points
       return points.map((point, i) => {
-        let parsedDate = point.date ? new Date(point.date) : null;
-        let date = parsedDate ? `${parsedDate.getMonth() + 1}/${parsedDate.getDate() + 1}` : `${point.month}/${point.year}`;
+        let date = point.date;
 
         if(this.dataset === 'cfsInstantaneous') {
           let historic = this.todaysHistoric;

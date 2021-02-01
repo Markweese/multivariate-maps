@@ -159,11 +159,9 @@ export default {
 
     checkCFS(cfs) {
       let today = new Date;
-      let cfsDate = new Date(cfs[cfs.length - 1].date);
-      let cfsClean = `${cfsDate.getMonth() + 1}/${cfsDate.getDate() + 1}`;
       let dateCompare = `${today.getMonth() + 1}/${today.getDate()}`;
 
-      return cfs.length > 0 && cfsClean === dateCompare;
+      return cfs.length > 0 && cfs[cfs.length - 1].date === dateCompare;
     },
   },
 
