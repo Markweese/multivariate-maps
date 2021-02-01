@@ -49,15 +49,15 @@ const stationSchema = new mongoose.Schema({
   }],
   temp: [{
     reading: Number,
-    date: Date
+    date: String
   }],
   conductance: [{
     reading: Number,
-    date: Date
+    date: String
   }],
   ph: [{
     reading: Number,
-    date: Date
+    date: String
   }],
   //historic daily data store
   historicDaily: [{
