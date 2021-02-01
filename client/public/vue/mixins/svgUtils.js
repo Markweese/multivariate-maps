@@ -3,7 +3,6 @@ const SvgUtils = {
     // parsedCurrent holds all of the points to be charted
     parsedCurrent() {
       let points;
-      const re = /(?<=-)[0-9]*/g;
 
       if(this.filterRange){
         points = this.data[this.dataset].slice(this.data[this.dataset].length - this.filterRange, this.data[this.dataset].length);
@@ -15,8 +14,7 @@ const SvgUtils = {
 
       // if return raw is true, don't return svg points
       return points.map((point, i) => {
-        let parsedDate = point.date ? point.date.match(re) : null;
-        let date = parsedDate ? `${parsedDate[0]}/${[parsedDate[1]]}` : `${point.month}/${point.year}`;
+        let date = point.date;
 
         if(this.dataset === 'cfsInstantaneous') {
           let historic = this.todaysHistoric;

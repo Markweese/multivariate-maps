@@ -18,8 +18,8 @@
       </thead>
       <tbody>
         <tr v-for="row in data" role="row">
-          <td v-for="(cell, i) in Object.keys(row)" role="cell" v-if="i !== 2">
-            {{i === 1 ? correctDate(row[cell]) : row[cell]}}
+          <td v-for="(cell, i) in Object.keys(row)" role="cell"  v-if="i !== 1">
+            {{row[cell]}}
           </td>
         </tr>
       </tbody>
@@ -27,27 +27,12 @@
   </div>
 </template>
 <script>
-  import { DateUtils } from '../mixins/generalUtils.js';
-
   export default {
     props: [
       'name',
       'data',
       'context',
       'duration'
-    ],
-
-    methods: {
-      correctDate(date) {
-        date = new Date(date);
-        date.setFullYear(new Date().getFullYear());
-
-        return date;
-      }
-    },
-
-    mixins: [
-      DateUtils
     ]
  }
 </script>

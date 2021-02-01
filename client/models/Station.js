@@ -26,7 +26,7 @@ const stationSchema = new mongoose.Schema({
   //short term array to hold all readings for the current day
   cfsInstantaneous: [{
     reading: Number,
-    date: Date,
+    date: String,
     time: String,
     errorCode: String
   }],
@@ -45,7 +45,7 @@ const stationSchema = new mongoose.Schema({
     max: Number,
     reading: Number,
     errorCode: String,
-    date: Date
+    date: String
   }],
   temp: [{
     reading: Number,
