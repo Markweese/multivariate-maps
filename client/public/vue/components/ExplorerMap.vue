@@ -150,6 +150,7 @@
       },
 
       checkCFS(cfs) {
+        console.log(cfs[cfs.length - 1].date);
         let today = new Date;
         let dateCompare = `${today.getMonth() + 1}/${today.getDate()}`;
         return cfs.length > 0 && cfs[cfs.length - 1].date === dateCompare;
