@@ -71,6 +71,24 @@ exports.register = async (req, res) => {
   }
 };
 
+exports.addUserPhoto = (req, res) => {
+    const fileRecievedFromClient = req.file; //File Object sent in 'photo' field in multipart/form-data
+    console.log(req.file)
+
+    // let form = new FormData();
+    // form.append('photo', fileRecievedFromClient.buffer, fileRecievedFromClient.originalname);
+    // console.log(form)
+    // axios.post('/api/upload-user-photo', form, {
+    //         headers: {
+    //             'Content-Type': `multipart/form-data; boundary=${form._boundary}`
+    //         }
+    //     }).then((responseFromServer2) => {
+    //         res.send("SUCCESS")
+    //     }).catch((err) => {
+    //         res.send("ERROR")
+    //     })
+};
+
 exports.account = async (req, res) => {
   const checkusername = await User.find({}, {'_id':0, 'name':1}).then(names => {
     return names.map(username => {

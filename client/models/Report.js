@@ -53,14 +53,30 @@ const reportSchema = new Schema({
       }]
     }
   ],
-  creel: Number,
+  numCaught: Number,
   fish: [{
     species: String,
     predefined: Boolean,
     length: Number,
     weight: Number
   }],
-  comment: String
+  comment: String,
+  score: Number,
+  views: Number,
+  flags: [
+    {
+      violation: {
+        type: String,
+        enum: ['nudity', 'harassment', 'spam', 'inaccurate']
+      },
+      comment: String
+    }
+  ],
+  images: [
+    {
+      type: String
+    }
+  ]
 });
 
 reportSchema.index({

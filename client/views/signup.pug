@@ -1,8 +1,22 @@
 extends layout
 
 block content
-  form.form(id='signup' action='/signup' method='POST' data-checkusername=checkusername data-jscript='signup')
+  form.form(id='signup' action='/signup' method='POST' data-checkusername=checkusername data-jscript='signup' enctype="multipart/form-data")
     h2 Sign Up
+    <label for="photo">Choose a profile picture:</label>
+    input(type="file" id="photo" name="photo" accept="image/png, image/jpeg")
+    div(class="photo-wrapper --hidden")
+      div(id="photoPreview" aria-label="photo preview" tabindex="1" style="background-image: url('images/photos/user-default.png')")
+        button(class="crop-btn btn-up" aria-label="move up" onclick="cropImage(event, this.parentElement, 'y', -2)")
+          img(src='/images/icons/arrow-up.png')
+        button(class="crop-btn btn-right" aria-label="move right" onclick="cropImage(event, this.parentElement, 'x', 2)")
+          img(src='/images/icons/arrow-right.png')
+        button(class="crop-btn btn-down" aria-label="move down" onclick="cropImage(event, this.parentElement, 'y', 2)")
+          img(src='/images/icons/arrow-down.png')
+        button(class="crop-btn btn-left" aria-label="move left" onclick="cropImage(event, this.parentElement, 'x', -2)")
+          img(src='/images/icons/arrow-left.png')
+    input(name='offsetX' type='number' class='--hidden' value=0)
+    input(name='offsetY' type='number' class='--hidden' value=0)
     label(for='name') Username
     input(type='text' name='name' placeholder='username' required)
     p.inputerr(id='nameErr')
@@ -24,3 +38,23 @@ block content
     input(type='password' name='confirm-password' autocomplete="confirm-password" placeholder='confirm password' required)
     p.inputerr(id='confirmErr')
     button.button.button-blue.button-medium(type='submit') Sign Up
+  script.
+    //globals
+    let cropPositionX = 0;
+    let cropPositionY = 0;
+    
+    function cropImage(event, img, axis, mag){
+      event.preventDefault();
+      
+      if (axis === 'y') {
+        cropPositionY += mag;
+        img.style[`background-position-${axis}`] = `${cropPositionY}px`;
+        document.querySelector('input[name="offsetY"]').value = cropPositionY;
+      }
+      
+      if (axis === 'x') {
+        cropPositionX += mag;
+        img.style[`background-position-${axis}`] = `${cropPositionX}px`;
+        document.querySelector('input[name="offsetX"]').value = cropPositionX;
+      }
+    };

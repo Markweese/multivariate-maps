@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer')();
 const flowsController = require('../controllers/flowsController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
@@ -26,8 +27,8 @@ router.get('/logout', authController.logout);
 
 router.get('/signup', userController.registerForm);
 router.post('/signup',
-  userController.validateRegister,
-  catchErrors(userController.register)
+  multer.single('photo'),
+  userController.addUserPhoto
 );
 
 router.get('/list',

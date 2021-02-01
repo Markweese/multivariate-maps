@@ -25,6 +25,13 @@ const userSchema = new Schema({
   sessionToken: String,
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  photo: {
+    id: String,
+    offsetX: Number,
+    offsetY: Number
+  },
+  reports: [String],
+  images: [String],
   activity: {
     type: String,
     enum: ['float', 'fish', 'other']

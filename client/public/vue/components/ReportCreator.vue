@@ -138,7 +138,7 @@
           fish: this.allFish,
           flys: this.allFlys,
           comment: this.comment,
-          watercraft: this.watercraftwritein ? this.watercraftwritein : this.watercraft;
+          watercraft: this.watercraftwritein ? this.watercraftwritein : this.watercraft,
           watercraftmake,
           watercraftmodel
         })

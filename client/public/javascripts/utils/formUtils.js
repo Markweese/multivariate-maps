@@ -53,6 +53,20 @@ const formUtils = {
     } else {
       document.getElementById('nameErr').innerHTML = '';
     }
+  },
+  showImage: (e, input) => {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        const photoPreview = document.getElementById('photoPreview');
+
+        photoPreview.parentElement.classList.remove('--hidden');
+
+        reader.onload = (e) => {
+            photoPreview.style.backgroundImage = `url(${e.target.result})`;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
   }
 }
 
