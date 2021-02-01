@@ -33,7 +33,7 @@ const reservoirSchema = new mongoose.Schema({
     ninety: Number,
     max: Number,
     reading: Number,
-    date: Date
+    date: String
   }],
   //storage monthly reading holder
   storageMonthly: [{

@@ -38,7 +38,7 @@ const snowpackSchema = new mongoose.Schema({
     max: Number,
     reading: Number,
     density: Number,
-    date: Date
+    date: String
   }],
   //SWE(snow water equivalent) live reading holder
   sweMonthly: [{
@@ -58,7 +58,7 @@ const snowpackSchema = new mongoose.Schema({
   //air temperature live reading holder
   temp: [{
     reading: Number,
-    date: Date
+    date: String
   }],
   //historic daily SWE and air temperature stats(need to decide on how much we want to flatten data)
   historicDaily: [{
