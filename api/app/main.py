@@ -3,6 +3,7 @@ import flask
 import logging
 from flask import request
 from pymongo import MongoClient
+import gridfs
 from bson.json_util import dumps
 from flask import request, render_template
 from snotel_module import snotel as snotel_module
@@ -229,6 +230,30 @@ def get_stations(id):
     try:
         output = station.get_stations(id)
         return dumps(output)
+    except Exception as e:
+        logging.error(request.path, exc_info=True)
+        return fail_res
+
+    client.close()
+
+@app.route('/upload-user-photo', methods=['POST'])
+def upload_user_photo():
+    client = MongoClient(connection_string)
+    fs = gridfs.GridFS(client[os.environ['MONGO_DB']])
+    photo = request.files['photo']
+    authentication = authentication_module(client)
+
+    print(photo)
+    
+    if authentication.authenticate_session(request) == False:
+        return auth_failure_res
+
+    try:
+        write = fs.put(photo)
+        return dict(
+            code=1,
+            id=fs.get(write).read()
+        )
     except Exception as e:
         logging.error(request.path, exc_info=True)
         return fail_res

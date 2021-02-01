@@ -3,7 +3,7 @@ extends layout
 block content
   form.form(id='signup' action='/signup' method='POST' data-checkusername=checkusername data-jscript='signup' enctype="multipart/form-data")
     h2 Sign Up
-    <label for="photo">Choose a profile picture:</label>
+    label(for="photo") Choose a profile picture:
     input(type="file" id="photo" name="photo" accept="image/png, image/jpeg")
     div(class="photo-wrapper --hidden")
       div(id="photoPreview" aria-label="photo preview" tabindex="1" style="background-image: url('images/photos/user-default.png')")

@@ -27,8 +27,9 @@ router.get('/logout', authController.logout);
 
 router.get('/signup', userController.registerForm);
 router.post('/signup',
+  userController.validateRegister,
   multer.single('photo'),
-  userController.addUserPhoto
+  catchErrors(userController.register)
 );
 
 router.get('/list',

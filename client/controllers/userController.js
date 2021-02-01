@@ -1,9 +1,11 @@
 const states = require('../data/states');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const FormData = require('form-data');
 const crypto = require('crypto');
 const promisify = require('es6-promisify');
 const fs = require('fs');
+const axios = require('axios');
 
 exports.loginForm = (req, res) => {
   let prepopulate = req.query.user ? req.query.user : null;
@@ -53,12 +55,27 @@ exports.register = async (req, res) => {
   const sessionToken = crypto.randomBytes(20).toString('hex')
   const user = new User({ email: req.body.email, name: req.body.name, origin: req.body.origin.toLowerCase(), sessionToken});
   const register = promisify(User.register, User);
+  const fileRecievedFromClient = req.file;
+  let form = new FormData();
+  form.append('photo', fileRecievedFromClient.buffer, fileRecievedFromClient.originalname);
 
+  //
   try {
     const newUser = await register(user, req.body['new-password']);
     req.login(newUser);
-    req.flash('success', 'You are now registered. <a href="/explorer">Visit the explorer</a> to begin adding stations.');
-    res.redirect('/');
+
+    axios.post('/api/upload-user-photo', form, {
+            headers: {
+                'user': req.body.email,
+                'token': sessionToken,
+                'Content-Type': `multipart/form-data; boundary=${form._boundary}`
+            }
+        }).catch((err) => {
+            req.flash('error', 'there was an issue uploading your profile picture, please <a href="/account">try again later</a>');
+        }).then(() => {
+            req.flash('success', 'You are now registered. <a href="/explorer">Visit the explorer</a> to begin adding stations.');
+            res.redirect('/');
+        });
   } catch(e) {
     if(e.name === 'UserExistsError'){
       req.flash('error', `${req.body.email} is already in use. Please <a href='/login?user=${req.body.email}'>log in</a> if you already have an account, or <a href='/login?user=${req.body.email}#forgotPassword'>reset your password</a>`);
@@ -69,24 +86,6 @@ exports.register = async (req, res) => {
       res.redirect('back');
     }
   }
-};
-
-exports.addUserPhoto = (req, res) => {
-    const fileRecievedFromClient = req.file; //File Object sent in 'photo' field in multipart/form-data
-    console.log(req.file)
-
-    // let form = new FormData();
-    // form.append('photo', fileRecievedFromClient.buffer, fileRecievedFromClient.originalname);
-    // console.log(form)
-    // axios.post('/api/upload-user-photo', form, {
-    //         headers: {
-    //             'Content-Type': `multipart/form-data; boundary=${form._boundary}`
-    //         }
-    //     }).then((responseFromServer2) => {
-    //         res.send("SUCCESS")
-    //     }).catch((err) => {
-    //         res.send("ERROR")
-    //     })
 };
 
 exports.account = async (req, res) => {
