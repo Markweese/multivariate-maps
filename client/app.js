@@ -53,7 +53,19 @@ app.use(flash());
 
 // pass variables to our templates + all requests
 app.use((req, res, next) => {
+  let avatar;
+
+  if (req.user && req.user.photo && req.user.photo.data && req.user.photo.data.buffer) {
+    avatar = {
+      type: 'base64',
+      string: req.user.photo.data.buffer.toString('base64')
+    };
+  } else {
+    avatar = null;
+  }
+
   res.locals.h = helpers;
+  res.locals.avatar = avatar;
   res.locals.flashes = req.flash();
   res.locals.user = req.user || null;
   res.locals.currentPath = req.path;

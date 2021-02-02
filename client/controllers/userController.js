@@ -6,6 +6,19 @@ const crypto = require('crypto');
 const promisify = require('es6-promisify');
 const fs = require('fs');
 const axios = require('axios');
+const jimp = require('jimp');
+const multer = require('multer');
+const multerOptions = {
+  storage: multer.memoryStorage(),
+  fileFilter(req, file, next){
+    const isPhoto = file.mimetype.startsWith('image/');
+    if(isPhoto) {
+      next(null, true);
+    } else {
+      next({message: 'Invalid file type'});
+    }
+  }
+};
 
 exports.loginForm = (req, res) => {
   let prepopulate = req.query.user ? req.query.user : null;
@@ -32,6 +45,7 @@ exports.validateRegister = (req, res, next) => {
   req.sanitize('email').blacklist('<>\{\}\$:\(\);\'\"\/');
   req.checkBody('name', 'You must supply a name').notEmpty();
   req.checkBody('origin', 'Supply A Home State').notEmpty();
+  req.checkBody('activity', 'Supply An Activity').notEmpty();
   req.checkBody('email', 'That Email is not valid').isEmail();
   req.sanitizeBody('email').normalizeEmail({
     gmail_remove_dots: false,
@@ -43,39 +57,44 @@ exports.validateRegister = (req, res, next) => {
   req.checkBody('confirm-password', 'Looks like your passwords didn\'t match').equals(req.body['new-password']);
 
   const errors = req.validationErrors();
+
   if (errors) {
     req.flash('error', errors.map(err => err.msg));
     res.render('signup', { title: 'Sign Up', states, body: req.body, flashes: req.flash() });
     return;
   }
+
   next();
 };
 
+exports.uploadProfilePhoto = multer(multerOptions).single('photo');
+
+exports.resizeProfilePhoto = async (req, res, next) => {
+  if (!req.file) {
+    next();
+    return;
+  } else {
+    const photo = await jimp.read(req.file.buffer);
+
+    await photo.crop(parseInt(req.body.offsetX), parseInt(req.body.offsetY), 200, 200);
+    await photo.getBuffer(jimp.MIME_PNG, (err, buffer) => {
+      req.file.buffer = buffer;
+    });
+
+    next();
+  }
+};
+
 exports.register = async (req, res) => {
-  const sessionToken = crypto.randomBytes(20).toString('hex')
-  const user = new User({ email: req.body.email, name: req.body.name, origin: req.body.origin.toLowerCase(), sessionToken});
+  const sessionToken = crypto.randomBytes(20).toString('hex');
+  const user = new User({ email: req.body.email, name: req.body.name, origin: req.body.origin.toLowerCase(), sessionToken, activity: req.body.activity});
   const register = promisify(User.register, User);
-  const fileRecievedFromClient = req.file;
-  let form = new FormData();
-  form.append('photo', fileRecievedFromClient.buffer, fileRecievedFromClient.originalname);
 
   //
   try {
     const newUser = await register(user, req.body['new-password']);
     req.login(newUser);
-
-    axios.post('/api/upload-user-photo', form, {
-            headers: {
-                'user': req.body.email,
-                'token': sessionToken,
-                'Content-Type': `multipart/form-data; boundary=${form._boundary}`
-            }
-        }).catch((err) => {
-            req.flash('error', 'there was an issue uploading your profile picture, please <a href="/account">try again later</a>');
-        }).then(() => {
-            req.flash('success', 'You are now registered. <a href="/explorer">Visit the explorer</a> to begin adding stations.');
-            res.redirect('/');
-        });
+    next();
   } catch(e) {
     if(e.name === 'UserExistsError'){
       req.flash('error', `${req.body.email} is already in use. Please <a href='/login?user=${req.body.email}'>log in</a> if you already have an account, or <a href='/login?user=${req.body.email}#forgotPassword'>reset your password</a>`);
@@ -88,13 +107,30 @@ exports.register = async (req, res) => {
   }
 };
 
+exports.postProfilePhoto = async (req, res) => {
+  const updates = {
+    data: req.file.buffer,
+    contentType: req.file.mimetype
+  };
+
+  try {
+    await User.findOneAndUpdate({_id: req.user._id}, {$set: {photo: updates}});
+
+    req.flash('success', 'Image successfully updated');
+    res.redirect('back');
+  } catch(e) {
+    req.flash('error', 'There was an issue uploading your photo');
+    res.redirect('back');
+  }
+};
+
 exports.account = async (req, res) => {
   const checkusername = await User.find({}, {'_id':0, 'name':1}).then(names => {
     return names.map(username => {
       return username.name;
     });
   });
-
+  
   res.render('account', {title: 'Edit your account', states, checkusername});
 }
 exports.updateAccountBasic = async (req, res) => {
@@ -107,6 +143,7 @@ exports.updateAccountBasic = async (req, res) => {
   req.sanitize('name').blacklist('<>\{\}\$:\(\);\'\"\/');
   req.checkBody('name', 'You must supply a name').notEmpty();
   req.checkBody('origin', 'Supply A Home State').notEmpty();
+  req.checkBody('activity', 'Supply An Activity').notEmpty();
 
   const errors = req.validationErrors();
 
@@ -118,7 +155,8 @@ exports.updateAccountBasic = async (req, res) => {
   } else {
     const updates = {
       name: req.body.name,
-      origin: req.body.origin
+      origin: req.body.origin,
+      activity: req.body.activity
     }
 
     // Catch db write errors

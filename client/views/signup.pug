@@ -49,12 +49,12 @@ block content
       if (axis === 'y') {
         cropPositionY += mag;
         img.style[`background-position-${axis}`] = `${cropPositionY}px`;
-        document.querySelector('input[name="offsetY"]').value = cropPositionY;
+        document.querySelector('input[name="offsetY"]').value = cropPositionY * -1;
       }
       
       if (axis === 'x') {
         cropPositionX += mag;
         img.style[`background-position-${axis}`] = `${cropPositionX}px`;
-        document.querySelector('input[name="offsetX"]').value = cropPositionX;
+        document.querySelector('input[name="offsetX"]').value = cropPositionX * -1;
       }
     };

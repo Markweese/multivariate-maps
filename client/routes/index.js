@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer')();
 const flowsController = require('../controllers/flowsController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
@@ -27,9 +26,11 @@ router.get('/logout', authController.logout);
 
 router.get('/signup', userController.registerForm);
 router.post('/signup',
+  userController.uploadProfilePhoto,
+  userController.resizeProfilePhoto,
   userController.validateRegister,
-  multer.single('photo'),
-  catchErrors(userController.register)
+  catchErrors(userController.register),
+  userController.postProfilePhoto
 );
 
 router.get('/list',
@@ -50,6 +51,11 @@ router.post('/account/update-email',
 router.post('/account/update-password',
   authController.confirmPassword,
   catchErrors(authController.updateAccountPassword)
+);
+router.post('/account/update-photo',
+  userController.uploadProfilePhoto,
+  userController.resizeProfilePhoto,
+  catchErrors(userController.postProfilePhoto)
 );
 router.post('/account/forgot',
   catchErrors(authController.forgot)

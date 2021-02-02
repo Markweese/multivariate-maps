@@ -7,8 +7,10 @@ const account = (() => {
   let passwordInput;
   let checkusername = [];
   let passwordStrengthBar;
+  let imageInput;
 
   const init = () => {
+    imageInput = document.getElementById('photo');
     emailInput = document.querySelector('input[name=email]');
     usernameInput = document.querySelector('input[name=name]');
     passwordInput = document.querySelector('input[name=new-password]');
@@ -18,11 +20,14 @@ const account = (() => {
     checkusername = JSON.parse(document.getElementById('account').dataset.checkusername);
 
     checkusername.forEach((name,i) => {
-        checkusername[i] = name.toLowerCase();
+        if (name) {
+          checkusername[i] = name.toLowerCase();
+        }
     });
 
     emailInput.addEventListener('focusin', warnEmailUpdate);
     emailInput.addEventListener('focusout', removeEmailUpdate);
+    imageInput.addEventListener('change', () => {formUtils.showImage(event, imageInput)});
     passwordInput.addEventListener('input', () => {formUtils.verifyPasswordSecurity(event)});
     usernameInput.addEventListener('input', () => {formUtils.verifyUsername(event, checkusername)});
     confirmInput.addEventListener('input', () => {formUtils.verifyPasswordMatch(event, passwordInput)});

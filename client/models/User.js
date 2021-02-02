@@ -26,15 +26,14 @@ const userSchema = new Schema({
   resetPasswordToken: String,
   resetPasswordExpires: Date,
   photo: {
-    id: String,
-    offsetX: Number,
-    offsetY: Number
+    data: Buffer,
+    contentType: String
   },
   reports: [String],
   images: [String],
   activity: {
     type: String,
-    enum: ['float', 'fish', 'other']
+    enum: ['float', 'fish', 'both', 'other']
   }
 });
 

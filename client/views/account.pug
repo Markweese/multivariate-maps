@@ -2,6 +2,22 @@ extends layout
 
 block content
   div(id='account' data-jscript='account' data-checkusername=checkusername)
+    form.form(action='/account/update-photo' method='POST' enctype="multipart/form-data")
+      label(for="photo") Choose a profile picture:
+      input(name='offsetX' type='number' class='--hidden' value=0)
+      input(name='offsetY' type='number' class='--hidden' value=0)
+      input(type="file" id="photo" name="photo" accept="image/png, image/jpeg")
+      div(class="photo-wrapper")
+        div(id="photoPreview" aria-label="photo preview" tabindex="1" style=`background-image: url(${avatar ? 'data:' + user.photo.contentType + ';base64<%=' + avatar.string + ' %>' : 'images/photos/user-default.png'})`)
+          button(class="crop-btn btn-up" aria-label="move up" onclick="cropImage(event, this.parentElement, 'y', -2)")
+            img(src='/images/icons/arrow-up.png')
+          button(class="crop-btn btn-right" aria-label="move right" onclick="cropImage(event, this.parentElement, 'x', 2)")
+            img(src='/images/icons/arrow-right.png')
+          button(class="crop-btn btn-down" aria-label="move down" onclick="cropImage(event, this.parentElement, 'y', 2)")
+            img(src='/images/icons/arrow-down.png')
+          button(class="crop-btn btn-left" aria-label="move left" onclick="cropImage(event, this.parentElement, 'x', -2)")
+            img(src='/images/icons/arrow-left.png')
+      button.button.button-blue.button-medium(type='submit') Update Photo
     form.form(action='/account/update-basic' method='POST')
       h2 Edit your account
       label(for="name") Name
@@ -12,12 +28,19 @@ block content
         option.placeholder #{user.origin}
         for state in states
           option(value=`${state.abbr}`) #{state.name}
+      label(for="origin") Primary Activity
+      select#state-select(type='text' name='activity')
+        option.placeholder #{user.activity}
+        option(value='fish') Fish
+        option(value='float') Float
+        option(value='both') Both
+        option(value='other') Other
       button.button.button-blue.button-medium(type='submit') Update Information
-    //form.form(action='/account/update-email' method='POST')
-    //  label(for='email') Email
-    //  input(type='email' name='email' autocomplete='email' value=user.email required)
-    //  p.inputerr(id='emailErr')
-    //  button.button.button-blue.button-medium(type='submit') Update Email
+    form.form(action='/account/update-email' method='POST')
+      label(for='email') Email
+      input(type='email' name='email' autocomplete='email' value=user.email required)
+      p.inputerr(id='emailErr')
+      button.button.button-blue.button-medium(type='submit') Update Email
     form.form(action='/account/update-password' method='POST')
       label(for='new-password') New Password
       input(type='password' name='new-password' autocomplete="new-password" placeholder='password' required)
@@ -29,3 +52,23 @@ block content
       input(type='password' name='confirm-password' autocomplete="confirm-password" placeholder='confirm password' required)
       p.inputerr(id='confirmErr')
       button.button.button-blue.button-medium(type='submit') Update Password
+  script.
+    //globals
+    let cropPositionX = 0;
+    let cropPositionY = 0;
+    
+    function cropImage(event, img, axis, mag){
+      event.preventDefault();
+      
+      if (axis === 'y') {
+        cropPositionY += mag;
+        img.style[`background-position-${axis}`] = `${cropPositionY}px`;
+        document.querySelector('input[name="offsetY"]').value = cropPositionY * -1;
+      }
+      
+      if (axis === 'x') {
+        cropPositionX += mag;
+        img.style[`background-position-${axis}`] = `${cropPositionX}px`;
+        document.querySelector('input[name="offsetX"]').value = cropPositionX * -1;
+      }
+    };
