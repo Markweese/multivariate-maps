@@ -5,6 +5,7 @@ const mongodbErrorHandler = require('mongoose-mongodb-errors');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const reportSchema = new Schema({
+  isPrivate: Boolean,
   stationNumber: {
     type: String
   },
@@ -26,6 +27,7 @@ const reportSchema = new Schema({
     type: String,
     required: 'an author name must be set'
   },
+  authorId: String,
   state: String,
   created:  Date,
   flys: [{
@@ -47,12 +49,19 @@ const reportSchema = new Schema({
     model: String,
     length: String
   },
-  putIn: [{
-    type: Number
-  }],
-  takeOut: [{
-    type: Number
-  }],
+
+  putIn: {
+    coordinates: [{
+      type: Number
+    }],
+    name: String
+},
+  takeOut: {
+    coordinates: [{
+      type: Number
+    }],
+    name: String
+  },
   obstacles: [
     {
       obstacle: String,
@@ -69,7 +78,7 @@ const reportSchema = new Schema({
     weight: Number,
     writein: String
   }],
-  comment: String,
+  comment: Buffer,
   score: Number,
   views: Number,
   flags: [
@@ -83,7 +92,8 @@ const reportSchema = new Schema({
   ],
   images: [
     {
-      type: String
+      data: Buffer,
+      contentType: String
     }
   ]
 });

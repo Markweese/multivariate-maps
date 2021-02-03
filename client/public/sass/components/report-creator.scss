@@ -20,6 +20,7 @@
 
   &__wrapper {
     padding: 15px;
+    position: relative;
     overflow-y: scroll;
     height: calc(100vh - 110px);
     background-color: $color-white;
@@ -27,11 +28,33 @@
     @media #{$break-medium} {
       height: calc(100vh - 99px);
     }
+
+    .selector-map {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      position:absolute;
+
+      .__google-map {
+        height: 100%;
+      }
+
+      button {
+        left:30px;
+        bottom: 30px;
+        position: absolute;
+      }
+    }
   }
 
   .close-panel {
     display: block;
     margin-left: auto;
+  }
+
+  button[type="submit"] {
+    margin: pxem(10) 0;
   }
 
   .item-editor {
@@ -68,10 +91,6 @@
 
       input {
         max-height: 20px;
-      }
-
-      fieldset {
-        border: none;
       }
     }
   }

@@ -1,12 +1,10 @@
 <template>
   <div v-if="user" class="report-creator">
-    <div class="report-creator__wrapper">
+    <div :class="{'report-creator__wrapper': 1, '--map-open': pointSelectorOpen}">
       <button v-if="user" v-on:click="closeReport" class="button button-red --narrow close-panel">X Scrap Report</button>
       <form action="index.html" method="post">
         <label for="title">Report Title</label>
         <input type="text" name="title" placeholder="title" v-model="title"></input>
-        <label for="author">Author</label>
-        <input type="text" name="author" v-bind:value="user.name" readonly></input>
         <label for="activity">Activity</label>
         <select placeholder="select activity" name="activity" v-model="activity">
           <option class="placeholder">Select An Activity</option>
@@ -71,32 +69,46 @@
             </fieldset>
           </div>
         </div>
-        <label v-if="activity.includes('float')" for="watercraft">Boat Type</label>
-        <select placeholder="select type" v-if="activity.includes('float')" name="watercraft" v-model="watercraft">
-          <option class="placeholder">Select A Type</option>
-          <option value="drift">Drift Boat</option>
-          <option value="raft">Raft</option>
-          <option value="wwkayak">Whitewater Kayak</option>
-          <option value="ifkayak">Inflatable Kayak</option>
-          <option value="genkayak">Kayak</option>
-          <option value="canoe">Canoe</option>
-          <option value="motorized">Motorized Boat</option>
-          <option value="other">Other</option>
-        </select>
-        <label v-if="watercraft === 'other'" for="watercraftwritein">Boat Type Write In</label>
-        <input v-if="watercraft === 'other'" type="watercraftwritein" name="watercraftwritein" placeholder="write boat type here (EG: kayak, canoe, raft)" v-model="watercraftwritein">
-        <label v-if="activity.includes('float')" for="watercraftmake">Boat Make</label>
-        <input v-if="activity.includes('float')" type="watercraftmake" name="watercraftmake" placeholder="write boat make here (EG: NRS, Clackacraft, Kokatat)" v-model="watercraftmake">
-        <label v-if="activity.includes('float')" for="watercraftmodel">Boat Model</label>
-        <input v-if="activity.includes('float')" type="watercraftmodel" name="watercraftmodel" placeholder="write boat model here" v-model="watercraftmodel">
-        <label v-if="activity.includes('float')" for="putIn">Put In</label>
-        <input v-if="activity.includes('float')"  name="putIn" v-model="putIn">
-        <label v-if="activity.includes('float')" for="takeOut">Take Out</label>
-        <input v-if="activity.includes('float')"  name="takeOut" v-model="takeOut">
+        <fieldset v-if="activity.includes('float')">
+          <label for="watercraft">Boat Type</label>
+          <select placeholder="select type" v-if="activity.includes('float')" name="watercraft" v-model="watercraft">
+            <option class="placeholder">Select A Type</option>
+            <option value="drift">Drift Boat</option>
+            <option value="raft">Raft</option>
+            <option value="wwkayak">Whitewater Kayak</option>
+            <option value="ifkayak">Inflatable Kayak</option>
+            <option value="genkayak">Kayak</option>
+            <option value="canoe">Canoe</option>
+            <option value="motorized">Motorized Boat</option>
+            <option value="other">Other</option>
+          </select>
+          <label v-if="watercraft === 'other'" for="watercraftwritein">Boat Type Write In</label>
+          <input v-if="watercraft === 'other'" type="watercraftwritein" name="watercraftwritein" placeholder="write boat type here (EG: kayak, canoe, raft)" v-model="watercraftwritein">
+          <label for="watercraftmake">Boat Make</label>
+          <input type="watercraftmake" name="watercraftmake" placeholder="write boat make here (EG: NRS, Clackacraft, Kokatat)" v-model="watercraftmake">
+          <label for="watercraftmodel">Boat Model</label>
+          <input type="watercraftmodel" name="watercraftmodel" placeholder="write boat model here" v-model="watercraftmodel">
+        </fieldset>
+        <fieldset v-if="activity.includes('float')">
+          <label for="putInName">Put In Name</label>
+          <input  name="putInName" v-model="putInName"></input>
+          <label for="putInLocation">Put In Location</label>
+          <span v-if="putInLocation">{{`${putInLocation.lat}, ${putInLocation.lng}`}}</span><button type="button" class="button button-green --narrow --hollow" v-on:click="openPointSelector('putInLocation', 'Put In')" name="select point on map">{{putInLocation ? 'Change Put In Location' : '+ Add Put In On Map'}}</button>
+          <label for="takeOutName">Take Out Name</label>
+          <input name="takeOutName" v-model="takeOutName"></input>
+          <label for="takeOutLocation">Take Out Location</label>
+          <span v-if="takeOutLocation">{{`${takeOutLocation.lat}, ${takeOutLocation.lng}`}}</span><button type="button" class="button button-green --narrow --hollow" v-on:click="openPointSelector('takeOutLocation', 'Take Out')" name="select point on map">{{takeOutLocation ? 'Change Take Out Location' : '+ Add Take Out On Map'}}</button>
+        </fieldset>
         <label for="comments">Trip Notes</label>
         <textarea name="comments" rows="8" cols="80" maxlength="30000" v-model="comment"></textarea>
-        <button class="button button-blue --narrow" type="submit" name="submit" v-on:click="submitReport">Log Your Report</button>
+        <label for="private">Make Report Private</label>
+        <label class="switch">
+          <input name="private" type="checkbox" v-model="isPrivate">
+          <span class="slider"></span>
+        </label>
+        <button class="button button-blue" type="submit" name="submit" v-on:click="submitReport">Log Your Report</button>
       </form>
+      <PointSelector v-if="pointSelectorOpen" v-on:coordinateOut="logCoordinate" v-bind:coordinates="data.coordinates" v-bind:context="pointSelectorContext"></PointSelector>
     </div>
   </div>
 </template>
@@ -104,6 +116,7 @@
 <script>
   // dependencies
   import species from '../../../data/species';
+  import PointSelector from '../components/PointSelector.vue';
 
   export default {
     props: [
@@ -121,12 +134,17 @@
         watercraftwritein: null,
         watercraftmake: null,
         watercraftmodel: null,
-        putIn: null,
-        takeOut: null,
+        putInName: null,
+        putInLocation: null,
+        takeOutName: null,
+        takeOutLocation: null,
         activity: [],
         activitywritein: null,
         numCaught: null,
-        species: species
+        species: species,
+        isPrivate: false,
+        pointSelectorOpen: false,
+        pointSelectorContext: null
       }
     },
 
@@ -156,6 +174,18 @@
       removeFish(i) {
         this.allFish.splice(i, 1);
       },
+      openPointSelector(context, name) {
+        this.pointSelectorOpen = true;
+        this.pointSelectorContext = {
+            dataset: context,
+            name: name
+          };
+      },
+      logCoordinate(coordinate) {
+        this.pointSelectorOpen = false;
+
+        this[this.pointSelectorContext.dataset] = coordinate;
+      },
       submitReport(event) {
         event.preventDefault();
         console.log({
@@ -170,9 +200,14 @@
           watercraftmake: this.watercraftmake,
           watercraftmodel: this.watercraftmodel,
           putIn: this.putIn,
-          takeOut: this.takeOut
+          takeOut: this.takeOut,
+          isPrivate: this.isPrivate
         })
       }
+    },
+
+    components: {
+      PointSelector
     }
   }
 </script>
