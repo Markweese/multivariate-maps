@@ -8,7 +8,8 @@
         <label for="author">Author</label>
         <input type="text" name="author" v-bind:value="user.name" readonly></input>
         <label for="activity">Activity</label>
-        <select name="activity" v-model="activity">
+        <select placeholder="select activity" name="activity" v-model="activity">
+          <option class="placeholder">Select An Activity</option>
           <option value="fish">Fish</option>
           <option value="float">Float</option>
           <option value="fish,float">Both</option>
@@ -21,39 +22,58 @@
         <div v-if="activity.includes('fish')" class="item-editor">
           <button class="button button-green --narrow --hollow" v-on:click="addFish" type="button" name="add fish">+ Add Fish Description</button>
           <div v-for="(fish, index) in allFish" :key="fish.id" class="item-editor__inputs">
-            <button class="button button-red" v-on:click="removeFish(index)" type="button">x</button>
-            <label for="species">Species</label>
-            <select name="species" v-on:input="setFishField(index, 'species', $event)">
-              <option v-for="s in species" v-bind:value="s.name">{{s.name}}</option>
-            </select>
-            <label for="length">Length</label>
-            <input type="number" min="0" name="length" v-on:input="setFishField(index, 'length', $event)">
-            <label for="weight">Weight</label>
-            <input type="number" min="0" name="weight" v-on:input="setFishField(index, 'weight', $event)">
+            <button class="button button-red --circular" v-on:click="removeFish(index)" type="button">x</button>
+            <span v-if="!fish.opened" class="collapsed-label">
+              Species: {{fish.species}} | Length: {{fish.length}} | Weight: {{fish.weight}}
+            </span>
+            <button class="button button-blue --inline" v-on:click="fish.opened = !fish.opened" type="button" aria-label="expand fish">{{ fish.opened? 'Collapse ˄' : 'Expand ˅'}}</button>
+            <fieldset :class="{'--hidden': !fish.opened}">
+              <label for="species">Species</label>
+              <select placeholder="select species" name="species" v-on:input="setFishField(index, 'species', $event)">
+                <option class="placeholder">Select a species</option>
+                <option v-for="s in species" v-bind:value="s.name">{{s.name}}</option>
+                <option value="other">Other</option>
+              </select>
+              <label v-if="fish.species === 'other'" for="specieswritein">Species Write In</label>
+              <input v-if="fish.species === 'other'" type="text" name="specieswritein" v-on:input="setFishField(index, 'specieswritein', $event)" placeholder="write species here">
+              <label for="length">Length</label>
+              <input type="number" min="0" name="length" v-on:input="setFishField(index, 'length', $event)">
+              <label for="weight">Weight</label>
+              <input type="number" min="0" name="weight" v-on:input="setFishField(index, 'weight', $event)">
+            </fieldset>
           </div>
         </div>
         <div v-if="activity.includes('fish')" class="item-editor">
           <button class="button button-green --narrow --hollow" v-on:click="addFly" type="button" name="add fly">+ Add Fly Description</button>
           <div v-for="(fly, index) in allFlys" :key="fly.id" class="item-editor__inputs">
-            <button class="button button-red" v-on:click="removeFly(index)" type="button">x</button>
-            <label for="method">Type</label>
-            <select type="method" name="method" v-on:input="setFlyField(index, 'method', $event)">
-              <option value="nymph">Nymph</option>
-              <option value="emerger">Emerger</option>
-              <option value="dry">Dry Fly</option>
-              <option value="terrestrial">Terrestrial(hopper, ants, etc)</option>
-              <option value="streamer">Streamer</option>
-            </select>
-            <label for="name">Name</label>
-            <input type="text" name="name" v-on:input="setFlyField(index, 'name', $event)">
-            <label for="color">Color</label>
-            <input type="text" name="color" v-on:input="setFlyField(index, 'color', $event)">
-            <label for="size">Size</label>
-            <input type="number" name="size" v-on:input="setFlyField(index, 'size', $event)">
+            <button class="button button-red --circular" v-on:click="removeFly(index)" type="button">x</button>
+            <span v-if="!fly.opened" class="collapsed-label">
+              Name: {{fly.name}} | color: {{fly.color}} | size: {{fly.size}}
+            </span>
+            <button class="button button-blue --inline" v-on:click="fly.opened = !fly.opened" type="button" aria-label="expand fly">{{ fly.opened? 'Collapse ˄' : 'Expand ˅'}}</button>
+            <fieldset :class="{'--hidden': !fly.opened}">
+              <label for="method">Type</label>
+              <select placeholder="select type" type="method" name="method" v-on:input="setFlyField(index, 'method', $event)">
+                <option class="placeholder">Select A Type</option>
+                <option value="nymph">Nymph</option>
+                <option value="emerger">Emerger</option>
+                <option value="dry">Dry Fly</option>
+                <option value="terrestrial">Terrestrial(hopper, ants, etc)</option>
+                <option value="streamer">Streamer</option>
+                <option value="stimulator">Stimulator</option>
+              </select>
+              <label for="name">Name</label>
+              <input type="text" name="name" v-on:input="setFlyField(index, 'name', $event)">
+              <label for="color">Color</label>
+              <input type="text" name="color" v-on:input="setFlyField(index, 'color', $event)">
+              <label for="size">Size</label>
+              <input type="number" name="size" v-on:input="setFlyField(index, 'size', $event)">
+            </fieldset>
           </div>
         </div>
         <label v-if="activity.includes('float')" for="watercraft">Boat Type</label>
-        <select v-if="activity.includes('float')" name="watercraft" v-model="watercraft">
+        <select placeholder="select type" v-if="activity.includes('float')" name="watercraft" v-model="watercraft">
+          <option class="placeholder">Select A Type</option>
           <option value="drift">Drift Boat</option>
           <option value="raft">Raft</option>
           <option value="wwkayak">Whitewater Kayak</option>
@@ -63,14 +83,18 @@
           <option value="motorized">Motorized Boat</option>
           <option value="other">Other</option>
         </select>
-        <label v-if="watercraft === 'other'" for="watercraftwritein">Boat Type</label>
+        <label v-if="watercraft === 'other'" for="watercraftwritein">Boat Type Write In</label>
         <input v-if="watercraft === 'other'" type="watercraftwritein" name="watercraftwritein" placeholder="write boat type here (EG: kayak, canoe, raft)" v-model="watercraftwritein">
         <label v-if="activity.includes('float')" for="watercraftmake">Boat Make</label>
         <input v-if="activity.includes('float')" type="watercraftmake" name="watercraftmake" placeholder="write boat make here (EG: NRS, Clackacraft, Kokatat)" v-model="watercraftmake">
-        <label v-if="activity.includes('float')" for="watercraftmake">Boat Make</label>
+        <label v-if="activity.includes('float')" for="watercraftmodel">Boat Model</label>
         <input v-if="activity.includes('float')" type="watercraftmodel" name="watercraftmodel" placeholder="write boat model here" v-model="watercraftmodel">
-        <label for="comments">Comments</label>
-        <textarea name="comments" rows="8" cols="80" maxlength="255" v-model="comment"></textarea>
+        <label v-if="activity.includes('float')" for="putIn">Put In</label>
+        <input v-if="activity.includes('float')"  name="putIn" v-model="putIn">
+        <label v-if="activity.includes('float')" for="takeOut">Take Out</label>
+        <input v-if="activity.includes('float')"  name="takeOut" v-model="takeOut">
+        <label for="comments">Trip Notes</label>
+        <textarea name="comments" rows="8" cols="80" maxlength="30000" v-model="comment"></textarea>
         <button class="button button-blue --narrow" type="submit" name="submit" v-on:click="submitReport">Log Your Report</button>
       </form>
     </div>
@@ -97,6 +121,8 @@
         watercraftwritein: null,
         watercraftmake: null,
         watercraftmodel: null,
+        putIn: null,
+        takeOut: null,
         activity: [],
         activitywritein: null,
         numCaught: null,
@@ -110,11 +136,13 @@
       },
       addFly() {
         const id = Math.random().toString(36).substring(7);
-        this.allFlys.push({id, method: null, name: null, size: null, color: null})
+        this.allFlys.forEach(f => f.opened = false);
+        this.allFlys.push({id, method: null, name: null, size: null, color: null, opened: true})
       },
       addFish() {
         const id = Math.random().toString(36).substring(7);
-        this.allFish.push({id, species: null, length: null, weight: null})
+        this.allFish.forEach(f => f.opened = false);
+        this.allFish.push({id, species: null, length: null, weight: null, opened: true})
       },
       setFlyField(i, field, event) {
         this.allFlys[i][field] = event.target.value;
@@ -139,8 +167,10 @@
           flys: this.allFlys,
           comment: this.comment,
           watercraft: this.watercraftwritein ? this.watercraftwritein : this.watercraft,
-          watercraftmake,
-          watercraftmodel
+          watercraftmake: this.watercraftmake,
+          watercraftmodel: this.watercraftmodel,
+          putIn: this.putIn,
+          takeOut: this.takeOut
         })
       }
     }

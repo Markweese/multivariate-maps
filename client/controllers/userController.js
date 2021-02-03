@@ -76,8 +76,8 @@ exports.resizeProfilePhoto = async (req, res, next) => {
   } else {
     const photo = await jimp.read(req.file.buffer);
 
-    await photo.crop(parseInt(req.body.offsetX), parseInt(req.body.offsetY), 200, 200);
-    await photo.getBuffer(jimp.MIME_PNG, (err, buffer) => {
+    await photo.resize(200, jimp.AUTO);
+    await photo.getBuffer(jimp.AUTO, (err, buffer) => {
       req.file.buffer = buffer;
     });
 
@@ -86,8 +86,19 @@ exports.resizeProfilePhoto = async (req, res, next) => {
 };
 
 exports.register = async (req, res) => {
+  let photo;
+
+  if (req.file) {
+    photo = {
+      data: req.file.buffer,
+      contentType: req.file.mimetype,
+      offsetX: req.body.offsetX[0],
+      offsetY: req.body.offsetY[0]
+    };
+  }
+
   const sessionToken = crypto.randomBytes(20).toString('hex');
-  const user = new User({ email: req.body.email, name: req.body.name, origin: req.body.origin.toLowerCase(), sessionToken, activity: req.body.activity});
+  const user = new User({ email: req.body.email, name: req.body.name, origin: req.body.origin.toLowerCase(), sessionToken, activity: req.body.activity, photo});
   const register = promisify(User.register, User);
 
   //
@@ -101,6 +112,7 @@ exports.register = async (req, res) => {
       res.redirect('back');
       return;
     } else {
+      console.log(e);
       req.flash('error', `There was an issue processing your registration`);
       res.redirect('back');
     }
@@ -108,18 +120,30 @@ exports.register = async (req, res) => {
 };
 
 exports.postProfilePhoto = async (req, res) => {
-  const updates = {
-    data: req.file.buffer,
-    contentType: req.file.mimetype
-  };
+  if (req.file && req.file.buffer) {
+    const updates = {
+      data: req.file.buffer,
+      contentType: req.file.mimetype,
+      offsetX: req.body.offsetX,
+      offsetY: req.body.offsetY
+    };
 
-  try {
-    await User.findOneAndUpdate({_id: req.user._id}, {$set: {photo: updates}});
+    try {
+      await User.findOneAndUpdate({_id: req.user._id}, {$set: {photo: updates}});
+
+      req.flash('success', 'Image successfully updated');
+      res.redirect('back');
+    } catch(e) {
+      req.flash('error', 'There was an issue uploading your photo');
+      res.redirect('back');
+    }
+  } else if (req.body.offsetX || req.body.offsetY) {
+    await User.findOneAndUpdate({_id: req.user._id}, {$set: {'photo.offsetX': req.body.offsetX, 'photo.offsetY': req.body.offsetY}});
 
     req.flash('success', 'Image successfully updated');
     res.redirect('back');
-  } catch(e) {
-    req.flash('error', 'There was an issue uploading your photo');
+  } else {
+    req.flash('success', 'Image successfully updated');
     res.redirect('back');
   }
 };
@@ -130,7 +154,11 @@ exports.account = async (req, res) => {
       return username.name;
     });
   });
-  
+
+  if (req.user.photo.data) {
+      req.user.photo.data = req.user.photo.data.toString('base64');
+  }
+
   res.render('account', {title: 'Edit your account', states, checkusername});
 }
 exports.updateAccountBasic = async (req, res) => {

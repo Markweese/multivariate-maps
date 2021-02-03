@@ -57,12 +57,13 @@ const formUtils = {
   showImage: (e, input) => {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
-        const photoPreview = document.getElementById('photoPreview');
-
-        photoPreview.parentElement.classList.remove('--hidden');
+        const photoPreview = document.getElementById('photoImage');
 
         reader.onload = (e) => {
-            photoPreview.style.backgroundImage = `url(${e.target.result})`;
+            photoPreview.style.top = '0px';
+            photoPreview.style.left = '0px';
+            photoPreview.style.width = '150px';
+            photoPreview.src = e.target.result;
         };
 
         reader.readAsDataURL(input.files[0]);

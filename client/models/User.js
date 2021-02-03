@@ -27,7 +27,9 @@ const userSchema = new Schema({
   resetPasswordExpires: Date,
   photo: {
     data: Buffer,
-    contentType: String
+    contentType: String,
+    offsetX: Number,
+    offsetY: Number
   },
   reports: [String],
   images: [String],

@@ -25,6 +25,10 @@
         border-radius: 15px;
     }
 
+    &.--inline {
+      padding: 2px 10px;
+    }
+
     &.--hollow {
       color: $color-red;
       border: 2px solid $color-red;
@@ -61,6 +65,10 @@
       }
     }
 
+    &.--inline {
+      padding: 2px 10px;
+    }
+
     &:hover {
       background-color: darken($color-blue, 10%);
       transition: background-color 300ms;
@@ -75,6 +83,10 @@
     &.--narrow {
         padding: 10px;
         border-radius: 15px;
+    }
+
+    &.--inline {
+      padding: 2px 10px;
     }
 
     &.--hollow {

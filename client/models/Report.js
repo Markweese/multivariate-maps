@@ -10,7 +10,7 @@ const reportSchema = new Schema({
   },
   activity: [{
     type: String,
-    enum: ['float', 'fish', 'other']
+    enum: ['float', 'fish', ' both', 'other']
   }],
   conditions: {
     cfs: Number,
@@ -31,23 +31,32 @@ const reportSchema = new Schema({
   flys: [{
     method: {
       type: String,
-      enum: ['nymph', 'emerger', 'fly', 'terrestrial', 'streamer']
+      enum: ['nymph', 'emerger', 'fly', 'terrestrial', 'streamer', 'stimulator']
     },
     size: Number,
     color: String,
     name: String
   }],
   waterCraft: {
-    category: String,
-    predefined: Boolean,
+    category: {
+      type: String,
+      enum: ['drift', 'raft', 'wwkayak', 'ifkayak', 'genkayak', 'canoe', 'motorized', 'other']
+    },
+    writein: String,
     make: String,
     model: String,
     length: String
   },
+  putIn: [{
+    type: Number
+  }],
+  takeOut: [{
+    type: Number
+  }],
   obstacles: [
     {
       obstacle: String,
-      predefined: Boolean,
+      writein: String,
       coordinates: [{
         type: Number
       }]
@@ -56,9 +65,9 @@ const reportSchema = new Schema({
   numCaught: Number,
   fish: [{
     species: String,
-    predefined: Boolean,
     length: Number,
-    weight: Number
+    weight: Number,
+    writein: String
   }],
   comment: String,
   score: Number,

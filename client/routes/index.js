@@ -29,8 +29,7 @@ router.post('/signup',
   userController.uploadProfilePhoto,
   userController.resizeProfilePhoto,
   userController.validateRegister,
-  catchErrors(userController.register),
-  userController.postProfilePhoto
+  catchErrors(userController.register)
 );
 
 router.get('/list',
