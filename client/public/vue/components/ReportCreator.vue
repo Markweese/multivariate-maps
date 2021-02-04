@@ -154,7 +154,7 @@
         putInLocation: null,
         takeOutName: null,
         takeOutLocation: null,
-        activity: this.user.activity,
+        activity: this.user.activity ? this.user.activity : '',
         activitywritein: null,
         species: species,
         isPrivate: false,
