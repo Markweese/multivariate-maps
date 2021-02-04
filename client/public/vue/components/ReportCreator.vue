@@ -23,10 +23,10 @@
             <div v-for="(fish, index) in allFish" :key="fish.id" class="item-editor__inputs">
               <button class="button button-red --circular" v-on:click="removeFish(index)" type="button">x</button>
               <span v-if="!fish.opened" class="collapsed-label">
-                Species: {{fish.species}}
+                Species: {{fish.species}} | Length: {{fish.length}}
               </span>
               <button class="button button-blue --inline" v-on:click="fish.opened = !fish.opened" type="button" aria-label="edit fish">{{ fish.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
-              <fieldset v-if="fish.opened">
+              <fieldset :class="{'--hidden' : !fish.opened}">
                 <label for="species">Species</label>
                 <select placeholder="select species" name="species" v-on:input="setFishField(index, 'species', $event)">
                   <option class="placeholder">Select a species</option>
@@ -47,10 +47,10 @@
             <div v-for="(fly, index) in allFlys" :key="fly.id" class="item-editor__inputs">
               <button class="button button-red --circular" v-on:click="removeFly(index)" type="button">x</button>
               <span v-if="!fly.opened" class="collapsed-label">
-                Name: {{fly.name}} | color: {{fly.color}} | size: {{fly.size}}
+                Name: {{fly.name}} | Size: {{fly.size}}
               </span>
               <button class="button button-blue --inline" v-on:click="fly.opened = !fly.opened" type="button" aria-label="edit fly">{{ fly.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
-              <fieldset v-if="fly.opened">
+              <fieldset :class="{'--hidden' : !fly.opened}">
                 <label for="method">Type</label>
                 <select placeholder="select type" type="text" name="method" v-on:input="setFlyField(index, 'method', $event)">
                   <option class="placeholder">Select A Type</option>
