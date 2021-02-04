@@ -36,7 +36,17 @@ const userSchema = new Schema({
   activity: {
     type: String,
     enum: ['float', 'fish', 'both', 'other']
-  }
+  },
+  waterCraft: {
+    category: {
+      type: String,
+      enum: ['drift', 'raft', 'wwkayak', 'ifkayak', 'genkayak', 'canoe', 'motorized', 'other']
+    },
+    writein: String,
+    make: String,
+    model: String,
+    length: String
+  },
 });
 
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });

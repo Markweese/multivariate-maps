@@ -7,16 +7,15 @@
         <input type="text" name="title" placeholder="title" v-model="title"></input>
         <label for="activity">Activity</label>
         <select placeholder="select activity" name="activity" v-model="activity">
-          <option class="placeholder">Select An Activity</option>
-          <option :selected="user.activity === 'fish' ? 'selected' : ''" value="fish">Fish</option>
-          <option :selected="user.activity === 'float' ? 'selected' : ''" value="float">Float</option>
-          <option :selected="user.activity === 'both' ? 'selected' : ''" value="fish,float">Both</option>
-          <option :selected="user.activity === 'other' ? 'selected' : ''" value="other">Other</option>
+          <option value="fish">Fish</option>
+          <option value="float">Float</option>
+          <option value="fishfloat">Both</option>
+          <option value="other">Other</option>
         </select>
         <label v-if="activity.includes('other')" for="activitywritein">Activity</label>
         <input v-if="activity.includes('other')" type="text" name="activitywritein" placeholder="write activity here" v-model="activitywritein">
         <div class="section-header" v-if="activity.includes('fish')">
-          <h3>Fishing Info</h3><button @click="showFishInfo = !showFishInfo" class="button button-blue --inline" type="button" aria-label="expand boat info">{{ showFishInfo ? 'Collapse ˄' : 'Expand ˅'}}</button>
+          <h3>Fishing Info</h3><button @click="showFishInfo = !showFishInfo" class="button button-blue --inline" type="button" aria-label="edit boat info">{{ showFishInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('fish') && showFishInfo">
           <div v-if="activity.includes('fish')" class="item-editor">
@@ -26,7 +25,7 @@
               <span v-if="!fish.opened" class="collapsed-label">
                 Species: {{fish.species}}
               </span>
-              <button class="button button-blue --inline" v-on:click="fish.opened = !fish.opened" type="button" aria-label="expand fish">{{ fish.opened? 'Collapse ˄' : 'Expand ˅'}}</button>
+              <button class="button button-blue --inline" v-on:click="fish.opened = !fish.opened" type="button" aria-label="edit fish">{{ fish.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
               <fieldset v-if="fish.opened">
                 <label for="species">Species</label>
                 <select placeholder="select species" name="species" v-on:input="setFishField(index, 'species', $event)">
@@ -50,7 +49,7 @@
               <span v-if="!fly.opened" class="collapsed-label">
                 Name: {{fly.name}} | color: {{fly.color}} | size: {{fly.size}}
               </span>
-              <button class="button button-blue --inline" v-on:click="fly.opened = !fly.opened" type="button" aria-label="expand fly">{{ fly.opened? 'Collapse ˄' : 'Expand ˅'}}</button>
+              <button class="button button-blue --inline" v-on:click="fly.opened = !fly.opened" type="button" aria-label="edit fly">{{ fly.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
               <fieldset v-if="fly.opened">
                 <label for="method">Type</label>
                 <select placeholder="select type" type="text" name="method" v-on:input="setFlyField(index, 'method', $event)">
@@ -73,7 +72,7 @@
           </div>
         </fieldset>
         <div class="section-header" v-if="activity.includes('float')">
-          <h3>Boat Info</h3><button @click="showBoatInfo = !showBoatInfo" class="button button-blue --inline" type="button" aria-label="expand boat info">{{ showBoatInfo ? 'Collapse ˄' : 'Expand ˅'}}</button>
+          <h3>Boat Info</h3><button @click="showBoatInfo = !showBoatInfo" class="button button-blue --inline" type="button" aria-label="edit boat info">{{ showBoatInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('float') && showBoatInfo">
           <label for="watercraft">Boat Type</label>
@@ -96,9 +95,14 @@
           <input type="text" name="watercraftmodel" placeholder="write boat model here" v-model="watercraftmodel">
           <label for="watercraftlength">Boat Length</label>
           <input type="number" name="watercraftlength" placeholder="write boat model here" v-model="watercraftlength">
+          <label for="remember boat">Remember My Boat Info</label>
+          <label class="switch">
+            <input name="remember boat" type="checkbox" v-model="rememberBoat">
+            <span class="slider"></span>
+          </label>
         </fieldset>
         <div class="section-header" v-if="activity.includes('float')">
-          <h3>Launch Info</h3><button @click="showLaunchInfo = !showLaunchInfo" class="button button-blue --inline" type="button" aria-label="expand boat info">{{ showLaunchInfo ? 'Collapse ˄' : 'Expand ˅'}}</button>
+          <h3>Launch Info</h3><button @click="showLaunchInfo = !showLaunchInfo" class="button button-blue --inline" type="button" aria-label="edit boat info">{{ showLaunchInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('float') && showLaunchInfo">
           <label for="putInName">Put In Name</label>
@@ -150,13 +154,14 @@
         putInLocation: null,
         takeOutName: null,
         takeOutLocation: null,
-        activity: [],
+        activity: this.user.activity,
         activitywritein: null,
         species: species,
         isPrivate: false,
-        showFishInfo: true,
-        showBoatInfo: true,
-        showLaunchInfo: true,
+        rememberBoat: false,
+        showFishInfo: false,
+        showBoatInfo: false,
+        showLaunchInfo: false,
         pointSelectorOpen: false,
         pointSelectorContext: null
       }
@@ -205,7 +210,7 @@
         console.log({
           title: this.title,
           author: this.user._id,
-          activity: this.activity.length > 1 ? 'both' : this.activity.length ? this.activity[0] : 'other',
+          activity: this.activity === 'fishfloat' ? 'both' : this.activity,
           activitywritein: this.activitywritein,
           numCaught: this.allFish.length,
           fish: this.allFish,
@@ -220,7 +225,8 @@
           putInLocation: this.putInLocation,
           takeOutName: this.takeOutName,
           takeOutLocation: this.takeOutLocation,
-          isPrivate: this.isPrivate
+          isPrivate: this.isPrivate,
+          rememberBoat: this.rememberBoat
         })
       }
     },

@@ -2,7 +2,10 @@
   <div class="selector-map">
     <div id="selectorMap" class="__google-map">
     </div>
-    <button v-if="pointSelected" @click="$emit('coordinateOut', selectedLatLng)" class="button button-green button-green--large" type="button" name="add point">Add {{context.name}} Point +</button>
+    <div class="selector-map--controls">
+      <button v-if="pointSelected" @click="$emit('coordinateOut', selectedLatLng)" class="button button-green button-green--large" type="button" name="add point">Add {{context.name}} Point +</button>
+      <button @click="$emit('coordinateOut', null)" class="button button-red" type="button" name="close map">Close Map X</button>
+    </div>
   </div>
 </template>
 <script>

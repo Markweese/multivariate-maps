@@ -49,7 +49,6 @@ const reportSchema = new Schema({
     model: String,
     length: String
   },
-
   putIn: {
     coordinates: [{
       type: Number
