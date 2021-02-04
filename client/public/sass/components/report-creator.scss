@@ -29,6 +29,27 @@
       height: calc(100vh - 99px);
     }
 
+    .section-header {
+      margin-top: 30px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid $color-lightest-gray;
+
+      .--inline {
+          margin-left: 0;
+          display: inline !important;
+
+          @media #{$break-medium} {
+            margin-left: 10px;
+          }
+      }
+
+      h3 {
+        display: inline;
+        font-size: 18px;
+        font-family: 'Courier New', serif;
+      }
+    }
+
     .selector-map {
       top: 0;
       left: 0;
@@ -88,10 +109,6 @@
       label {
         margin: 0 5px;
       }
-
-      input {
-        max-height: 20px;
-      }
     }
   }
 
@@ -102,7 +119,7 @@
     }
   }
 
-  button, select {
+  button, select, span {
     font-size: 16px;
     font-family: 'Courier New', serif;
   }
@@ -115,6 +132,11 @@
 
   textarea {
     height: 50vh;
+  }
+
+  fieldset {
+    padding: 10px;
+    border-bottom: 1px solid $color-lightest-gray
   }
 
   input::placeholder {
