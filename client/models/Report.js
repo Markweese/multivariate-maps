@@ -77,7 +77,7 @@ const reportSchema = new Schema({
     weight: Number,
     writein: String
   }],
-  comment: Buffer,
+  comment: String,
   score: Number,
   views: Number,
   flags: [

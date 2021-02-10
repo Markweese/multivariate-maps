@@ -47,7 +47,7 @@
             <div v-for="(fly, index) in allFlys" :key="fly.id" class="item-editor__inputs">
               <button class="button button-red --circular" v-on:click="removeFly(index)" type="button">x</button>
               <span v-if="!fly.opened" class="collapsed-label">
-                Name: {{fly.name}} | Size: {{fly.size}}
+                Name: {{fly.name}} | color: {{fly.color}}
               </span>
               <button class="button button-blue --inline" v-on:click="fly.opened = !fly.opened" type="button" aria-label="edit fly">{{ fly.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
               <fieldset :class="{'--hidden' : !fly.opened}">
@@ -143,6 +143,7 @@
       return {
         allFish: [],
         allFlys: [],
+        allObstacles: [],
         title: null,
         comment: null,
         watercraft: null,
