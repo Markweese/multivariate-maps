@@ -19,7 +19,7 @@
         </div>
         <fieldset v-if="activity.includes('fish') && showFishInfo">
           <div v-if="activity.includes('fish')" class="item-editor">
-            <button class="button button-green --narrow --hollow" v-on:click="addFish" type="button" name="add fish">+ Add Fish Description</button>
+            <button class="button button-green --narrow" v-on:click="addFish" type="button" name="add fish">+ Add Fish Description</button>
             <div v-for="(fish, index) in allFish" :key="fish.id" class="item-editor__inputs">
               <button class="button button-red --circular" v-on:click="removeFish(index)" type="button">x</button>
               <span v-if="!fish.opened" class="collapsed-label">
@@ -43,7 +43,7 @@
             </div>
           </div>
           <div v-if="activity.includes('fish')" class="item-editor">
-            <button class="button button-green --narrow --hollow" v-on:click="addFly" type="button" name="add fly">+ Add Fly Description</button>
+            <button class="button button-green --narrow" v-on:click="addFly" type="button" name="add fly">+ Add Fly Description</button>
             <div v-for="(fly, index) in allFlys" :key="fly.id" class="item-editor__inputs">
               <button class="button button-red --circular" v-on:click="removeFly(index)" type="button">x</button>
               <span v-if="!fly.opened" class="collapsed-label">
@@ -102,17 +102,56 @@
           </label>
         </fieldset>
         <div class="section-header" v-if="activity.includes('float')">
-          <h3>Launch Info</h3><button @click="showLaunchInfo = !showLaunchInfo" class="button button-blue --inline" type="button" aria-label="edit boat info">{{ showLaunchInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
+          <h3>Launch Info</h3><button @click="showLaunchInfo = !showLaunchInfo" class="button button-blue --inline" type="button" aria-label="edit launch info">{{ showLaunchInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('float') && showLaunchInfo">
           <label for="putInName">Put In Name</label>
           <input  name="putInName" v-model="putInName"></input>
           <label for="putInLocation">Put In Location</label>
-          <span v-if="putInLocation">{{`${putInLocation.lat}, ${putInLocation.lng}`}}</span><button type="button" class="button button-green --narrow --hollow" v-on:click="openPointSelector('putInLocation', 'Put In')" name="select point on map">{{putInLocation ? 'Change Put In Location' : '+ Add Put In On Map'}}</button>
+          <span v-if="putInLocation">{{`${putInLocation.lat}, ${putInLocation.lng}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('putInLocation', 'Put In')" name="select point on map">{{putInLocation ? 'Change Put In Location' : '+ Add Put In On Map'}}</button>
           <label for="takeOutName">Take Out Name</label>
           <input name="takeOutName" v-model="takeOutName"></input>
           <label for="takeOutLocation">Take Out Location</label>
-          <span v-if="takeOutLocation">{{`${takeOutLocation.lat}, ${takeOutLocation.lng}`}}</span><button type="button" class="button button-green --narrow --hollow" v-on:click="openPointSelector('takeOutLocation', 'Take Out')" name="select point on map">{{takeOutLocation ? 'Change Take Out Location' : '+ Add Take Out On Map'}}</button>
+          <span v-if="takeOutLocation">{{`${takeOutLocation.lat}, ${takeOutLocation.lng}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('takeOutLocation', 'Take Out')" name="select point on map">{{takeOutLocation ? 'Change Take Out Location' : '+ Add Take Out On Map'}}</button>
+        </fieldset>
+        <div class="section-header" v-if="activity.includes('float')">
+          <h3>Rapid & Obstacle Info</h3><button @click="showObstacleInfo = !showObstacleInfo" class="button button-blue --inline" type="button" aria-label="edit obstacle info">{{ showObstacleInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
+        </div>
+        <fieldset v-if="activity.includes('float') && showObstacleInfo" class="item-editor">
+          <button class="button button-green --narrow" v-on:click="addObstacle" type="button" name="add obstacle">+ Add Obstacle Description</button>
+          <div v-for="(obstacle, index) in allObstacles" :key="obstacle.id" class="item-editor__inputs">
+            <button class="button button-red --circular" v-on:click="removeObstacle(index)" type="button">x</button>
+            <span v-if="!obstacle.opened" class="collapsed-label">
+              Name: {{obstacle.name}}
+            </span>
+            <button class="button button-blue --inline" v-on:click="obstacle.opened = !obstacle.opened" type="button" aria-label="edit obstacle">{{ obstacle.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
+            <fieldset :class="{'--hidden' : !obstacle.opened}">
+              <label for="name">Name</label>
+              <input placeholder="optional" type="text" name="name" v-on:input="setObstacleField(index, 'name', $event)">
+              <label for="type">Type</label>
+              <select placeholder="select obstacle type" type="text" name="type" v-on:input="setObstacleField(index, 'type', $event)">
+                <option class="placeholder">Select a type</option>
+                <option value="rapid">Rapid</option>
+                <option value="strainersweeper">Strainer/Sweeper</option>
+                <option value="rockboulder">Rocks/Boulders</option>
+                <option value="spillway">Dam/Spillway</option>
+                <option value="wingdam">Wing Dam</option>
+                <option value="manmadeobstruction">Manmade Obstruction</option>
+                <option value="other">Other</option>
+              </select>
+              <label v-if="obstacle.type === 'other'" for="obstaclewritein">Obstacle Write In</label>
+              <input v-if="obstacle.type === 'other'" type="text" name="obstaclewritein" v-on:input="setObstacleField(index, 'obstaclewritein', $event)" placeholder="write obstacle type here">
+              <label for="name">Description</label>
+              <textarea placeholder="describe the obstacle here" type="text" name="name" v-on:input="setObstacleField(index, 'description', $event)"></textarea>
+              <label for="obstacle location">Obstacle Location</label>
+              <span v-if="obstacle.location" class="lat-lng">{{`${obstacle.location.lat}, ${obstacle.location.lng}`}}</span><button type="button" class="button button-green --inline" v-on:click="openPointSelector('allObstacles', 'Obstacle', {index, field: 'location'})" name="select obstacle on map">{{obstacle.location ? 'Change Obstacle Location' : '+ Add Obstacle On Map'}}</button>
+              <label for="incident occurred">Incident Occurred (flipped, pinned, or person thrown overboard)</label>
+              <label class="switch">
+                <input v-on:input="setObstacleField(index, 'incidentOccurred', $event)" name="incident occurred" type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </fieldset>
+          </div>
         </fieldset>
         <label for="comments">Trip Notes</label>
         <textarea name="comments" rows="8" cols="80" maxlength="30000" v-model="comment"></textarea>
@@ -163,6 +202,7 @@
         showFishInfo: false,
         showBoatInfo: false,
         showLaunchInfo: false,
+        showObstacleInfo: false,
         pointSelectorOpen: false,
         pointSelectorContext: null
       }
@@ -182,11 +222,23 @@
         this.allFish.forEach(f => f.opened = false);
         this.allFish.push({id, species: null, specieswritein: null, length: null, weight: null, opened: true})
       },
+      addObstacle() {
+        const id = Math.random().toString(36).substring(7);
+        this.allObstacles.forEach(o => o.opened = false);
+        this.allObstacles.push({id, type: null, obstaclewritein: null, description: null, incidentOccurred: false, opened: true})
+      },
       setFlyField(i, field, event) {
         this.allFlys[i][field] = event.target.value;
       },
       setFishField(i, field, event) {
         this.allFish[i][field] = event.target.value;
+      },
+      setObstacleField(i, field, event) {
+        if (event.target.type === 'checkbox') {
+          this.allObstacles[i][field] = event.target.checked;
+        } else {
+            this.allObstacles[i][field] = event.target.value;
+        }
       },
       removeFly(i) {
         this.allFlys.splice(i, 1);
@@ -194,17 +246,25 @@
       removeFish(i) {
         this.allFish.splice(i, 1);
       },
-      openPointSelector(context, name) {
+      removeObstacle(i) {
+        this.allObstacles.splice(i, 1);
+      },
+      openPointSelector(context, name, deepWrite) {
         this.pointSelectorOpen = true;
         this.pointSelectorContext = {
             dataset: context,
-            name: name
+            name: name,
+            deepWrite: deepWrite ? deepWrite : null
           };
       },
       logCoordinate(coordinate) {
         this.pointSelectorOpen = false;
 
-        this[this.pointSelectorContext.dataset] = coordinate;
+        if (this.pointSelectorContext.deepWrite) {
+          this[this.pointSelectorContext.dataset][this.pointSelectorContext.deepWrite.index][this.pointSelectorContext.deepWrite.field] = coordinate;
+        } else {
+          this[this.pointSelectorContext.dataset] = coordinate;
+        }
       },
       submitReport(event) {
         event.preventDefault();
@@ -224,6 +284,7 @@
           watercraftlength: this.watercraftlength,
           putInName: this.putInName,
           putInLocation: this.putInLocation,
+          obstacles: this.allObstacles,
           takeOutName: this.takeOutName,
           takeOutLocation: this.takeOutLocation,
           isPrivate: this.isPrivate,

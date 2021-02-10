@@ -104,6 +104,11 @@
           font-family: 'Courier New', serif;
       }
 
+      .lat-lng {
+        display: block;
+        margin-bottom: 10px;
+      }
+
       button {
         margin-top: 0px;
         display: inline !important;
@@ -152,6 +157,7 @@
 
   fieldset {
     padding: 10px;
+    background-color: $color-lightest-gray;
     border-bottom: 1px solid $color-lightest-gray
   }
 

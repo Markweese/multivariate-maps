@@ -63,8 +63,10 @@ const reportSchema = new Schema({
   },
   obstacles: [
     {
+      name: String,
       obstacle: String,
       writein: String,
+      description: String,
       coordinates: [{
         type: Number
       }]

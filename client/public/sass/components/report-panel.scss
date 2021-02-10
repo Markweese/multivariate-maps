@@ -10,17 +10,21 @@
     h2 {
       display: block;
       color: $color-gray;
+      margin-bottom: 10px;
 
       @media #{$break-medium} {
         display: inline;
+        margin-bottom: 0;
       }
     }
 
     button {
+      width: 100%;
       display: block;
       margin-left: 0;
 
       @media #{$break-medium} {
+        width: initial;
         display: inline;
         margin-left: 10px;
       }
