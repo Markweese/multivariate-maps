@@ -3,6 +3,7 @@ const router = express.Router();
 const flowsController = require('../controllers/flowsController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const reportController = require('../controllers/reportController');
 const { catchErrors } = require('../handlers/errorHandlers');
 
 // Do work here
@@ -14,6 +15,10 @@ router.get('/explorer/new/:id', flowsController.pushValue);
 
 //station dashboard pages
 router.get('/site/:station', flowsController.loadStationDashboard);
+router.post('/site/:station/report',
+  reportController.validateReport,
+  catchErrors(reportController.postReport)
+);
 
 router.post('/login',
   authController.login,

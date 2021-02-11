@@ -2,11 +2,20 @@
   <div v-if="user" class="report-creator">
     <div :class="{'report-creator__wrapper': 1, '--map-open': pointSelectorOpen}">
       <button v-if="user" v-on:click="closeReport" class="button button-red --narrow close-panel">X Scrap Report</button>
-      <form action="index.html" method="post">
+      <form v-bind:action="`/site/${data.stationNumber}/report`" method="post">
         <label for="title">Report Title</label>
         <input type="text" name="title" placeholder="title" v-model="title"></input>
+        <label for="date">Start Date</label>
+        <input type="date" name="date" placeholder="date" v-model="date" v-bind:min="`${new Date().getFullYear()}-${data.cfs[0].date.split('/')[0].toString().length < 2 ? '0' + data.cfs[0].date.split('/')[0] : data.cfs[0].date.split('/')[0]}-${data.cfs[0].date.split('/')[1].toString().length < 2 ? '0' + data.cfs[0].date.split('/')[1] : data.cfs[0].date.split('/')[1]}`" v-bind:max="new Date().toISOString().split('T')[0]"></input>
+        <label for="multiday">Multiday Trip</label>
+        <label class="switch">
+          <input name="multiday" type="checkbox" v-model="multiday">
+          <span class="slider"></span>
+        </label>
+        <label v-if="multiday" for="endDate">End Date</label>
+        <input v-if="multiday" type="date" name="endDate" placeholder="date" v-model="endDate" v-bind:min="date" v-bind:max="new Date().toISOString().split('T')[0]"></input>
         <label for="activity">Activity</label>
-        <select placeholder="select activity" name="activity" v-model="activity">
+        <select required placeholder="select activity" name="activity" v-model="activity">
           <option value="fish">Fish</option>
           <option value="float">Float</option>
           <option value="fishfloat">Both</option>
@@ -169,6 +178,7 @@
 
 <script>
   // dependencies
+  import axios from 'axios';
   import species from '../../../data/species';
   import PointSelector from '../components/PointSelector.vue';
 
@@ -185,6 +195,10 @@
         allObstacles: [],
         title: null,
         comment: null,
+        date: null,
+        multiday: false,
+        startDate: this.date,
+        endDate: null,
         watercraft: null,
         watercraftwritein: null,
         watercraftlength: null,
@@ -205,6 +219,53 @@
         showObstacleInfo: false,
         pointSelectorOpen: false,
         pointSelectorContext: null
+      }
+    },
+
+    computed: {
+      registeredPH() {
+        if (this.date && this.data.ph && this.data.ph.length) {
+          const startDate = new Date(this.date);
+          const day = startDate.getDay() + 1;
+          const month = startDate.getMonth() + 1;
+
+          return this.data.ph.filter(ph => {ph.date === `${month}/${day}`})[0].reading;
+        } else {
+          return null;
+        }
+      },
+      registeredCFS() {
+        if (this.date && this.data.cfs && this.data.cfs.length) {
+          const startDate = new Date(this.date);
+          const day = startDate.getDate() + 1;
+          const month = startDate.getMonth() + 1;
+
+          return this.data.cfs.filter(cfs => cfs.date === `${month}/${day}`)[0].reading;
+        } else {
+          return null;
+        }
+      },
+      registeredTemp() {
+        if (this.date && this.data.temp && this.data.temp.length) {
+          const startDate = new Date(this.date);
+          const day = startDate.getDay() + 1;
+          const month = startDate.getMonth() + 1;
+
+          return this.data.temp.filter(temp => {temp.date === `${month}/${day}`})[0].reading;
+        } else {
+          return null;
+        }
+      },
+      registeredConductance() {
+        if (this.date && this.data.conductance && this.data.conductance.length) {
+          const startDate = new Date(this.date);
+          const day = startDate.getDay() + 1;
+          const month = startDate.getMonth() + 1;
+
+          return this.data.conductance.filter(conductance => {conductance.date === `${month}/${day}`})[0].reading;
+        } else {
+          return null;
+        }
       }
     },
 
@@ -268,28 +329,52 @@
       },
       submitReport(event) {
         event.preventDefault();
-        console.log({
-          title: this.title,
-          author: this.user._id,
-          activity: this.activity === 'fishfloat' ? 'both' : this.activity,
-          activitywritein: this.activitywritein,
-          numCaught: this.allFish.length,
-          fish: this.allFish,
-          flys: this.allFlys,
-          comment: this.comment,
-          watercraft: this.watercraft,
-          watercraftwritein: this.watercraftwritein,
-          watercraftmake: this.watercraftmake,
-          watercraftmodel: this.watercraftmodel,
-          watercraftlength: this.watercraftlength,
-          putInName: this.putInName,
-          putInLocation: this.putInLocation,
-          obstacles: this.allObstacles,
-          takeOutName: this.takeOutName,
-          takeOutLocation: this.takeOutLocation,
-          isPrivate: this.isPrivate,
-          rememberBoat: this.rememberBoat
+
+        axios({
+          method: 'post',
+          url: `/site/${this.data.stationNumber}/report`,
+          data: {
+            stationNumber: this.data.stationNumber,
+            title: this.title,
+            startDate: this.date,
+            endDate: this.endDate,
+            conditions: {
+              cfs: this.registeredCFS,
+              temp: this.registeredTemp,
+              ph: this.registeredPH,
+              conductance: this.registeredConductance
+            },
+            author: this.user.name,
+            authorId: this.user._id,
+            state: this.data.state,
+            created: new Date().toJSON().slice(0,10).replace(/-/g,'/'),
+            activity: this.activity === 'fishfloat' ? 'both' : this.activity,
+            activitywritein: this.activitywritein,
+            numCaught: this.allFish.length,
+            fish: this.allFish,
+            flys: this.allFlys,
+            comment: this.comment,
+            watercraft: this.watercraft,
+            watercraftwritein: this.watercraftwritein,
+            watercraftmake: this.watercraftmake,
+            watercraftmodel: this.watercraftmodel,
+            watercraftlength: this.watercraftlength,
+            putInName: this.putInName,
+            putInLocation: this.putInLocation,
+            obstacles: this.allObstacles,
+            takeOutName: this.takeOutName,
+            takeOutLocation: this.takeOutLocation,
+            isPrivate: this.isPrivate,
+            rememberBoat: this.rememberBoat
+          }
         })
+        .then(res => {
+          if (res.status === 200) {
+            alert('top guy');
+          } else {
+            alert('not top guy');
+          }
+        });
       }
     },
 

@@ -5,7 +5,10 @@ const mongodbErrorHandler = require('mongoose-mongodb-errors');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const reportSchema = new Schema({
+  title: String,
   isPrivate: Boolean,
+  startDate: Date,
+  endDate: Date,
   stationNumber: {
     type: String
   },
@@ -13,6 +16,7 @@ const reportSchema = new Schema({
     type: String,
     enum: ['float', 'fish', ' both', 'other']
   }],
+  activitywritein: String,
   conditions: {
     cfs: Number,
     temp: Number,
@@ -54,7 +58,7 @@ const reportSchema = new Schema({
       type: Number
     }],
     name: String
-},
+  },
   takeOut: {
     coordinates: [{
       type: Number
@@ -80,6 +84,14 @@ const reportSchema = new Schema({
     writein: String
   }],
   comment: String,
+  comments: [
+    {
+      type: String,
+      date: Date,
+      author: String,
+      score: Number
+    }
+  ],
   score: Number,
   views: Number,
   flags: [
