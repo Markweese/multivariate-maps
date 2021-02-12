@@ -40,7 +40,7 @@ const userSchema = new Schema({
   waterCraft: {
     category: {
       type: String,
-      enum: ['drift', 'raft', 'wwkayak', 'ifkayak', 'genkayak', 'canoe', 'motorized', 'other']
+      enum: [null, 'drift', 'raft', 'wwkayak', 'ifkayak', 'genkayak', 'canoe', 'motorized', 'other']
     },
     writein: String,
     make: String,

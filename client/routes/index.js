@@ -17,7 +17,7 @@ router.get('/explorer/new/:id', flowsController.pushValue);
 router.get('/site/:station', flowsController.loadStationDashboard);
 router.post('/site/:station/report',
   reportController.validateReport,
-  catchErrors(reportController.postReport)
+  reportController.postReport
 );
 
 router.post('/login',

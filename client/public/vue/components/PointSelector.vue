@@ -56,7 +56,7 @@
           this.currentMarker.setMap(null);
         }
 
-        this.selectedLatLng = position;
+        this.selectedLatLng = [position.lat, position.lng];
         this.currentMarker = new google.maps.Marker({map: mapAlias, position});
       }
     }

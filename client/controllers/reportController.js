@@ -47,27 +47,26 @@ exports.validateReport = (req, res, next) => {
   }
 
   if (req.body.obstacles.length > 0) {
-      req.checkBody('obstacles.*.incidentOccurred').isBoolean();
       req.sanitize('obstacles.*.name').blacklist('<>\{\}\$:\(\);\'\"\/');
       req.sanitize('obstacles.*.type').blacklist('<>\{\}\$:\(\);\'\"\/');
-      req.sanitize('obstacles.*.obstaclewritein').blacklist('<>\{\}\$:\(\);\'\"\/');
+      req.sanitize('obstacles.*.writein').blacklist('<>\{\}\$:\(\);\'\"\/');
       req.sanitize('obstacles.*.description').blacklist('<>\{\}\$:\(\);\'\"\/');
   }
 
   if (req.body.conditions && req.body.conditions.cfs) {
-    req.checkBody('conditions.cfs', 'issue writing cfs data').isNumeric();
+    req.checkBody('conditions.cfs', 'issue writing cfs data').isFloat();
   }
 
   if (req.body.conditions && req.body.conditions.temp) {
-    req.checkBody('conditions.*.temp', 'issue writing temp data').isNumeric();
+    req.checkBody('conditions.*.temp', 'issue writing temp data').isFloat();
   }
 
   if (req.body.conditions && req.body.conditions.ph) {
-    req.checkBody('conditions.*.ph', 'issue writing ph data').isNumeric();
+    req.checkBody('conditions.*.ph', 'issue writing ph data').isFloat();
   }
 
   if (req.body.conditions && req.body.conditions.conductance) {
-    req.checkBody('conditions.*.conductance', 'issue writing conductance data').isNumeric();
+    req.checkBody('conditions.*.conductance', 'issue writing conductance data').isFloat();
   }
 
   if (req.body.date) {
@@ -90,9 +89,25 @@ exports.validateReport = (req, res, next) => {
 }
 
 exports.postReport = async (req, res) => {
+  if (req.body.rememberBoat === true) {
+
+    try {
+      await User.findOneAndUpdate({_id: req.user._id}, {$set: { waterCraft: {
+            category: req.body.watercraft,
+            writein: req.body.watercraftwritein,
+            make: req.body.watercraftmake,
+            model: req.body.watercraftmodel,
+            length: req.body.watercraftlength
+          }
+         }
+       });
+     } catch(e) {
+       console.log(e);
+     }
+  }
+
   if (req.user && req.user._id.toString() === req.body.authorId) {
-    console.log('writing report')
-    const report = await (new Report(
+    await (new Report(
       {
         title: req.body.title,
         isPrivate: req.body.isPrivate,
@@ -103,7 +118,7 @@ exports.postReport = async (req, res) => {
         activitywritein: req.body.activitywritein,
         conditions: req.body.conditions,
         author: req.body.author,
-        authorId: req.body.authorId,
+        authorId: req.user._id,
         state: req.body.state,
         created:  req.body.created,
         flys: req.body.flys,
@@ -126,9 +141,13 @@ exports.postReport = async (req, res) => {
         numCaught: req.body.numCaught,
         fish: req.body.fish,
         comment: req.body.comment
-    })).save();
-
-    console.log('report saved');
+    })).save(function (err) {
+        if (err) {
+          res.json({status: 500, errors: [{msg: 'there, was an issue logging your report, please try again later'}]});
+        } else {
+          res.json({status: 200});
+        }
+    });
   } else {
     res.json({status: 500, errors: [{msg: 'please log in before trying to log a report'}]});
   }

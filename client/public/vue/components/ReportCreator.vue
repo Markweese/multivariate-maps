@@ -2,6 +2,7 @@
   <div v-if="user" class="report-creator">
     <div :class="{'report-creator__wrapper': 1, '--map-open': pointSelectorOpen}">
       <button v-if="user" v-on:click="closeReport" class="button button-red --narrow close-panel">X Scrap Report</button>
+      <div class="flash-messages"></div>
       <form v-bind:action="`/site/${data.stationNumber}/report`" method="post">
         <label for="title">Report Title</label>
         <input type="text" name="title" placeholder="title" v-model="title"></input>
@@ -117,11 +118,11 @@
           <label for="putInName">Put In Name</label>
           <input  name="putInName" v-model="putInName"></input>
           <label for="putInLocation">Put In Location</label>
-          <span v-if="putInLocation">{{`${putInLocation.lat}, ${putInLocation.lng}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('putInLocation', 'Put In')" name="select point on map">{{putInLocation ? 'Change Put In Location' : '+ Add Put In On Map'}}</button>
+          <span v-if="putInLocation">{{`${putInLocation[0]}, ${putInLocation[1]}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('putInLocation', 'Put In')" name="select point on map">{{putInLocation ? 'Change Put In Location' : '+ Add Put In On Map'}}</button>
           <label for="takeOutName">Take Out Name</label>
           <input name="takeOutName" v-model="takeOutName"></input>
           <label for="takeOutLocation">Take Out Location</label>
-          <span v-if="takeOutLocation">{{`${takeOutLocation.lat}, ${takeOutLocation.lng}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('takeOutLocation', 'Take Out')" name="select point on map">{{takeOutLocation ? 'Change Take Out Location' : '+ Add Take Out On Map'}}</button>
+          <span v-if="takeOutLocation">{{`${takeOutLocation[0]}, ${takeOutLocation[1]}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('takeOutLocation', 'Take Out')" name="select point on map">{{takeOutLocation ? 'Change Take Out Location' : '+ Add Take Out On Map'}}</button>
         </fieldset>
         <div class="section-header" v-if="activity.includes('float')">
           <h3>Rapid & Obstacle Info</h3><button @click="showObstacleInfo = !showObstacleInfo" class="button button-blue --inline" type="button" aria-label="edit obstacle info">{{ showObstacleInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
@@ -137,8 +138,8 @@
             <fieldset :class="{'--hidden' : !obstacle.opened}">
               <label for="name">Name</label>
               <input placeholder="optional" type="text" name="name" v-on:input="setObstacleField(index, 'name', $event)">
-              <label for="type">Type</label>
-              <select placeholder="select obstacle type" type="text" name="type" v-on:input="setObstacleField(index, 'type', $event)">
+              <label for="obstacle">Type</label>
+              <select placeholder="select obstacle type" type="text" name="obstacle" v-on:input="setObstacleField(index, 'obstacle', $event)">
                 <option class="placeholder">Select a type</option>
                 <option value="rapid">Rapid</option>
                 <option value="strainersweeper">Strainer/Sweeper</option>
@@ -148,12 +149,12 @@
                 <option value="manmadeobstruction">Manmade Obstruction</option>
                 <option value="other">Other</option>
               </select>
-              <label v-if="obstacle.type === 'other'" for="obstaclewritein">Obstacle Write In</label>
-              <input v-if="obstacle.type === 'other'" type="text" name="obstaclewritein" v-on:input="setObstacleField(index, 'obstaclewritein', $event)" placeholder="write obstacle type here">
+              <label v-if="obstacle.obstacle === 'other'" for="write in">Obstacle Write In</label>
+              <input v-if="obstacle.obstacle === 'other'" type="text" name="write in" v-on:input="setObstacleField(index, 'writein', $event)" placeholder="write obstacle type here">
               <label for="name">Description</label>
               <textarea placeholder="describe the obstacle here" type="text" name="name" v-on:input="setObstacleField(index, 'description', $event)"></textarea>
               <label for="obstacle location">Obstacle Location</label>
-              <span v-if="obstacle.location" class="lat-lng">{{`${obstacle.location.lat}, ${obstacle.location.lng}`}}</span><button type="button" class="button button-green --inline" v-on:click="openPointSelector('allObstacles', 'Obstacle', {index, field: 'location'})" name="select obstacle on map">{{obstacle.location ? 'Change Obstacle Location' : '+ Add Obstacle On Map'}}</button>
+              <span v-if="obstacle.coordinates" class="lat-lng">{{`${obstacle.coordinates[0]}, ${obstacle.coordinates[1]}`}}</span><button type="button" class="button button-green --inline" v-on:click="openPointSelector('allObstacles', 'Obstacle', {index, field: 'coordinates'})" name="select obstacle on map">{{obstacle.coordinates ? 'Change Obstacle Location' : '+ Add Obstacle On Map'}}</button>
               <label for="incident occurred">Incident Occurred (flipped, pinned, or person thrown overboard)</label>
               <label class="switch">
                 <input v-on:input="setObstacleField(index, 'incidentOccurred', $event)" name="incident occurred" type="checkbox">
@@ -180,6 +181,7 @@
   // dependencies
   import axios from 'axios';
   import species from '../../../data/species';
+  import { FlashUtils } from '../mixins/flashUtils.js';
   import PointSelector from '../components/PointSelector.vue';
 
   export default {
@@ -199,11 +201,11 @@
         multiday: false,
         startDate: this.date,
         endDate: null,
-        watercraft: null,
-        watercraftwritein: null,
-        watercraftlength: null,
-        watercraftmake: null,
-        watercraftmodel: null,
+        watercraft: this.user.waterCraft ? this.user.waterCraft.category : null,
+        watercraftwritein: this.user.waterCraft ? this.user.waterCraft.writein : null,
+        watercraftlength: this.user.waterCraft ? this.user.waterCraft.length : null,
+        watercraftmake: this.user.waterCraft ? this.user.waterCraft.make : null,
+        watercraftmodel: this.user.waterCraft ? this.user.waterCraft.model : null,
         putInName: null,
         putInLocation: null,
         takeOutName: null,
@@ -212,13 +214,14 @@
         activitywritein: null,
         species: species,
         isPrivate: false,
-        rememberBoat: false,
+        rememberBoat: this.user.waterCraft.category ? true : false,
         showFishInfo: false,
         showBoatInfo: false,
         showLaunchInfo: false,
         showObstacleInfo: false,
         pointSelectorOpen: false,
-        pointSelectorContext: null
+        pointSelectorContext: null,
+        flashMessages: document.querySelector('.flash-messages')
       }
     },
 
@@ -228,8 +231,9 @@
           const startDate = new Date(this.date);
           const day = startDate.getDay() + 1;
           const month = startDate.getMonth() + 1;
+          const result = this.data.ph.filter(ph => {ph.date === `${month}/${day}`});
 
-          return this.data.ph.filter(ph => {ph.date === `${month}/${day}`})[0].reading;
+          return result.length ? result[0].reading : null
         } else {
           return null;
         }
@@ -239,8 +243,9 @@
           const startDate = new Date(this.date);
           const day = startDate.getDate() + 1;
           const month = startDate.getMonth() + 1;
+          const result = this.data.cfs.filter(cfs => cfs.date === `${month}/${day}`);
 
-          return this.data.cfs.filter(cfs => cfs.date === `${month}/${day}`)[0].reading;
+          return result.length ? result[0].reading : null
         } else {
           return null;
         }
@@ -250,8 +255,9 @@
           const startDate = new Date(this.date);
           const day = startDate.getDay() + 1;
           const month = startDate.getMonth() + 1;
+          const result = this.data.temp.filter(temp => {temp.date === `${month}/${day}`});
 
-          return this.data.temp.filter(temp => {temp.date === `${month}/${day}`})[0].reading;
+          return result.length ? result[0].reading : null
         } else {
           return null;
         }
@@ -261,8 +267,9 @@
           const startDate = new Date(this.date);
           const day = startDate.getDay() + 1;
           const month = startDate.getMonth() + 1;
+          const result = this.data.conductance.filter(conductance => {conductance.date === `${month}/${day}`});
 
-          return this.data.conductance.filter(conductance => {conductance.date === `${month}/${day}`})[0].reading;
+          return result.length ? result[0].reading : null
         } else {
           return null;
         }
@@ -286,7 +293,7 @@
       addObstacle() {
         const id = Math.random().toString(36).substring(7);
         this.allObstacles.forEach(o => o.opened = false);
-        this.allObstacles.push({id, type: null, obstaclewritein: null, description: null, incidentOccurred: false, opened: true})
+        this.allObstacles.push({id, obstacle: null, writein: null, description: null, incidentOccurred: false, opened: true})
       },
       setFlyField(i, field, event) {
         this.allFlys[i][field] = event.target.value;
@@ -369,10 +376,17 @@
           }
         })
         .then(res => {
-          if (res.status === 200) {
-            alert('top guy');
-          } else {
-            alert('not top guy');
+          if (res.data.status === 200) {
+            this.flashMessages.appendChild(this.generateSuccess('Successfully created report, <a href="/reports">view your reports</a>'));
+            this.closeReport();
+          } else if (res.data.errors.length) {
+
+             res.data.errors.forEach(e => {
+                document.querySelector('.report-creator .flash-messages').appendChild(this.generateError(e.msg));
+              });
+
+              document.querySelector('.report-creator .flash-messages').scrollIntoView();
+
           }
         });
       }
@@ -380,6 +394,10 @@
 
     components: {
       PointSelector
-    }
+    },
+
+    mixins: [
+      FlashUtils
+    ]
   }
 </script>

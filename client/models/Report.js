@@ -12,10 +12,10 @@ const reportSchema = new Schema({
   stationNumber: {
     type: String
   },
-  activity: [{
+  activity: {
     type: String,
-    enum: ['float', 'fish', ' both', 'other']
-  }],
+    enum: [null, 'float', 'fish', 'both', 'other']
+  },
   activitywritein: String,
   conditions: {
     cfs: Number,
@@ -37,7 +37,7 @@ const reportSchema = new Schema({
   flys: [{
     method: {
       type: String,
-      enum: ['nymph', 'emerger', 'fly', 'terrestrial', 'streamer', 'stimulator']
+      enum: [null, 'nymph', 'emerger', 'dry', 'terrestrial', 'streamer', 'stimulator']
     },
     size: Number,
     color: String,
@@ -46,7 +46,7 @@ const reportSchema = new Schema({
   waterCraft: {
     category: {
       type: String,
-      enum: ['drift', 'raft', 'wwkayak', 'ifkayak', 'genkayak', 'canoe', 'motorized', 'other']
+      enum: [null, 'drift', 'raft', 'wwkayak', 'ifkayak', 'genkayak', 'canoe', 'motorized', 'other']
     },
     writein: String,
     make: String,
@@ -73,7 +73,8 @@ const reportSchema = new Schema({
       description: String,
       coordinates: [{
         type: Number
-      }]
+      }],
+      incidentOccurred: Boolean
     }
   ],
   numCaught: Number,
@@ -98,7 +99,7 @@ const reportSchema = new Schema({
     {
       violation: {
         type: String,
-        enum: ['nudity', 'harassment', 'spam', 'inaccurate']
+        enum: ['nudity', 'harassment', 'spam', 'inaccurate', 'other']
       },
       comment: String
     }

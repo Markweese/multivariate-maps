@@ -41,6 +41,7 @@
       },
       closeReport() {
         this.isReporting = false;
+        document.querySelector('.inner.--flash').scrollIntoView();
       }
     },
 
