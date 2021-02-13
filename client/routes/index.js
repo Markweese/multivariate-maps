@@ -15,10 +15,6 @@ router.get('/explorer/new/:id', flowsController.pushValue);
 
 //station dashboard pages
 router.get('/site/:station', flowsController.loadStationDashboard);
-router.post('/site/:station/report',
-  reportController.validateReport,
-  reportController.postReport
-);
 
 router.post('/login',
   authController.login,
@@ -70,6 +66,17 @@ router.get('/account/reset/:token',
 router.post('/account/reset/:token',
   authController.confirmPassword,
   catchErrors(authController.updatePassword)
+);
+
+// Rest Endpoints
+
+router.post('/site/:station/report',
+  reportController.validateReport,
+  reportController.postReport
+);
+
+router.get('/reports/station/:station',
+  reportController.getStationReports
 );
 
 

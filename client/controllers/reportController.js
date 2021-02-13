@@ -152,3 +152,18 @@ exports.postReport = async (req, res) => {
     res.json({status: 500, errors: [{msg: 'please log in before trying to log a report'}]});
   }
 }
+
+exports.getStationReports = async (req, res) => {
+  if (req.params.station) {
+    const reports = await Report.find({stationNumber: req.params.station}, {})
+    const promises = await reports.map(async report => {
+      const user = await User.findOne({_id: mongoose.Types.ObjectId(report.authorId)}, {photo: 1});
+      report.photo = user.photo;
+
+      return report;
+    })
+
+    const reportsEnhanced = await Promise.all(promises)
+    res.json({status: 200, data: reportsEnhanced});
+  }
+}

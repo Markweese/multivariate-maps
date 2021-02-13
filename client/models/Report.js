@@ -9,6 +9,12 @@ const reportSchema = new Schema({
   isPrivate: Boolean,
   startDate: Date,
   endDate: Date,
+  photo: {
+    data: Buffer,
+    contentType: String,
+    offsetX: Number,
+    offsetY: Number
+  },
   stationNumber: {
     type: String
   },
