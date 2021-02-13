@@ -10,7 +10,9 @@
       <div v-if="reports && reports.length > 0" v-for="report in reports" class="report-panel__report">
         <div class="report-header">
           <div class="report-header__left">
-            <img v-bind:src="`data:${report.photo.contentType};base64,${getBuff(report.photo.data.data)}`" alt="user photo">
+            <div class="avatar-photo">
+              <img v-bind:src="`data:${report.photo.contentType};base64,${getBuff(report.photo.data.data)}`" v-bind:style="`left: ${report.photo.offsetX}px; top: ${report.photo.offsetY}px`" alt="user photo">
+            </div>
             <h3>{{report.title}}</h3>
             <p class="report-header__author">{{report.author}}</p>
             <p class="report-header__date">{{report.startDate}}</p>

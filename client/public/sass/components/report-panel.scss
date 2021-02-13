@@ -36,6 +36,31 @@
     background-color: $color-lightest-gray;
   }
 
+  &__report {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid $color-blue;
+    background-color: $color-white;
+
+    .report-header {
+      &__left {
+        
+      }
+
+      &__right {
+
+      }
+    }
+
+    .report-body {
+
+    }
+
+    .report-data {
+
+    }
+  }
+
   &__no-reports {
     text-align: center;
   }
