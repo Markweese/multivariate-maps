@@ -60,10 +60,14 @@ form {
   button {
     width: 100%;
     margin-top: pxem(10);
-    display: block !important;
 
-    @media #{$break-medium} {
-      width: initial;
+    &.button {
+      display: block;
+
+      @media #{$break-medium} {
+        width: initial;
+        display: block;
+      }
     }
   }
 
@@ -97,6 +101,12 @@ form {
     width: min-content;
     position: relative;
 
+    &.--active {
+        .crop-btn {
+          display: block;
+        }
+    }
+
     #photoPreview {
       display: block;
       width:100px;
@@ -109,12 +119,14 @@ form {
       border: 2px solid $color-blue;
 
       #photoImage {
-        width: 150px;
+        margin: auto;
+        width: 100px;
         position: absolute;
       }
     }
 
     .crop-btn {
+      display: none;
       margin: 0px;
       width: 30px;
       height: 30px;

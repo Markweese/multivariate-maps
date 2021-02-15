@@ -56,17 +56,39 @@ const formUtils = {
   },
   showImage: (e, input) => {
     if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        const photoPreview = document.getElementById('photoImage');
+        const fileSize = input.files[0].size / 1024 / 1024;
 
-        reader.onload = (e) => {
-            photoPreview.style.top = '0px';
-            photoPreview.style.left = '0px';
-            photoPreview.style.width = '150px';
-            photoPreview.src = e.target.result;
-        };
+        if (fileSize > 1) {
+            document.getElementById('imageErr').innerHTML = 'Please upload an image under 1mb';
+        } else {
+            document.getElementById('imageErr').innerHTML = '';
+            var image = new Image();
+            var reader = new FileReader();
+            const photoWrapper = document.getElementById('photoWrapper');
+            const photoPreview = document.getElementById('photoImage');
 
-        reader.readAsDataURL(input.files[0]);
+            reader.onload = (e) => {
+              image.src = e.target.result;
+              photoPreview.src = e.target.result;
+              photoWrapper.classList.add('--active');
+
+              image.onload = () => {
+                if(image.height > image.width) {
+                  photoPreview.style.top = '0px';
+                  photoPreview.style.left = '0px';
+                  photoPreview.style.height = 'auto';
+                  photoPreview.style.width = '100px';
+                } else {
+                  photoPreview.style.top = '0px';
+                  photoPreview.style.left = '0px';
+                  photoPreview.style.width = 'auto';
+                  photoPreview.style.height = '100px';
+                }
+              };
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
     }
   }
 }

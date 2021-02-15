@@ -75,11 +75,22 @@ exports.resizeProfilePhoto = async (req, res, next) => {
     return;
   } else {
     const photo = await jimp.read(req.file.buffer);
+    const width = parseInt(req.body.offsetX) * -1;
+    const height = parseInt(req.body.offsetY) * -1;
 
-    await photo.resize(200, jimp.AUTO);
+    if (photo.bitmap.height > photo.bitmap.width) {
+        await photo.resize(300, jimp.AUTO);
+        await photo.crop(0, height * 3, 300, 300);
+    } else if (photo.bitmap.height < photo.bitmap.width) {
+        await photo.resize(jimp.AUTO, 300);
+        await photo.crop(width * 3, 0, 300, 300);
+    } else {
+      await photo.resize(300, 300);
+    }
+
     await photo.getBuffer(jimp.AUTO, (err, buffer) => {
       req.file.buffer = buffer;
-    });
+    })
 
     next();
   }
