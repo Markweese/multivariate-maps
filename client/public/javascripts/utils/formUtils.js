@@ -71,6 +71,8 @@ const formUtils = {
               image.src = e.target.result;
               photoPreview.src = e.target.result;
               photoWrapper.classList.add('--active');
+              document.querySelector('input[name="offsetY"]').value = 0;
+              document.querySelector('input[name="offsetX"]').value = 0;
 
               image.onload = () => {
                 if(image.height > image.width) {
