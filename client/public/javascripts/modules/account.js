@@ -7,6 +7,7 @@ const account = (() => {
   let passwordInput;
   let checkusername = [];
   let passwordStrengthBar;
+  let passwordStrengthText;
   let imageInput;
 
   const init = () => {

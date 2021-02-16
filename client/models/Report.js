@@ -96,7 +96,8 @@ const reportSchema = new Schema({
       type: String,
       date: Date,
       author: String,
-      score: Number
+      score: Number,
+      comment: String
     }
   ],
   score: Number,
