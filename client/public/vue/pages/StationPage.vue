@@ -39,7 +39,7 @@
     <!-- <div v-if='activePanel === "reservoir"' v-for='item in reservoirData'>
       <BarGraph v-if='item.storage.length' v-bind:data='item' v-bind:context='"storage"' units='M³'/>
     </div> -->
-    <a v-if="checkCFS(usgsData.cfs) && !isTracked(usgsData.stationNumber)" v-bind:href="`/explorer/${usgsData.stationNumber}`" class="button button-green button-medium --button-shadow station-page__add-station" v-bind:aria-label="`Add ${usgsData.name} to list`">+ Add To List</a>
+    <a v-if="checkCFS(usgsData.cfs) && user && !isTracked(usgsData.stationNumber)" v-bind:href="`/explorer/${usgsData.stationNumber}`" class="button button-green button-medium --button-shadow station-page__add-station" v-bind:aria-label="`Add ${usgsData.name} to list`">+ Add To List</a>
   </div>
 </template>
 <script>

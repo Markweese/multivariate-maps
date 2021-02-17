@@ -25,17 +25,21 @@
         <label v-if="activity.includes('other')" for="activitywritein">Activity</label>
         <input v-if="activity.includes('other')" type="text" name="activitywritein" placeholder="write activity here" v-model="activitywritein">
         <div class="section-header" v-if="activity.includes('fish')">
-          <h3>Fishing Info</h3><button @click="showFishInfo = !showFishInfo" class="button button-blue --inline" type="button" aria-label="edit boat info">{{ showFishInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
+          <h3>Fishing Info</h3><button @click="showFishInfo = !showFishInfo" class="button button-blue --inline" type="button" aria-label="edit boat info">{{ showFishInfo ? 'Close ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('fish') && showFishInfo">
           <div v-if="activity.includes('fish')" class="item-editor">
             <button class="button button-green --narrow" v-on:click="addFish" type="button" name="add fish">+ Add Fish Description</button>
             <div v-for="(fish, index) in allFish" :key="fish.id" class="item-editor__inputs">
-              <button class="button button-red --circular" v-on:click="removeFish(index)" type="button">x</button>
-              <span v-if="!fish.opened" class="collapsed-label">
-                Species: {{fish.species}} | Length: {{fish.length}}
-              </span>
-              <button class="button button-blue --inline" v-on:click="fish.opened = !fish.opened" type="button" aria-label="edit fish">{{ fish.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
+              <div class="item-editor__controls">
+                <p class="collapsed-label">
+                  {{index + 1}}. <span :class="{'--empty': !fish.species}">{{fish.species ? trimLabel(fish.species) : '--'}}</span>
+                </p>
+                <div class="control-buttons">
+                  <button class="button button-blue --inline" v-on:click="fish.opened = !fish.opened" type="button" aria-label="edit fish">{{ fish.opened? 'Close ˄' : 'Edit ˅'}}</button>
+                  <button class="button button-red --circular" v-on:click="removeFish(index)" type="button">x</button>
+                </div>
+              </div>
               <fieldset :class="{'--hidden' : !fish.opened}">
                 <label for="species">Species</label>
                 <select placeholder="select species" name="species" v-on:input="setFishField(index, 'species', $event)">
@@ -55,11 +59,15 @@
           <div v-if="activity.includes('fish')" class="item-editor">
             <button class="button button-green --narrow" v-on:click="addFly" type="button" name="add fly">+ Add Fly Description</button>
             <div v-for="(fly, index) in allFlys" :key="fly.id" class="item-editor__inputs">
-              <button class="button button-red --circular" v-on:click="removeFly(index)" type="button">x</button>
-              <span v-if="!fly.opened" class="collapsed-label">
-                Name: {{fly.name}} | color: {{fly.color}}
-              </span>
-              <button class="button button-blue --inline" v-on:click="fly.opened = !fly.opened" type="button" aria-label="edit fly">{{ fly.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
+              <div class="item-editor__controls">
+                <p class="collapsed-label">
+                  {{index + 1}}. <span :class="{'--empty': !fly.name}">{{fly.name ? trimLabel(fly.name) : '--'}}</span>
+                </p>
+                <div class="control-buttons">
+                  <button class="button button-blue --inline" v-on:click="fly.opened = !fly.opened" type="button" aria-label="edit fly">{{ fly.opened? 'Close ˄' : 'Edit ˅'}}</button>
+                  <button class="button button-red --circular" v-on:click="removeFly(index)" type="button">x</button>
+                </div>
+              </div>
               <fieldset :class="{'--hidden' : !fly.opened}">
                 <label for="method">Type</label>
                 <select placeholder="select type" type="text" name="method" v-on:input="setFlyField(index, 'method', $event)">
@@ -82,7 +90,7 @@
           </div>
         </fieldset>
         <div class="section-header" v-if="activity.includes('float')">
-          <h3>Boat Info</h3><button @click="showBoatInfo = !showBoatInfo" class="button button-blue --inline" type="button" aria-label="edit boat info">{{ showBoatInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
+          <h3>Boat Info</h3><button @click="showBoatInfo = !showBoatInfo" class="button button-blue --inline" type="button" aria-label="edit boat info">{{ showBoatInfo ? 'Close ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('float') && showBoatInfo">
           <label for="watercraft">Boat Type</label>
@@ -112,7 +120,7 @@
           </label>
         </fieldset>
         <div class="section-header" v-if="activity.includes('float')">
-          <h3>Launch Info</h3><button @click="showLaunchInfo = !showLaunchInfo" class="button button-blue --inline" type="button" aria-label="edit launch info">{{ showLaunchInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
+          <h3>Launch Info</h3><button @click="showLaunchInfo = !showLaunchInfo" class="button button-blue --inline" type="button" aria-label="edit launch info">{{ showLaunchInfo ? 'Close ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('float') && showLaunchInfo">
           <label for="putInName">Put In Name</label>
@@ -125,16 +133,20 @@
           <span v-if="takeOutLocation">{{`${takeOutLocation[0]}, ${takeOutLocation[1]}`}}</span><button type="button" data-out-target="takeOutLocation" class="button button-green --narrow" v-on:click="openPointSelector('takeOutLocation', 'Take Out')" name="select point on map">{{takeOutLocation ? 'Change Take Out Location' : '+ Add Take Out On Map'}}</button>
         </fieldset>
         <div class="section-header" v-if="activity.includes('float')">
-          <h3>Rapid & Obstacle Info</h3><button @click="showObstacleInfo = !showObstacleInfo" class="button button-blue --inline" type="button" aria-label="edit obstacle info">{{ showObstacleInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
+          <h3>Rapid & Obstacle Info</h3><button @click="showObstacleInfo = !showObstacleInfo" class="button button-blue --inline" type="button" aria-label="edit obstacle info">{{ showObstacleInfo ? 'Close ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('float') && showObstacleInfo" class="item-editor">
           <button class="button button-green --narrow" v-on:click="addObstacle" type="button" name="add obstacle" data-out-target="allObstacles">+ Add Obstacle Description</button>
           <div v-for="(obstacle, index) in allObstacles" :key="obstacle.id" class="item-editor__inputs">
-            <button class="button button-red --circular" v-on:click="removeObstacle(index)" type="button">x</button>
-            <span v-if="!obstacle.opened" class="collapsed-label">
-              Name: {{obstacle.name}}
-            </span>
-            <button class="button button-blue --inline" v-on:click="obstacle.opened = !obstacle.opened" type="button" aria-label="edit obstacle">{{ obstacle.opened? 'Collapse ˄' : 'Edit ˅'}}</button>
+            <div class="item-editor__controls">
+              <p class="collapsed-label">
+                {{index + 1}}. <span :class="{'--empty': !obstacle.name}">{{obstacle.name ? trimLabel(obstacle.name) : '--'}}</span>
+              </p>
+              <div class="control-buttons">
+                <button class="button button-blue --inline" v-on:click="obstacle.opened = !obstacle.opened" type="button" aria-label="edit obstacle">{{ obstacle.opened? 'Close ˄' : 'Edit ˅'}}</button>
+                <button class="button button-red --circular" v-on:click="removeObstacle(index)" type="button">x</button>
+              </div>
+            </div>
             <fieldset :class="{'--hidden' : !obstacle.opened}">
               <label for="name">Name</label>
               <input placeholder="optional" type="text" name="name" v-on:input="setObstacleField(index, 'name', $event)">
@@ -281,6 +293,13 @@
     },
 
     methods: {
+      trimLabel(s) {
+        if (window.innerWidth < 650) {
+          return `${s.substring(0, 5)}...`;
+        } else {
+            return `${s.substring(0, 25)}...`;
+        }
+      },
       trapFocus(e, place) {
         if (place === 'top') {
           if (e.shiftKey && event.key === 'Tab') {

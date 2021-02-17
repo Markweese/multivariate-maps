@@ -16,7 +16,8 @@
             <div class="header-block">
               <h3 class="header-block__title">{{report.title}}</h3>
               <p class="header-block__author">{{report.author}}</p>
-              <p class="header-block__date">{{getDisplayDate(report.startDate)}}</p>
+              <p class="header-block__author">{{getDisplayDate(report.startDate)}}</p>
+              <p v-if="report.conditions"><span v-if="report.conditions.cfs">{{Math.round(report.conditions.cfs)}} CFS</span><span v-if="report.conditions.temp">, {{Math.round(report.conditions.temp)}} °F</span></p>
             </div>
           </div>
           <div class="report-header__right">
@@ -48,30 +49,30 @@
         </div>
         <div class="report-data">
           <div class="info-section" v-if="report.activity.includes('fish') || report.activity.includes('both')">
-            <h2 class="info-section__header">Fishing Information</h2>
-            <div class="info-section__data">
+            <h2 class="info-section__header">Fishing Information <button class="button button-blue --inline" name="show fish information" aria-haspopup="true" @click="showFishInfo = !showFishInfo" :aria-expanded="showFishInfo">{{showFishInfo ? 'Close' : 'View'}}<img :src="`${showFishInfo ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
+            <div class="info-section__data" v-if="showFishInfo">
               <p class="report-data__data-point"><strong>Number Caught: </strong><span v-if="report.numCaught">{{report.numCaught}}</span><span v-else class="--empty">none listed</span></p>
               <p class="report-data__data-point"><strong>Species Reported: </strong><span v-if="report.fish.length" v-for="(species, index) in getSpecies(report.fish)">{{species}}</span><span v-else class="--empty">none listed</span></p>
               <p class="report-data__data-point"><strong>Flies Used: </strong><span v-if="report.flys.length" v-for="(fly, index) in report.flys">{{fly.name}}</span><span v-else class="--empty">none listed</span></p>
             </div>
           </div>
           <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
-            <h2 class="info-section__header">Navigation Information</h2>
-            <div class="info-section__data">
-              <p class="report-data__data-point"><strong>Obstacles Reported: </strong><span v-if="report.obstacles.length">{{report.obstacles.length}}</span><span v-else class="--empty">none listed</span></p>
+            <h2 class="info-section__header">Float Information <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="showNavInfo = !showNavInfo" :aria-expanded="showNavInfo">{{showNavInfo ? 'Close' : 'View'}}<img :src="`${showNavInfo ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
+            <div class="info-section__data" v-if="showNavInfo">
+              <p class="report-data__data-point"><strong>Obstacles: </strong><span v-if="report.obstacles.length">{{report.obstacles.length}}</span><span v-else class="--empty">none listed</span></p>
               <p class="report-data__data-point"><strong>Put In Point: </strong><span v-if="report.putIn.coordinates">{{report.putIn.name}}</span><span v-else class="--empty">none listed</span></p>
               <p class="report-data__data-point"><strong>Take Out Point: </strong><span v-if="report.takeOut.coordinates">{{report.takeOut.name}}</span><span v-else class="--empty">none listed</span></p>
             </div>
           </div>
-          <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
-            <h2 class="info-section__header">Boat Information</h2>
-            <div class="info-section__data">
+          <!-- <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
+            <h2 class="info-section__header">Boat Information <button class="button button-blue --inline" name="show boat information" aria-haspopup="true" @click="showBoatInfo = !showBoatInfo" :aria-expanded="showBoatInfo">{{showBoatInfo ? 'Close' : 'View'}}<img :src="`${showBoatInfo ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
+            <div class="info-section__data" v-if="showBoatInfo">
               <p class="report-data__data-point"><strong>Boat Type: </strong><span v-if="report.waterCraft.category">{{report.waterCraft.category}}</span><span v-else class="--empty">none listed</span></p>
               <p class="report-data__data-point"><strong>Boat Make: </strong><span v-if="report.waterCraft.make">{{report.waterCraft.make}}</span><span v-else class="--empty">none listed</span></p>
               <p class="report-data__data-point"><strong>Boat Model: </strong><span v-if="report.waterCraft.model">{{report.waterCraft.model}}</span><span v-else class="--empty">none listed</span></p>
               <p class="report-data__data-point"><strong>Boat Length: </strong><span v-if="report.waterCraft.length">{{report.waterCraft.length}}</span><span v-else class="--empty">none listed</span></p>
             </div>
-          </div>
+          </div> -->
         </div>
         <div v-if="report.comments && report.comments.length" class="report-comments">
           <div v-for="c in report.comments" class="report-comments__comment">
@@ -79,8 +80,8 @@
           </div>
         </div>
         <div class="report-actions">
-          <a href="" class="button button-blue" type="button" name="see full report">See Full Report</a>
-          <button v-if="user" class="edit-button button button-black --hollow" type="button" name="Leave a comment">Write A Comment <img src="/images/icons/edit.png" alt="edit icon"/></button>
+          <a href="" class="button button-blue button-small" type="button" name="see full report">View Report</a>
+          <button v-if="user" class="edit-button button button-black button-small --hollow" type="button" name="Leave a comment">Comment <img src="/images/icons/edit.png" alt="edit icon"/></button>
         </div>
       </div>
     </div>
@@ -105,7 +106,10 @@
         allFlys: [],
         openSocial: null,
         isReporting: false,
-        isLoadingReports: false
+        isLoadingReports: false,
+        showBoatInfo: false,
+        showNavInfo: false,
+        showFishInfo: false
       }
     },
 
