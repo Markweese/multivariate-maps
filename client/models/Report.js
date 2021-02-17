@@ -97,10 +97,16 @@ const reportSchema = new Schema({
       date: Date,
       author: String,
       score: Number,
-      comment: String
+      comment: String,
+      flagged: Boolean
     }
   ],
-  score: Number,
+  votes: [
+    {
+      userId: String,
+      vote: Number
+    }
+  ],
   views: Number,
   flags: [
     {

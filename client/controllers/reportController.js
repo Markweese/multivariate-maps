@@ -155,7 +155,7 @@ exports.postReport = async (req, res) => {
 
 exports.getStationReports = async (req, res) => {
   if (req.params.station) {
-    const reports = await Report.find({stationNumber: req.params.station}, {})
+    const reports = await Report.find({stationNumber: req.params.station, isPrivate: false});
     const promises = await reports.map(async report => {
       const user = await User.findOne({_id: mongoose.Types.ObjectId(report.authorId)}, {photo: 1});
       report.photo = user.photo;

@@ -1,7 +1,7 @@
 <template>
   <div v-if="user" class="report-creator">
     <div :class="{'report-creator__wrapper': 1, '--map-open': pointSelectorOpen}">
-      <button v-if="user" v-on:click="closeReport" class="button button-red --narrow close-panel">X Scrap Report</button>
+      <button v-if="user" v-on:click="closeReport" v-on:keydown="trapFocus($event, 'top')" class="button button-red --narrow close-panel">X Scrap Report</button>
       <div class="flash-messages"></div>
       <form v-bind:action="`/site/${data.stationNumber}/report`" method="post">
         <label for="title">Report Title</label>
@@ -118,17 +118,17 @@
           <label for="putInName">Put In Name</label>
           <input  name="putInName" v-model="putInName"></input>
           <label for="putInLocation">Put In Location</label>
-          <span v-if="putInLocation">{{`${putInLocation[0]}, ${putInLocation[1]}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('putInLocation', 'Put In')" name="select point on map">{{putInLocation ? 'Change Put In Location' : '+ Add Put In On Map'}}</button>
+          <span v-if="putInLocation">{{`${putInLocation[0]}, ${putInLocation[1]}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('putInLocation', 'Put In')" data-out-target="putInLocation" name="select point on map">{{putInLocation ? 'Change Put In Location' : '+ Add Put In On Map'}}</button>
           <label for="takeOutName">Take Out Name</label>
           <input name="takeOutName" v-model="takeOutName"></input>
           <label for="takeOutLocation">Take Out Location</label>
-          <span v-if="takeOutLocation">{{`${takeOutLocation[0]}, ${takeOutLocation[1]}`}}</span><button type="button" class="button button-green --narrow" v-on:click="openPointSelector('takeOutLocation', 'Take Out')" name="select point on map">{{takeOutLocation ? 'Change Take Out Location' : '+ Add Take Out On Map'}}</button>
+          <span v-if="takeOutLocation">{{`${takeOutLocation[0]}, ${takeOutLocation[1]}`}}</span><button type="button" data-out-target="takeOutLocation" class="button button-green --narrow" v-on:click="openPointSelector('takeOutLocation', 'Take Out')" name="select point on map">{{takeOutLocation ? 'Change Take Out Location' : '+ Add Take Out On Map'}}</button>
         </fieldset>
         <div class="section-header" v-if="activity.includes('float')">
           <h3>Rapid & Obstacle Info</h3><button @click="showObstacleInfo = !showObstacleInfo" class="button button-blue --inline" type="button" aria-label="edit obstacle info">{{ showObstacleInfo ? 'Collapse ˄' : 'Edit ˅'}}</button>
         </div>
         <fieldset v-if="activity.includes('float') && showObstacleInfo" class="item-editor">
-          <button class="button button-green --narrow" v-on:click="addObstacle" type="button" name="add obstacle">+ Add Obstacle Description</button>
+          <button class="button button-green --narrow" v-on:click="addObstacle" type="button" name="add obstacle" data-out-target="allObstacles">+ Add Obstacle Description</button>
           <div v-for="(obstacle, index) in allObstacles" :key="obstacle.id" class="item-editor__inputs">
             <button class="button button-red --circular" v-on:click="removeObstacle(index)" type="button">x</button>
             <span v-if="!obstacle.opened" class="collapsed-label">
@@ -170,7 +170,7 @@
           <input name="private" type="checkbox" v-model="isPrivate">
           <span class="slider"></span>
         </label>
-        <button class="button button-blue" type="submit" name="submit" v-on:click="submitReport">Log Your Report</button>
+        <button class="button button-blue" type="submit" name="submit" v-on:click="submitReport" v-on:keydown="trapFocus($event, 'bottom')">Log Your Report</button>
       </form>
       <PointSelector v-if="pointSelectorOpen" v-on:coordinateOut="logCoordinate" v-bind:coordinates="data.coordinates" v-bind:context="pointSelectorContext"></PointSelector>
     </div>
@@ -225,6 +225,10 @@
       }
     },
 
+    mounted() {
+      document.querySelector('input[name="title"]').focus()
+    },
+
     computed: {
       registeredPH() {
         if (this.date && this.data.ph && this.data.ph.length) {
@@ -277,6 +281,19 @@
     },
 
     methods: {
+      trapFocus(e, place) {
+        if (place === 'top') {
+          if (e.shiftKey && event.key === 'Tab') {
+            e.preventDefault();
+          }
+        }
+
+        if (place === 'bottom') {
+          if (!e.shiftKey && event.key === 'Tab') {
+            e.preventDefault();
+          }
+        }
+      },
       closeReport() {
         this.$emit('deactivate', false);
       },
@@ -327,6 +344,7 @@
       },
       logCoordinate(coordinate) {
         this.pointSelectorOpen = false;
+        document.querySelector(`*[data-out-target="${this.pointSelectorContext.dataset}"]`).focus();
 
         if (this.pointSelectorContext.deepWrite) {
           this[this.pointSelectorContext.dataset][this.pointSelectorContext.deepWrite.index][this.pointSelectorContext.deepWrite.field] = coordinate;

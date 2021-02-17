@@ -177,6 +177,14 @@
       padding: 15px;
       min-height: 50px;
       border-bottom: 2px solid $color-lightest-gray;
+
+      &__copy {
+        font-size: 18px;
+
+        a {
+          color: $color-blue;
+        }
+      }
     }
 
     .report-data {
@@ -184,7 +192,7 @@
       border-bottom: 2px solid $color-lightest-gray;
 
       &__data-point {
-        margin-bottom: 5px;
+        margin-bottom: 10px;
 
         &:last-child {
             margin-bottom: 0px;
@@ -198,7 +206,28 @@
         span {
           padding: 5px;
           font-size: 16px;
+          margin-right: 10px;
+          position: relative;
           background-color: $color-lightest-gray;
+
+          &::after {
+            bottom: 0;
+            right: -5px;
+            content: ',';
+            position: absolute;
+          }
+
+          &:last-of-type {
+            &::after {
+              content: '';
+            }
+          }
+
+          &.--empty {
+            font-style: italic;
+            color: $color-light-gray;
+            background-color: $color-white;
+          }
 
           &.no-shadow {
             background-color: $color-white;
@@ -207,21 +236,23 @@
       }
 
       .info-section {
+        margin-bottom: 10px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid $color-lightest-gray;
+
+        &:last-of-type {
+          margin-bottom: 0px;
+          padding-bottom: 0px;
+          border-bottom: none;
+        }
 
         &__header {
           font-size: 18px;
-          margin: 10px 0;
           padding: 10px 0;
-          border-top: 2px solid $color-lightest-gray;
-          border-bottom: 2px solid $color-lightest-gray;
         }
 
-        &:first-of-type {
-          .info-section__header {
-            margin-top: 0px;
-            padding-top: 0px;
-            border-top: none;
-          }
+        &__data {
+          padding: 0 10px;
         }
       }
     }

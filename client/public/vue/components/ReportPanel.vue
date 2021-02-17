@@ -44,24 +44,33 @@
           </div>
         </div>
         <div v-if="report.comment" class="report-body">
-          <p class="report-body__copy">{{report.comment}}</p>
+          <p class="report-body__copy">{{trimComment(report.comment, 500)}}<a href="#"> ...see full report</a></p>
         </div>
         <div class="report-data">
           <div class="info-section" v-if="report.activity.includes('fish') || report.activity.includes('both')">
             <h2 class="info-section__header">Fishing Information</h2>
-            <p v-if="report.numCaught" class="report-data__data-point"><strong>Number Caught: </strong><span>{{report.numCaught}}</span></p>
-            <p v-if="report.fish.length" class="report-data__data-point"><strong>Species Reported: </strong><span v-for="(species, index) in getSpecies(report.fish)">{{species}}{{index !== getSpecies(report.fish).size - 1 ? ', ': ''}}</span></p>
-            <p v-if="report.flys.length" class="report-data__data-point"><strong>Flies Used: </strong><span v-for="(fly, index) in report.flys">{{fly.name}}{{index !== report.flys.length - 1 ? ', ': ''}}</span></p>
+            <div class="info-section__data">
+              <p class="report-data__data-point"><strong>Number Caught: </strong><span v-if="report.numCaught">{{report.numCaught}}</span><span v-else class="--empty">none listed</span></p>
+              <p class="report-data__data-point"><strong>Species Reported: </strong><span v-if="report.fish.length" v-for="(species, index) in getSpecies(report.fish)">{{species}}</span><span v-else class="--empty">none listed</span></p>
+              <p class="report-data__data-point"><strong>Flies Used: </strong><span v-if="report.flys.length" v-for="(fly, index) in report.flys">{{fly.name}}</span><span v-else class="--empty">none listed</span></p>
+            </div>
           </div>
           <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
-            <h2 class="info-section__header">Floating Information</h2>
-            <p v-if="report.putIn.coordinates" class="report-data__data-point"><strong>Put In Point: </strong><span>{{report.putIn.name}}</span></p>
-            <p v-if="report.takeOut.coordinates" class="report-data__data-point"><strong>Take Out Point: </strong><span>{{report.takeOut.name}}</span></p>
-            <p v-if="report.obstacles.length" class="report-data__data-point"><strong>Obstacles Reported: </strong><span>{{report.obstacles.length}}</span></p>
-            <p v-if="report.waterCraft" class="report-data__data-point"><strong>Boat Type: </strong><span>{{report.waterCraft.category}}</span></p>
-            <p v-if="report.waterCraft" class="report-data__data-point"><strong>Boat Make: </strong><span>{{report.waterCraft.make}}</span></p>
-            <p v-if="report.waterCraft" class="report-data__data-point"><strong>Boat Model: </strong><span>{{report.waterCraft.model}}</span></p>
-            <p v-if="report.waterCraft" class="report-data__data-point"><strong>Boat Length: </strong><span>{{report.waterCraft.length}}</span></p>
+            <h2 class="info-section__header">Navigation Information</h2>
+            <div class="info-section__data">
+              <p class="report-data__data-point"><strong>Obstacles Reported: </strong><span v-if="report.obstacles.length">{{report.obstacles.length}}</span><span v-else class="--empty">none listed</span></p>
+              <p class="report-data__data-point"><strong>Put In Point: </strong><span v-if="report.putIn.coordinates">{{report.putIn.name}}</span><span v-else class="--empty">none listed</span></p>
+              <p class="report-data__data-point"><strong>Take Out Point: </strong><span v-if="report.takeOut.coordinates">{{report.takeOut.name}}</span><span v-else class="--empty">none listed</span></p>
+            </div>
+          </div>
+          <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
+            <h2 class="info-section__header">Boat Information</h2>
+            <div class="info-section__data">
+              <p class="report-data__data-point"><strong>Boat Type: </strong><span v-if="report.waterCraft.category">{{report.waterCraft.category}}</span><span v-else class="--empty">none listed</span></p>
+              <p class="report-data__data-point"><strong>Boat Make: </strong><span v-if="report.waterCraft.make">{{report.waterCraft.make}}</span><span v-else class="--empty">none listed</span></p>
+              <p class="report-data__data-point"><strong>Boat Model: </strong><span v-if="report.waterCraft.model">{{report.waterCraft.model}}</span><span v-else class="--empty">none listed</span></p>
+              <p class="report-data__data-point"><strong>Boat Length: </strong><span v-if="report.waterCraft.length">{{report.waterCraft.length}}</span><span v-else class="--empty">none listed</span></p>
+            </div>
           </div>
         </div>
         <div v-if="report.comments && report.comments.length" class="report-comments">
@@ -122,6 +131,9 @@
       },
       getSpecies(fish) {
         return new Set(fish.map(f => {return f.species}));
+      },
+      trimComment(s, n) {
+        return s.substring(0, n);
       },
       getReports() {
         this.isLoadingReports = true;
