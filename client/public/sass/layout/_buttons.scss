@@ -12,7 +12,7 @@
   background-color: $color-white;
 
   @media #{$break-medium} {
-    display: inline;
+    display: inline-block;
   }
 
   &-red {
@@ -23,6 +23,10 @@
     &.--narrow {
         padding: 10px;
         border-radius: 15px;
+    }
+
+    &.--inline {
+      padding: 5px 10px;
     }
 
     &.--hollow {
@@ -61,6 +65,10 @@
       }
     }
 
+    &.--inline {
+      padding: 5px 10px;
+    }
+
     &:hover {
       background-color: darken($color-blue, 10%);
       transition: background-color 300ms;
@@ -75,6 +83,10 @@
     &.--narrow {
         padding: 10px;
         border-radius: 15px;
+    }
+
+    &.--inline {
+      padding: 5px 10px;
     }
 
     &.--hollow {
@@ -115,6 +127,23 @@
     &:hover {
       background-color: darken($color-orange, 10%);
       transition: background-color 300ms;
+    }
+  }
+
+  &-black {
+    color: $color-white;
+    background-color: $color-black;
+    transition: background-color 300ms;
+
+    &.--hollow {
+      color: $color-black;
+      border: 2px solid $color-black;
+      background-color: $color-white;
+      transition: background-color 300ms, color 300ms;
+    }
+
+    &.--inline {
+      padding: 5px 10px;
     }
   }
 

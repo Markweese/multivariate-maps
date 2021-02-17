@@ -54,10 +54,15 @@
     }
 
     &--filter {
+      width: 100%;
       z-index: 200;
       cursor: pointer;
       position: relative;
       display: inline-block;
+
+      @media #{$break-medium} {
+        width: initial;
+      }
 
       &:hover {
         p {

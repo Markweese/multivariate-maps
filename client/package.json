@@ -38,6 +38,7 @@
     "extract-text-webpack-plugin": "2.1.0",
     "faker": "4.1.0",
     "forever": "0.15.3",
+    "form-data": "^3.0.0",
     "glob": "7.1.1",
     "hoek": "^5.0.3",
     "html-to-text": "3.2.0",

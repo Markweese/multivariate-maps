@@ -25,10 +25,28 @@ const userSchema = new Schema({
   sessionToken: String,
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  photo: {
+    data: Buffer,
+    contentType: String,
+    offsetX: Number,
+    offsetY: Number
+  },
+  reports: [String],
+  images: [String],
   activity: {
     type: String,
-    enum: ['float', 'fish', 'other']
-  }
+    enum: ['float', 'fish', 'both', 'other']
+  },
+  waterCraft: {
+    category: {
+      type: String,
+      enum: [null, 'drift', 'raft', 'wwkayak', 'ifkayak', 'genkayak', 'canoe', 'motorized', 'other']
+    },
+    writein: String,
+    make: String,
+    model: String,
+    length: String
+  },
 });
 
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });

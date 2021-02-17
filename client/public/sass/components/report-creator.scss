@@ -20,6 +20,7 @@
 
   &__wrapper {
     padding: 15px;
+    position: relative;
     overflow-y: scroll;
     height: calc(100vh - 110px);
     background-color: $color-white;
@@ -27,46 +28,112 @@
     @media #{$break-medium} {
       height: calc(100vh - 99px);
     }
+
+    .flash {
+      padding: 15px !important;
+    }
+
+    .section-header {
+      margin-top: 30px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid $color-lightest-gray;
+
+      .--inline {
+          margin-left: 0;
+          display: inline !important;
+
+          @media #{$break-medium} {
+            margin-left: 10px;
+          }
+      }
+
+      h3 {
+        display: inline;
+        font-size: 18px;
+        font-family: 'Courier New', serif;
+      }
+    }
+
+    .selector-map {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      position:fixed;
+      top: 198px;
+      height: calc(100vh - 198px);
+
+      @media #{$break-medium} {
+        top: 187px;
+        height: calc(100vh - 187px);
+      }
+
+      .__google-map {
+        height: 100%;
+      }
+
+      &--controls {
+        left: 0;
+        top: 90px;
+        width: 100%;
+        padding: 30px;
+        display: flex;
+        position: fixed;
+        justify-content: space-between;
+        background-color: $color-white;
+
+        @media #{$break-medium} {
+          top: 79px;
+        }
+      }
+    }
   }
 
   .close-panel {
     display: block;
     margin-left: auto;
+    margin-bottom: 10px;
+  }
+
+  button[type="submit"] {
+    margin: pxem(10) 0;
   }
 
   .item-editor {
 
     &__inputs {
-      display: flex;
-      flex-direction: column;
       font-size: 16px;
       padding: 10px 0;
-      align-items: center;
 
-      @media #{$break-medium} {
-        flex-direction: row;
+      .collapsed-label {
+          font-family: 'Courier New', serif;
+      }
+
+      .lat-lng {
+        display: block;
+        margin-bottom: 10px;
       }
 
       button {
-        padding: 0px;
         margin-top: 0px;
-        min-width: 20px;
-        max-width: 20px;
-        min-height: 20px;
-        border-radius: 20px;
-        align-self: flex-start;
+        display: inline !important;
 
-        @media #{$break-medium} {
-          align-self: center;
+        &.--circular {
+          padding: 0px;
+          min-width: 20px;
+          max-width: 20px;
+          min-height: 20px;
+          margin-bottom: 10px;
+          border-radius: 20px;
+
+          @media #{$break-medium} {
+            margin-bottom: 0px;
+          }
         }
       }
 
       label {
         margin: 0 5px;
-      }
-
-      input {
-        max-height: 20px;
       }
     }
   }
@@ -78,14 +145,25 @@
     }
   }
 
-  button, select {
+  button, select, span {
     font-size: 16px;
     font-family: 'Courier New', serif;
   }
 
   input, textarea {
+    width: 100%;
     font-family: 'Courier New', serif;
     border: 1px dashed $color-light-gray;
+  }
+
+  textarea {
+    height: 50vh;
+  }
+
+  fieldset {
+    padding: 10px;
+    background-color: $color-lightest-gray;
+    border-bottom: 1px solid $color-lightest-gray
   }
 
   input::placeholder {

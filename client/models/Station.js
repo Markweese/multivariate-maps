@@ -75,10 +75,7 @@ const stationSchema = new mongoose.Schema({
     hundred: Number,
   }],
   //logs element interaction
-  clicks: [{
-    time: Date,
-    origin: String
-  }]
+  views: Number
 });
 
   stationSchema.index({

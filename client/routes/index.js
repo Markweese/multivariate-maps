@@ -3,6 +3,7 @@ const router = express.Router();
 const flowsController = require('../controllers/flowsController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const reportController = require('../controllers/reportController');
 const { catchErrors } = require('../handlers/errorHandlers');
 
 // Do work here
@@ -26,6 +27,8 @@ router.get('/logout', authController.logout);
 
 router.get('/signup', userController.registerForm);
 router.post('/signup',
+  userController.uploadProfilePhoto,
+  userController.resizeProfilePhoto,
   userController.validateRegister,
   catchErrors(userController.register)
 );
@@ -49,6 +52,11 @@ router.post('/account/update-password',
   authController.confirmPassword,
   catchErrors(authController.updateAccountPassword)
 );
+router.post('/account/update-photo',
+  userController.uploadProfilePhoto,
+  userController.resizeProfilePhoto,
+  catchErrors(userController.postProfilePhoto)
+);
 router.post('/account/forgot',
   catchErrors(authController.forgot)
 );
@@ -58,6 +66,17 @@ router.get('/account/reset/:token',
 router.post('/account/reset/:token',
   authController.confirmPassword,
   catchErrors(authController.updatePassword)
+);
+
+// Rest Endpoints
+
+router.post('/site/:station/report',
+  reportController.validateReport,
+  reportController.postReport
+);
+
+router.get('/reports/station/:station',
+  reportController.getStationReports
 );
 
 

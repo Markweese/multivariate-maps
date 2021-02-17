@@ -44,6 +44,32 @@ const FlashUtils = {
                 </p>
                 <button class="flash__remove" onclick="this.parentElement.remove()">×</button>
               </div>`
+    },
+
+    generateError(message) {
+      let output = document.createElement('div');
+
+      output.innerHTML = `<div class="flash flash--error">
+          <p class="flash__text --error">
+            ${message}
+          </p>
+          <button class="flash__remove" onclick="this.parentElement.remove()">×</button>
+        </div>`
+
+      return output;
+    },
+
+    generateSuccess(message) {
+      let output = document.createElement('div');
+
+      output.innerHTML = `<div class="flash flash--success">
+          <p class="flash__text --loaded">
+            ${message}
+          </p>
+          <button class="flash__remove" onclick="this.parentElement.remove()">×</button>
+        </div>`
+
+      return output;
     }
   }
 };

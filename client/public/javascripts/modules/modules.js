@@ -10,6 +10,7 @@ const modules = {
   explorer
 };
 
+// run modules
 const initJS = (() => {
   const jsComponents = document.querySelectorAll('*[data-jscript]');
 

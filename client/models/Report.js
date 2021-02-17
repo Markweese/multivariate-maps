@@ -5,13 +5,24 @@ const mongodbErrorHandler = require('mongoose-mongodb-errors');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const reportSchema = new Schema({
+  title: String,
+  isPrivate: Boolean,
+  startDate: Date,
+  endDate: Date,
+  photo: {
+    data: Buffer,
+    contentType: String,
+    offsetX: Number,
+    offsetY: Number
+  },
   stationNumber: {
     type: String
   },
-  activity: [{
+  activity: {
     type: String,
-    enum: ['float', 'fish', 'other']
-  }],
+    enum: [null, 'float', 'fish', 'both', 'other']
+  },
+  activitywritein: String,
   conditions: {
     cfs: Number,
     temp: Number,
@@ -26,41 +37,92 @@ const reportSchema = new Schema({
     type: String,
     required: 'an author name must be set'
   },
+  authorId: String,
   state: String,
   created:  Date,
   flys: [{
     method: {
       type: String,
-      enum: ['nymph', 'emerger', 'fly', 'terrestrial', 'streamer']
+      enum: [null, 'nymph', 'emerger', 'dry', 'terrestrial', 'streamer', 'stimulator']
     },
     size: Number,
     color: String,
     name: String
   }],
   waterCraft: {
-    category: String,
-    predefined: Boolean,
+    category: {
+      type: String,
+      enum: [null, 'drift', 'raft', 'wwkayak', 'ifkayak', 'genkayak', 'canoe', 'motorized', 'other']
+    },
+    writein: String,
     make: String,
     model: String,
     length: String
   },
+  putIn: {
+    coordinates: [{
+      type: Number
+    }],
+    name: String
+  },
+  takeOut: {
+    coordinates: [{
+      type: Number
+    }],
+    name: String
+  },
   obstacles: [
     {
+      name: String,
       obstacle: String,
-      predefined: Boolean,
+      writein: String,
+      description: String,
       coordinates: [{
         type: Number
-      }]
+      }],
+      incidentOccurred: Boolean
     }
   ],
-  creel: Number,
+  numCaught: Number,
   fish: [{
     species: String,
-    predefined: Boolean,
     length: Number,
-    weight: Number
+    weight: Number,
+    writein: String
   }],
-  comment: String
+  comment: String,
+  comments: [
+    {
+      type: String,
+      date: Date,
+      author: String,
+      score: Number,
+      comment: String,
+      flagged: Boolean
+    }
+  ],
+  votes: [
+    {
+      userId: String,
+      vote: Number
+    }
+  ],
+  views: Number,
+  flags: [
+    {
+      violation: {
+        type: String,
+        enum: ['nudity', 'harassment', 'spam', 'inaccurate', 'other']
+      },
+      comment: String
+    }
+  ],
+  images: [
+    {
+      data: Buffer,
+      contentType: String
+    }
+  ]
 });
 
 reportSchema.index({

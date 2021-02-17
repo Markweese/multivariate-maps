@@ -13,6 +13,14 @@ html {
       max-width:100%;
       color: $color-black;
       background-color: $color-white;
+
+      .--no-mobile {
+        display: none;
+
+        @media #{$break-medium} {
+          display: initial
+        }
+      }
     }
 
     #vue {
