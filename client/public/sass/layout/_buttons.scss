@@ -184,6 +184,30 @@
   }
 }
 
+.text-button {
+  border: none;
+  padding-bottom: 0px;
+  font-size: pxem(18);
+  font-family: $font-main;
+  border-bottom: 2px solid;
+  background-color: rgba(0,0,0,0);
+
+  &.--blue {
+    color: $color-blue;
+    border-bottom-color: $color-blue;
+  }
+
+  &.--red {
+    color: $color-red;
+    border-bottom-color: $color-red;
+  }
+
+  &.--green {
+    color: $color-green;
+    border-bottom-color: $color-green;
+  }
+}
+
 .--button-shadow {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
