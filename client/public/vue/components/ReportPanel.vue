@@ -8,7 +8,7 @@
       <div v-if='isLoadingReports' class='station-list__loader'><p>Loading Reports</p><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div></div>
       <div v-else-if="reportLoadError" class='report-panel__no-reports'>{{reportLoadError}}</div>
       <p class='report-panel__no-reports' v-else-if="!reports || reports.length === 0">No reports to show</p>
-      <div v-if="reports && reports.length > 0" v-for="report in reports" :key="report._id" class="report-panel__report">
+      <div v-if="reports && reports.length > 0" v-for="report in reports.slice(currentPage - 1, currentPage + 2)" :key="report._id" class="report-panel__report">
         <div class="report-header">
           <div class="report-header__left">
             <div class="avatar-photo --medium">
@@ -86,6 +86,10 @@
           <button v-if="user" class="edit-button button button-black button-small --hollow" type="button" name="Leave a comment">Comment <img src="/images/icons/edit.png" alt="edit icon"/></button>
         </div>
       </div>
+      <div v-if="reports && numPages > 1" class="report-pagination">
+        <button v-for="page in numPages" :class="{'report-pagination__indicator': 1, '--active-page': page === currentPage}" @click="currentPage = page">
+        </button>
+      </div>
     </div>
     <PointViewer v-if="pointViewerOpen" v-on:deactivate="closePointViewer" v-bind:points="pointViewerPoints"></PointViewer>
     <ReportCreator v-if="user && isReporting" v-on:deactivate="closeReport" v-bind:data="data" v-bind:user="user"></ReportCreator>
@@ -104,6 +108,9 @@
 
     data() {
       return {
+        currentPage: 1,
+        perPage: 3,
+        perPageMobile: 1,
         reports: null,
         allFish: [],
         allFlys: [],
@@ -118,6 +125,13 @@
 
     mounted() {
       this.getReports();
+    },
+
+    computed: {
+      numPages() {
+        let pp = window.innerWidth < 725 ? this.perPageMobile : this.perPage;
+        return Math.ceil(this.reports.length / pp);
+      }
     },
 
     methods: {

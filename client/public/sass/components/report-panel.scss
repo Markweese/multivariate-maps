@@ -34,6 +34,28 @@
   &__list {
     padding: 15px;
     background-color: $color-light-gray;
+
+    .report-pagination {
+      text-align: center;
+
+      &__indicator {
+        width: 10px;
+        height: 10px;
+        border: none;
+        margin-right: 10px;
+        border-radius: 10px;
+        display: inline-block;
+        background-color: $color-lightest-gray;
+
+        &:last-of-type {
+          margin-right: 0px;
+        }
+
+        &.--active-page {
+          background-color: $color-blue;
+        }
+      }
+    }
   }
 
   &__report {
