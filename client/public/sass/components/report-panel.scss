@@ -36,7 +36,10 @@
     background-color: $color-light-gray;
 
     .report-pagination {
-      text-align: center;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &__indicator {
         width: 10px;
@@ -47,13 +50,13 @@
         display: inline-block;
         background-color: $color-lightest-gray;
 
-        &:last-of-type {
-          margin-right: 0px;
-        }
-
         &.--active-page {
           background-color: $color-blue;
         }
+      }
+
+      .prev {
+        margin-right: 10px;
       }
     }
   }
