@@ -7,14 +7,14 @@
         <label for="title">Report Title</label>
         <input type="text" name="title" placeholder="title" v-model="title"></input>
         <label for="date">Start Date</label>
-        <input type="date" name="date" placeholder="date" v-model="date" v-bind:min="`${new Date().getFullYear()}-${data.cfs[0].date.split('/')[0].toString().length < 2 ? '0' + data.cfs[0].date.split('/')[0] : data.cfs[0].date.split('/')[0]}-${data.cfs[0].date.split('/')[1].toString().length < 2 ? '0' + data.cfs[0].date.split('/')[1] : data.cfs[0].date.split('/')[1]}`" v-bind:max="new Date().toISOString().split('T')[0]"></input>
+        <input type="date" name="date" placeholder="date" v-model="date" v-bind:max="new Date().toISOString().split('T')[0]"></input>
         <label for="multiday">Multiday Trip</label>
         <label class="switch">
           <input name="multiday" type="checkbox" v-model="multiday">
           <span class="slider"></span>
         </label>
         <label v-if="multiday" for="endDate">End Date</label>
-        <input v-if="multiday" type="date" name="endDate" placeholder="date" v-model="endDate" v-bind:min="date" v-bind:max="new Date().toISOString().split('T')[0]"></input>
+        <input v-if="multiday" type="date" name="endDate" placeholder="date" v-model="endDate" v-bind:max="new Date().toISOString().split('T')[0]"></input>
         <label for="activity">Activity</label>
         <select required placeholder="select activity" name="activity" v-model="activity">
           <option value="fish">Fish</option>
