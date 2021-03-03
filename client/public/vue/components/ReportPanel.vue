@@ -64,7 +64,7 @@
                 <p class="report-data__data-point"><strong>Obstacles: </strong><span v-if="report.obstacles.length">{{report.obstacles.length}}</span><span v-else class="--empty">none listed</span></p>
                 <p class="report-data__data-point"><strong>Put In Point: </strong><span v-if="report.putIn.coordinates">{{report.putIn.name}}</span><span v-else class="--empty">none listed</span></p>
                 <p class="report-data__data-point"><strong>Take Out Point: </strong><span v-if="report.takeOut.coordinates">{{report.takeOut.name}}</span><span v-else class="--empty">none listed</span></p>
-                <button type="button" class="text-button --blue" name="view on map" @click="openPointViewer(report)">See on map</button>
+                <button v-if="report.obstacles.length || report.putIn.coordinates || report.takeOut.coordinates" type="button" class="text-button --blue" name="view on map" @click="openPointViewer(report)">See on map</button>
               </div>
             </div>
             <!-- <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
