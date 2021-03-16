@@ -167,3 +167,27 @@ exports.getStationReports = async (req, res) => {
     res.json({status: 200, data: reportsEnhanced});
   }
 }
+
+exports.upvoteReport = async (req, res) => {
+  const vote = { vote: 1, userId: req.user._id};
+  const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)}, {_id: 1, votes: 1});
+
+  if (report.votes.filter(v => v.userId === req.user._id.toString()).length) {
+    res.json({status: 401, msg: 'vote already recorded'});
+  } else {
+    await report.update({$push: {votes: vote}, $inc: {score: 1}});
+    res.json({status: 200, msg: 'vote recorded'});
+  }
+}
+
+exports.downvoteReport = async (req, res) => {
+  const vote = { vote: -1, userId: req.user._id};
+  const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)}, {_id: 1, votes: 1});
+
+  if (report.votes.filter(v => v.userId === req.user._id.toString()).length) {
+    res.json({status: 401, msg: 'user already voted'});
+  } else {
+    await report.update({$push: {votes: vote}, $inc: {score: -1}});
+    res.json({status: 200, msg: 'vote recorded'});
+  }
+}

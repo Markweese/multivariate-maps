@@ -32,7 +32,7 @@
     </div>
 
     <Timeseries v-if='activePanel === "usgs" && usgsData.cfs.length' v-bind:data='usgsData' v-bind:context='"cfs"' units='CFS'/>
-    <ReportPanel v-if='activePanel === "usgs"' v-bind:data='usgsData' v-bind:user='user'/>
+    <ReportPanel v-if='activePanel === "usgs"' v-bind:data='usgsData' v-bind:user='user' v-bind:usernames='usernames'/>
     <div v-if='activePanel === "snotel"' v-for='item in snotelData'>
       <BarGraph v-if='item.swe.length' v-bind:data='item' v-bind:context='"swe"' units='IN'/>
     </div>
@@ -54,6 +54,7 @@ export default {
   data() {
 		return {
       user: null,
+      usernames: null,
 			usgsData: null,
       snotelData: null,
       reservoirData: null,
@@ -105,10 +106,12 @@ export default {
 			let usgs = dataElement.dataset.cfs;
       let snotel = dataElement.dataset.snotel;
       let reservoir = dataElement.dataset.reservoir;
+      let usernames = dataElement.dataset.usernames;
 
       this.user = user ? JSON.parse(user) : null;
 			this.usgsData = usgs ? JSON.parse(usgs) : null;
       this.snotelData = snotel ? JSON.parse(snotel) : null;
+      this.usernames = usernames ? JSON.parse(usernames) : null;
       this.reservoirData = reservoir ? JSON.parse(reservoir) : null;
       this.activePanel = this.usgsData.cfs.length ? 'usgs' : this.snotelData.length ? 'snotel' : this.reservoirData.length ? 'reservoir' : null;
 		},

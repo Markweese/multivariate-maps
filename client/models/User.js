@@ -33,6 +33,17 @@ const userSchema = new Schema({
   },
   reports: [String],
   images: [String],
+  notifications: [
+    {
+      notificationType: {
+          type: String,
+          enum: ['message', 'comment', 'tag', 'share']
+      },
+      fromUser: String,
+      reportId: String,
+      commentId: String
+    }
+  ],
   activity: {
     type: String,
     enum: ['float', 'fish', 'both', 'other']

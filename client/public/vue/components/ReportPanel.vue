@@ -9,7 +9,7 @@
       <div v-else-if="reportLoadError" class='report-panel__no-reports'>{{reportLoadError}}</div>
       <p class='report-panel__no-reports' v-else-if="!reports || reports.length === 0">No reports to show</p>
       <div v-if="reports && reports.length > 0">
-        <div v-for="report in pageItems" :key="report._id" class="report-panel__report">
+        <div v-for="report in pageItems" :key="report._id" class="report-panel__report" v-if="report.score > -10">
           <div class="report-header">
             <div class="report-header__left">
               <div class="avatar-photo --medium">
@@ -19,7 +19,7 @@
                 <h3 class="header-block__title">{{report.title}}</h3>
                 <p class="header-block__author">{{report.author}}</p>
                 <p class="header-block__author" v-if="getDisplayDate(report.startDate) !== '12/32/1969'">{{getDisplayDate(report.startDate)}}</p>
-                <p v-if="report.conditions"><span v-if="report.conditions.cfs">{{Math.round(report.conditions.cfs)}} CFS</span><span v-if="report.conditions.temp">, {{Math.round(report.conditions.temp)}} °F</span></p>
+                <p v-if="report.conditions"><span v-if="report.conditions.cfs && report.conditions.cfs > 0">{{Math.round(report.conditions.cfs)}} CFS</span><span v-if="report.conditions.temp">, {{Math.round(report.conditions.temp)}} °F</span></p>
               </div>
             </div>
             <div class="report-header__right">
@@ -28,10 +28,10 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
               </button>
-              <button :class="{'social-button': 1, 'social-button__upvote': 1, '--active': openSocial === report._id}" type="button" name="upvote">
+              <button @click="upvoteReport(report._id)" :class="{'social-button': 1, 'social-button__upvote': 1, '--active': openSocial === report._id}" type="button" name="upvote">
                 <img src="/images/icons/upvote-blue.png" alt="upvote icon"/>
               </button>
-              <button :class="{'social-button': 1, 'social-button__downvote': 1, '--active': openSocial === report._id}" type="button" name="downvote">
+              <button @click="downvoteReport(report._id)" :class="{'social-button': 1, 'social-button__downvote': 1, '--active': openSocial === report._id}" type="button" name="downvote">
                 <img src="/images/icons/downvote-blue.png" alt="downvote icon"/>
               </button>
               <button :class="{'social-button': 1, 'social-button__edit': 1, '--active': openSocial === report._id}" type="button" name="edit">
@@ -64,7 +64,28 @@
                 <p class="report-data__data-point"><strong>Obstacles: </strong><span v-if="report.obstacles.length">{{report.obstacles.length}}</span><span v-else class="--empty">none listed</span></p>
                 <p class="report-data__data-point"><strong>Put In Point: </strong><span v-if="report.putIn.coordinates">{{report.putIn.name}}</span><span v-else class="--empty">none listed</span></p>
                 <p class="report-data__data-point"><strong>Take Out Point: </strong><span v-if="report.takeOut.coordinates">{{report.takeOut.name}}</span><span v-else class="--empty">none listed</span></p>
-                <button type="button" class="text-button --blue" name="view on map" @click="openPointViewer(report)">See on map</button>
+                <button v-if="report.obstacles.length || report.putIn.coordinates || report.takeOut.coordinates" type="button" class="text-button --blue" name="view on map" @click="openPointViewer(report)">See on map</button>
+              </div>
+            </div>
+            <div class="info-section">
+              <h2 class="info-section__header">Comments <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="report.commentsOpen = !report.commentsOpen" :aria-expanded="report.commentsOpen">{{report.commentsOpen ? 'Close' : 'View Comments'}}<img :src="`${report.commentsOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
+              <div class="info-section__data" v-if="report.commentsOpen">
+                <div class="comment" v-if="report.comments.length">
+                  <p v-for="comment in report.comments">
+                    {{comment}}
+                    <span class="author-line">- {{comment.author}} | {{getDisplayDate(comment.date)}}</span>
+                    <span class="score">{{comment.score}}</span>
+                  </p>
+                </div>
+                <button v-if="user && !report.writingComment" @click="report.writingComment = true" class="edit-button button button-green" type="button" name="Leave a comment">+ Add Comment</button>
+                <form v-if="user && report.writingComment" class="comment-box" method="post">
+                  <textarea name="comment" rows="8" cols="80" maxlength="30000" @focus="activateComment(report._id, $event)" @focusout="currentReport = null" @input="setComment($event)"></textarea>
+                  <p class="text-overlay" v-html="currentReport === report._id ? currentComment: ''"></p>
+                  <fieldset>
+                    <button @click="submitComment" type="submit" class="edit-button button button-blue --inline" name="submit comment">Submit</button>
+                    <button @click="report.writingComment = false" class="edit-button button button-red --inline" type="button" name="Cancel">Cancel</button>
+                  </fieldset>
+                </form>
               </div>
             </div>
             <!-- <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
@@ -77,14 +98,8 @@
               </div>
             </div> -->
           </div>
-          <div v-if="report.comments && report.comments.length" class="report-comments">
-            <div v-for="c in report.comments" class="report-comments__comment">
-              <p>{{c.comment}}</p>
-            </div>
-          </div>
           <div class="report-actions">
             <a href="" class="button button-blue button-small" type="button" name="see full report">View Report</a>
-            <button v-if="user" class="edit-button button button-black button-small --hollow" type="button" name="Leave a comment">Comment <img src="/images/icons/edit.png" alt="edit icon"/></button>
           </div>
         </div>
       </div>
@@ -100,29 +115,35 @@
 </template>
 <script>
   import axios from 'axios';
+  import { FlashUtils } from '../mixins/flashUtils.js';
   import PointViewer from '../components/PointViewer.vue';
   import ReportCreator from '../components/ReportCreator.vue';
 
   export default {
     props: [
       'data',
-      'user'
+      'user',
+      'usernames'
     ],
 
     data() {
       return {
         currentPage: 1,
+        currentReport: null,
+        currentComment: null,
         perPage: 3,
         perPageMobile: 1,
         reports: null,
         allFish: [],
         allFlys: [],
         openSocial: null,
+        userOptions: null,
         isReporting: false,
         isLoadingReports: false,
         reportLoadError: null,
         pointViewerOpen: false,
-        pointViewerPoints: []
+        pointViewerPoints: [],
+        flashMessages: document.querySelector('.flash-messages')
       }
     },
 
@@ -153,7 +174,6 @@
       },
       closeReport() {
         this.isReporting = false;
-        document.querySelector('.inner.--flash').scrollIntoView();
       },
       getDisplayDate(date) {
         const d = new Date(date);
@@ -221,6 +241,8 @@
                 r.navOpen = false;
                 r.fishOpen = false;
                 r.boatOpen = false;
+                r.commentsOpen = false;
+                r.writingComment = false;
 
                 return r;
               })
@@ -244,8 +266,68 @@
             this.isLoadingReports = false;
             this.reportLoadError = 'We had an issue loading reports, please refresh the page.';
           });
+      },
+
+      upvoteReport(reportId) {
+        axios.post(`/reports/upvote/${reportId}`)
+          .then(res => {
+            if (res.data.status === 200) {
+              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
+            }
+
+            if (res.data.status === 401) {
+              this.flashMessages.appendChild(this.generateError(res.data.msg));
+            }
+
+            this.openSocial = null;
+          });
+      },
+
+      downvoteReport(reportId) {
+        axios.post(`/reports/downvote/${reportId}`)
+          .then(res => {
+            if (res.data.status === 200) {
+              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
+            }
+
+            if (res.data.status === 401) {
+              this.flashMessages.appendChild(this.generateError(res.data.msg));
+            }
+
+            this.openSocial = null;
+          });
+      },
+
+      submitComment(event) {
+        event.preventDefault();
+      },
+
+      activateComment(id, e) {
+        this.currentReport = id;
+        this.currentComment = e.target.value.replace(/(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm, '<span class=input-highlight ref="$1$2">$1$2</span>$3');
+      },
+
+      setComment(e) {
+        const re = /(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
+        const word = event.target.value.split(' ')[event.target.value.split(' ').length - 1];
+        const isUserTag = word.includes('@');
+
+        this.currentComment = e.target.value.replace(re, '<span class=input-highlight ref="$1$2">$1$2</span>$3');
+
+        if (isUserTag) {
+          console.log(re.exec(e.target.value)[0]);
+          let cursorLocation = document.getElementById(/(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm.exec(e.target.value)[0]);
+          this.usersOptions = this.usernames.filter(u => u.name && u.name.includes(word.substring(1)));
+          cursorLocation.innerHTML += ('<ul>' + this.usersOptions.reduce((acc, u) => {acc += `<li>${u.name}</li>`}) + '</ul>');
+        } else {
+          this.userOptions = null;
+        }
       }
     },
+
+    mixins: [
+      FlashUtils
+    ],
 
     components: {
       ReportCreator,

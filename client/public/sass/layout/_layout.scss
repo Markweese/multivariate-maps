@@ -21,6 +21,17 @@ html {
           display: initial
         }
       }
+
+      &.--flash {
+        top: 90px;
+        width: 100%;
+        z-index: 2000;
+        position: fixed;
+
+        @media #{$break-medium} {
+          top: 79px;
+        }
+      }
     }
 
     #vue {
