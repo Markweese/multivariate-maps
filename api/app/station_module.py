@@ -4,6 +4,7 @@ import ssl
 
 import os
 import csv
+import json
 import numpy as np
 from io import StringIO
 from bson.objectid import ObjectId
@@ -86,6 +87,21 @@ class station:
         for station in stations:
             print('populating: {}'.format(station))
             self.populate_day(station)
+
+    # get_all_timezones
+    # attach all station timezones
+    def get_all_timezones(self):
+        all_stations = list(self.client[os.environ['MONGO_DB']].stations.find({},{'_id':1, 'stationNumber': 1}))
+
+        for station in all_stations:
+            url = 'https://waterservices.usgs.gov/nwis/iv/?format=json&sites={}&siteStatus=active'.format(station['stationNumber'])
+            req = Request(url)
+
+            with urlopen(req) as response:
+                json_obj = json.loads(response.read())
+
+                if len(json_obj['value']['timeSeries']) > 0:
+                    self.client[os.environ['MONGO_DB']].stations.update({'stationNumber': station['stationNumber'] }, {'$set': {'timezone': json_obj['value']['timeSeries'][0]['sourceInfo']['timeZoneInfo']['defaultTimeZone']['zoneAbbreviation']}})
 
 ######################## Begin general GET routes for Node app ##########################
     # get_by_state

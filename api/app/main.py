@@ -38,6 +38,7 @@ def docs():
 # ------ The only endpoint called from our node application -------
 
 # Station routes
+
 @app.route('/station/new/<id>', methods=['GET'])
 def station_new(id):
     client = MongoClient(connection_string)

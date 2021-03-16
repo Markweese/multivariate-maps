@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
 const stationSchema = new mongoose.Schema({
+  timezone: {
+    type: String
+  },
   //for indexing and searching by text filter.
   name: {
     type: String
