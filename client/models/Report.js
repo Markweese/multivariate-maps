@@ -96,11 +96,33 @@ const reportSchema = new Schema({
       type: String,
       date: Date,
       author: String,
-      score: Number,
+      replyTo: String,
+      score: {
+        type: Number,
+        default: 0
+      },
       comment: String,
-      flagged: Boolean
+      flags: [
+        {
+          violation: {
+            type: String,
+            enum: ['offensive', 'spam', 'inaccurate', 'needs moderator attention']
+          },
+          comment: String
+        }
+      ],
+      votes: [
+        {
+          userId: String,
+          vote: Number
+        }
+      ]
     }
   ],
+  score: {
+    type: Number,
+    default: 0
+  },
   votes: [
     {
       userId: String,
@@ -112,7 +134,7 @@ const reportSchema = new Schema({
     {
       violation: {
         type: String,
-        enum: ['nudity', 'harassment', 'spam', 'inaccurate', 'other']
+        enum: ['offensive', 'spam', 'inaccurate', 'needs moderator attention']
       },
       comment: String
     }

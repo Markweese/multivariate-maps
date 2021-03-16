@@ -75,6 +75,14 @@ router.post('/site/:station/report',
   reportController.postReport
 );
 
+router.post('/reports/upvote/:report',
+  reportController.upvoteReport
+);
+
+router.post('/reports/downvote/:report',
+  reportController.downvoteReport
+);
+
 router.get('/reports/station/:station',
   reportController.getStationReports
 );
