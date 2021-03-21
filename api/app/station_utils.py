@@ -138,7 +138,7 @@ class station_utils:
 
         for row in data:
             if len(row) > 1 and row[0] == 'USGS':
-                timezone_map = {'PST': 'US/Pacific', 'CST': 'US/Central', 'EST': 'EST', 'MST': 'MST', 'AKST': 'US/Alaska'}
+                timezone_map = {'PST': 'US/Pacific', 'PDT': 'US/Pacific', 'CST': 'US/Central', 'CDT': 'US/Central', 'EST': 'EST', 'EDT': 'EST', 'ET': 'EST', 'MST': 'MST', 'MDT': 'MST', 'MT': 'MST', 'AKST': 'US/Alaska', 'AKDT': 'US/Alaska'}
                 today = datetime.now(timezone(timezone_map[row[3]]))
                 date_compare = '{}/{}'.format(today.month, today.day)
                 date_object = datetime.strptime(row[2], '%Y-%m-%d %H:%M')
