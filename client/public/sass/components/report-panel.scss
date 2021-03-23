@@ -333,6 +333,36 @@
                 text-decoration: underline;
               }
             }
+
+            .user-tag-dropdown {
+              margin-top: -10px;
+              margin-left: 10px;
+              margin-bottom: 10px;
+              max-width: min-content;
+              background-color: $color-white;
+
+              .user-tag {
+                border: none;
+                display: flex;
+                min-height: 90px;
+                min-width: 300px;
+                align-items: center;
+                padding: 20px;
+                font-size: 16px;
+                margin-top: 0px;
+                text-align: left;
+                background-color: $color-white;
+
+                &:hover {
+                  background-color: $color-alt;
+                }
+
+                .avatar-photo {
+                  border: none;
+                  margin-right: 10px;
+                }
+              }
+            }
           }
         }
       }

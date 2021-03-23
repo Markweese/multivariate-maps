@@ -81,6 +81,11 @@
                 <form v-if="user && report.writingComment" class="comment-box" method="post">
                   <textarea name="comment" rows="8" cols="80" maxlength="30000" @focus="activateComment(report._id, $event)" @focusout="currentReport = null" @input="setComment($event)"></textarea>
                   <p class="text-overlay" v-html="currentReport === report._id ? currentComment: ''"></p>
+                  <div class="user-tag-dropdown" v-if="userOptions && userOptions.length">
+                    <button class="user-tag" v-for="user in userOptions" type="button" :name="user.name">
+                      <img class="avatar-photo --small" v-if="user.photo" v-bind:src="`data:${user.photo.contentType};base64,${getBuff(user.photo.data.data)}`" alt="user photo"> {{user.name}}
+                    </button>
+                  </div>
                   <fieldset>
                     <button @click="submitComment" type="submit" class="edit-button button button-blue --inline" name="submit comment">Submit</button>
                     <button @click="report.writingComment = false" class="edit-button button button-red --inline" type="button" name="Cancel">Cancel</button>
@@ -311,14 +316,12 @@
         const re = /(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
         const word = event.target.value.split(' ')[event.target.value.split(' ').length - 1];
         const isUserTag = word.includes('@');
+        const isHashTag = word.includes('#');
 
         this.currentComment = e.target.value.replace(re, '<span class=input-highlight ref="$1$2">$1$2</span>$3');
 
         if (isUserTag) {
-          console.log(re.exec(e.target.value)[0]);
-          let cursorLocation = document.getElementById(/(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm.exec(e.target.value)[0]);
-          this.usersOptions = this.usernames.filter(u => u.name && u.name.includes(word.substring(1)));
-          cursorLocation.innerHTML += ('<ul>' + this.usersOptions.reduce((acc, u) => {acc += `<li>${u.name}</li>`}) + '</ul>');
+          this.userOptions = this.usernames.filter(u => u.name && u.name.includes(word.substring(1)));
         } else {
           this.userOptions = null;
         }

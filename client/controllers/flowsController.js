@@ -9,7 +9,7 @@
  exports.loadStationDashboard = async (req,res) => {
    let stationNumber = req.params.station;
    let cfs = await Station.findOne({stationNumber});
-   const usernames = await User.find({}, {'_id':1, 'name':1})
+   const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1})
 
    if (cfs) {
      let snotel = await Snowpack.find({huc: cfs.huc});
