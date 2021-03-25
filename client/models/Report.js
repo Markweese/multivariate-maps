@@ -93,9 +93,9 @@ const reportSchema = new Schema({
   comment: String,
   comments: [
     {
-      type: String,
       date: Date,
       author: String,
+      authorId: String,
       replyTo: String,
       score: {
         type: Number,
@@ -115,6 +115,16 @@ const reportSchema = new Schema({
         {
           userId: String,
           vote: Number
+        }
+      ],
+      hashTags: [
+        {
+          type: String
+        }
+      ],
+      userTags: [
+        {
+          type: String
         }
       ]
     }
@@ -143,6 +153,16 @@ const reportSchema = new Schema({
     {
       data: Buffer,
       contentType: String
+    }
+  ],
+  userTags: [
+    {
+      type: String
+    }
+  ],
+  hashTags: [
+    {
+      type: String
     }
   ]
 });

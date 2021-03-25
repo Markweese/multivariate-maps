@@ -9,6 +9,7 @@ mongoose.connection.on('error', (err) => {
 });
 
 //import all models
+require('./models/Tag');
 require('./models/User');
 require('./models/Report');
 require('./models/Station');

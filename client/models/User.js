@@ -41,7 +41,11 @@ const userSchema = new Schema({
       },
       fromUser: String,
       reportId: String,
-      commentId: String
+      commentId: String,
+      seen: {
+        type: Boolean,
+        default: false
+      }
     }
   ],
   activity: {

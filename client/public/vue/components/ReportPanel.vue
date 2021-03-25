@@ -72,22 +72,28 @@
               <div class="info-section__data" v-if="report.commentsOpen">
                 <div class="comment" v-if="report.comments.length">
                   <p v-for="comment in report.comments">
-                    {{comment}}
+                    {{comment.comment}}
                     <span class="author-line">- {{comment.author}} | {{getDisplayDate(comment.date)}}</span>
                     <span class="score">{{comment.score}}</span>
                   </p>
                 </div>
                 <button v-if="user && !report.writingComment" @click="report.writingComment = true" class="edit-button button button-green" type="button" name="Leave a comment">+ Add Comment</button>
                 <form v-if="user && report.writingComment" class="comment-box" method="post">
-                  <textarea name="comment" rows="8" cols="80" maxlength="30000" @focus="activateComment(report._id, $event)" @focusout="currentReport = null" @input="setComment($event)"></textarea>
-                  <p class="text-overlay" v-html="currentReport === report._id ? currentComment: ''"></p>
-                  <div class="user-tag-dropdown" v-if="userOptions && userOptions.length">
-                    <button class="user-tag" v-for="user in userOptions" type="button" :name="user.name">
-                      <img class="avatar-photo --small" v-if="user.photo" v-bind:src="`data:${user.photo.contentType};base64,${getBuff(user.photo.data.data)}`" alt="user photo"> {{user.name}}
+                  <textarea :id="`comment${report._id}`" name="comment" rows="8" cols="80" maxlength="30000" @focus="activateComment(report._id, $event)" @focusout="currentReport = null" @input="setComment($event)"></textarea>
+                  <div class="comment-tag-dropdown" v-if="userOptions && userOptions.length">
+                    <button class="comment-tag" v-for="user in userOptions" type="button" :name="user.name" v-on:click="autocomplete(user.name, report._id)">
+                      <img class="avatar-photo --small" v-if="user.photo" v-bind:src="`data:${user.photo.contentType};base64,${getBuff(user.photo.data.data)}`" alt="user photo">
+                      <img class="avatar-photo --small" v-else-if="user.name" src="/images/photos/user-default.png" alt="user photo">
+                      {{user.name}}
+                    </button>
+                  </div>
+                  <div class="comment-tag-dropdown" v-if="hashtagOptions && hashtagOptions.length">
+                    <button class="comment-tag" v-for="tag in hashtagOptions" type="button" :name="tag" v-on:click="autocomplete(user.name, report._id)">
+                      {{tag}}
                     </button>
                   </div>
                   <fieldset>
-                    <button @click="submitComment" type="submit" class="edit-button button button-blue --inline" name="submit comment">Submit</button>
+                    <button @click="submitComment($event, report._id)" type="submit" class="edit-button button button-blue --inline" name="submit comment">Submit</button>
                     <button @click="report.writingComment = false" class="edit-button button button-red --inline" type="button" name="Cancel">Cancel</button>
                   </fieldset>
                 </form>
@@ -128,7 +134,8 @@
     props: [
       'data',
       'user',
-      'usernames'
+      'usernames',
+      'hashTags'
     ],
 
     data() {
@@ -143,6 +150,7 @@
         allFlys: [],
         openSocial: null,
         userOptions: null,
+        hashtagOptions: null,
         isReporting: false,
         isLoadingReports: false,
         reportLoadError: null,
@@ -303,28 +311,80 @@
           });
       },
 
-      submitComment(event) {
+      submitComment(event, id) {
         event.preventDefault();
+
+        const hashRe = /(#)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
+        const userRe = /(@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
+        const comment = document.getElementById(`comment${id}`).value;
+        const userTags = comment.match(userRe);
+        const hashTags = comment.match(hashRe);
+        const userTagsClean = userTags ? userTags.map(t => {return t.replace(/[\s|@]/g, '')}) : userTags;
+        const hashTagsClean = hashTags ? hashTags.map(t => {return t.replace(/[\s|#]/g, '')}) : hashTags;
+        const commentObject = {
+                                date: new Date(),
+                                author: this.user.name,
+                                authorId: this.user._id,
+                                replyTo: null,
+                                score: 0,
+                                comment: comment,
+                                hashTags: hashTagsClean,
+                                userTags: userTagsClean
+                              };
+                              console.log(commentObject);
+        axios({
+          method: 'post',
+          url: `/reports/comment/${id}`,
+          data: commentObject
+        })
+        .then(res => {
+          if (res.data.status === 200) {
+            const rIndex = this.reports.findIndex(r => r._id === id);
+            this.reports[rIndex].writingComment = false;
+            this.reports[rIndex].comments.push(commentObject);
+            this.flashMessages.appendChild(this.generateSuccess('Comment recorded'));
+          } else if (res.data.errors.length) {
+             res.data.errors.forEach(e => {
+                this.flashMessages.appendChild(this.generateError(e.msg));
+              });
+          }
+        });
       },
 
       activateComment(id, e) {
+        const targetEl = document.getElementById(`comment${id}`);
         this.currentReport = id;
-        this.currentComment = e.target.value.replace(/(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm, '<span class=input-highlight ref="$1$2">$1$2</span>$3');
+
+        targetEl.focus();
       },
 
       setComment(e) {
-        const re = /(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
+        const re = /(#|@)[^@]*$/;
         const word = event.target.value.split(' ')[event.target.value.split(' ').length - 1];
-        const isUserTag = word.includes('@');
-        const isHashTag = word.includes('#');
+        const tag = re.exec(word);
 
-        this.currentComment = e.target.value.replace(re, '<span class=input-highlight ref="$1$2">$1$2</span>$3');
-
-        if (isUserTag) {
-          this.userOptions = this.usernames.filter(u => u.name && u.name.includes(word.substring(1)));
-        } else {
-          this.userOptions = null;
+        if (tag) {
+            if (tag[1] === '@') {
+              this.userOptions = this.usernames.filter(u => u.name && u.name.toLowerCase().includes(tag[0].substring(1).toLowerCase()));
+            } else if (tag[1] === '#') {
+              this.hashtagOptions = this.hashTags.filter(h => h.includes(tag[0].substring(1)));
+            } else {
+              this.userOptions = null;
+              this.hashtagOptions = null;
+            }
         }
+      },
+
+      autocomplete(term, id) {
+        const re = /(#|@)[^@]*$/;
+        const targetEl = document.getElementById(`comment${id}`);
+
+        this.currentReport = id;
+        this.userOptions = null;
+        this.hashtagOptions = null;
+
+        targetEl.value = targetEl.value.replace(re, '$1') + term;
+        targetEl.focus();
       }
     },
 

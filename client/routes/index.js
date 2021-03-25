@@ -83,6 +83,11 @@ router.post('/reports/downvote/:report',
   reportController.downvoteReport
 );
 
+router.post('/reports/comment/:report',
+  reportController.validateComment,
+  reportController.addComment
+);
+
 router.get('/reports/station/:station',
   reportController.getStationReports
 );

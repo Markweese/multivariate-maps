@@ -1,5 +1,6 @@
  const mongoose = require('mongoose');
  const User = mongoose.model('User');
+ const Report = mongoose.model('Report');
  const Station = mongoose.model('Station');
  const Snowpack = mongoose.model('Snowpack');
  const Reservoir = mongoose.model('Reservoir');
@@ -9,13 +10,16 @@
  exports.loadStationDashboard = async (req,res) => {
    let stationNumber = req.params.station;
    let cfs = await Station.findOne({stationNumber});
-   const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1})
+   const hashtags = await Report.find({}, {'_id': 0, 'hashTags': 1});
+   const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1});
+
+   // console.log(hashtags.reduce((acc,t) => acc.push(t.hashtags)));
 
    if (cfs) {
      let snotel = await Snowpack.find({huc: cfs.huc});
      let reservoir = await Reservoir.find({huc: cfs.huc});
 
-     res.render('stationPage', {cfs, snotel, reservoir, user: req.user, usernames: usernames});
+     res.render('stationPage', {cfs, snotel, reservoir, user: req.user, usernames, hashtags});
    } else {
      res.render('error');
    }
