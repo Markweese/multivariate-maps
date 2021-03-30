@@ -30,7 +30,7 @@ exports.send = async (options) => {
 
   const mailOptions = {
     from:'River Collective <checktheflowsapp@gmail.com>',
-    to: options.user.email,
+    to: options.toEmail ? options.toEmail : options.user.email,
     subject: options.subject,
     html,
     text

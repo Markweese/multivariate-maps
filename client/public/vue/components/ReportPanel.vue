@@ -23,23 +23,29 @@
               </div>
             </div>
             <div class="report-header__right">
-              <button v-on:click="openSocial ? openSocial = null : openSocial = report._id" :class="{'social-open': 1, '--active': openSocial === report._id}" type="button" name="options">
+              <button v-on:click="openSocial === report._id ? openSocial = null : openSocial = report._id" :class="{'social-open': 1, '--active': openSocial === report._id}" type="button" name="options">
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
               </button>
-              <button @click="upvoteReport(report._id)" :class="{'social-button': 1, 'social-button__upvote': 1, '--active': openSocial === report._id}" type="button" name="upvote">
-                <img src="/images/icons/upvote-blue.png" alt="upvote icon"/>
-              </button>
-              <button @click="downvoteReport(report._id)" :class="{'social-button': 1, 'social-button__downvote': 1, '--active': openSocial === report._id}" type="button" name="downvote">
-                <img src="/images/icons/downvote-blue.png" alt="downvote icon"/>
-              </button>
-              <button :class="{'social-button': 1, 'social-button__edit': 1, '--active': openSocial === report._id}" type="button" name="edit">
-                <img src="/images/icons/edit.png" alt="edit icon"/>
-              </button>
-              <button :class="{'social-button': 1, 'social-button__flag': 1, '--active': openSocial === report._id}" type="button" name="flag">
-                <img src="/images/icons/flag.png" alt="flag icon"/>
-              </button>
+              <div :class="{'social-buttons': 1, '--active': openSocial === report._id}">
+                <button :disabled="userVoted(report.votes)" @click="upvoteReport(report._id)" class="social-button social-button__upvote" type="button" name="upvote">
+                  <img v-if="!userVoted(report.votes)" src="/images/icons/upvote-blue.png" alt="upvote icon"/>
+                  <img v-else :src="userVote(report.votes) > 0 ? '/images/icons/upvote.png' : '/images/icons/upvote-inactive.png'" alt="upvote icon"/>
+                </button>
+                <button :disabled="userVoted(report.votes)" @click="downvoteReport(report._id)" class="social-button social-button__downvote" type="button" name="downvote">
+                  <img v-if="!userVoted(report.votes)" src="/images/icons/downvote-blue.png" alt="downvote icon"/>
+                  <img v-else :src="userVote(report.votes) < 0 ? '/images/icons/downvote.png' : '/images/icons/downvote-inactive.png'" alt="downvote icon"/>
+                </button>
+                <!-- Report Editin, needs work -->
+                <!-- <button v-if="user._id === report.authorId" class="social-button social-button__edit" type="button" name="edit">
+                  <img src="/images/icons/edit.png" alt="edit icon"/>
+                </button> -->
+                <button :disabled="userFlagged(report.flags)" @click="flagReport = report._id" :class="{'social-button social-button__flag': 1, '--filled': userFlagged(report.flags)}" type="button" name="flag">
+                  <img v-if="!userFlagged(report.flags)" src="/images/icons/flag.png" alt="flag icon"/>
+                  <img v-else src="/images/icons/flag-white.png" alt="flag icon"/>
+                </button>
+              </div>
               <div class="activity-icons">
                 <img src="/images/icons/fish.png" v-if="report.activity.includes('fish')" alt="fishing report">
                 <img src="/images/icons/outfitters.png" v-if="report.activity.includes('float')" alt="floating report">
@@ -76,12 +82,14 @@
                     <span class="comment-author">- <a :href="`/users/user/${comment.author}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
                   </div>
                   <div class="comment-block__right">
-                    <button @click="upvoteComment(report._id, comment._id)" type="button" name="upvote">
-                      <img src="/images/icons/upvote-blue.png" alt="upvote icon"/>
+                    <button :disabled="userVoted(comment.votes)" @click="upvoteComment(report._id, comment._id)" type="button" name="upvote">
+                      <img v-if="!userVoted(comment.votes)" src="/images/icons/upvote-blue.png" alt="upvote icon"/>
+                      <img v-else :src="userVote(comment.votes) > 0 ? '/images/icons/upvote.png' : '/images/icons/upvote-inactive.png'" alt="upvote icon"/>
                     </button>
                     <span class="comment-score">{{comment.score}}</span>
-                    <button @click="downvoteComment(report._id, comment._id)" type="button" name="downvote">
-                      <img src="/images/icons/downvote-blue.png" alt="downvote icon"/>
+                    <button :disabled="userVoted(comment.votes)" @click="downvoteComment(report._id, comment._id)" type="button" name="downvote">
+                      <img v-if="!userVoted(comment.votes)" src="/images/icons/downvote-blue.png" alt="downvote icon"/>
+                      <img v-else :src="userVote(comment.votes) < 0 ? '/images/icons/downvote.png' : '/images/icons/downvote-inactive.png'" alt="downvote icon"/>
                     </button>
                   </div>
                 </div>
@@ -131,11 +139,13 @@
     </div>
     <PointViewer v-if="pointViewerOpen" v-on:deactivate="closePointViewer" v-bind:points="pointViewerPoints"></PointViewer>
     <ReportCreator v-if="user && isReporting" v-on:deactivate="closeReport" v-bind:data="data" v-bind:user="user"></ReportCreator>
+    <ContentFlag v-if="user && flagReport" v-on:deactivate="closeFlagger" contentType="report" v-bind:contentId="flagReport" v-bind:user="user"></ContentFlag>
   </div>
 </template>
 <script>
   import axios from 'axios';
   import { FlashUtils } from '../mixins/flashUtils.js';
+  import ContentFlag from '../components/ContentFlag.vue';
   import PointViewer from '../components/PointViewer.vue';
   import ReportCreator from '../components/ReportCreator.vue';
 
@@ -157,6 +167,7 @@
         reports: null,
         allFish: [],
         allFlys: [],
+        flagReport: null,
         openSocial: null,
         userOptions: null,
         hashtagOptions: null,
@@ -196,6 +207,9 @@
       },
       closeReport() {
         this.isReporting = false;
+      },
+      closeFlagger() {
+        this.flagReport = null;
       },
       getDisplayDate(date) {
         const d = new Date(date);
@@ -422,8 +436,10 @@
 
         if (tag) {
             if (tag[1] === '@') {
+              this.hashtagOptions = null;
               this.userOptions = this.usernames.filter(u => u.name && u.name.toLowerCase().includes(tag[0].substring(1).toLowerCase()));
             } else if (tag[1] === '#') {
+              this.userOptions = null;
               this.hashtagOptions = this.hashTags.filter(h => h.includes(tag[0].substring(1)));
             } else {
               this.userOptions = null;
@@ -433,7 +449,7 @@
       },
 
       autocomplete(term, id) {
-        const re = /(#|@)[^@]*$/;
+        const re = /(#|@)[^#|@]*$/;
         const targetEl = document.getElementById(`comment${id}`);
 
         this.currentReport = id;
@@ -478,6 +494,18 @@
               this.flashMessages.appendChild(this.generateError(res.data.msg));
             }
           });
+      },
+
+      userFlagged(flags) {
+        return flags.find(f => f.flagger.toString() === this.user._id.toString());
+      },
+
+      userVoted(votes) {
+        return votes.find(v => v.userId.toString() === this.user._id.toString());
+      },
+
+      userVote(votes) {
+        return votes.find(v => v.userId.toString() === this.user._id.toString()).vote;
       }
     },
 
@@ -487,7 +515,8 @@
 
     components: {
       ReportCreator,
-      PointViewer
+      PointViewer,
+      ContentFlag
     }
   }
 </script>

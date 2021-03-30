@@ -105,6 +105,7 @@ const reportSchema = new Schema({
       comment: String,
       flags: [
         {
+          flagger: String,
           violation: {
             type: String,
             enum: ['offensive', 'spam', 'inaccurate', 'needs moderator attention']
@@ -143,9 +144,10 @@ const reportSchema = new Schema({
   views: Number,
   flags: [
     {
+      flagger: String,
       violation: {
         type: String,
-        enum: ['offensive', 'spam', 'inaccurate', 'needs moderator attention']
+        enum: ['offensive', 'spam', 'inaccurate', 'unethical', 'needs moderator attention']
       },
       comment: String
     }

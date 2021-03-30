@@ -75,6 +75,11 @@ router.post('/site/:station/report',
   reportController.postReport
 );
 
+router.post('/reports/flag/:report',
+  reportController.validateFlag,
+  reportController.flagReport
+);
+
 router.post('/reports/upvote/:report',
   reportController.upvoteReport
 );

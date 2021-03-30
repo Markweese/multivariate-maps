@@ -37,7 +37,7 @@ const userSchema = new Schema({
     {
       notificationType: {
           type: String,
-          enum: ['message', 'comment', 'tag', 'share']
+          enum: ['message', 'comment', 'tag', 'share', 'flag']
       },
       fromUser: String,
       reportId: String,

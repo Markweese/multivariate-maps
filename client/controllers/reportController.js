@@ -1,3 +1,4 @@
+const mail = require('../handlers/mail');
 const mongoose = require('mongoose');
 const Tag = mongoose.model('Tag');
 const User = mongoose.model('User');
@@ -169,6 +170,71 @@ exports.getStationReports = async (req, res) => {
   }
 }
 
+exports.validateFlag = (req, res, next) => {
+  req.checkBody('violation', 'no author provided').notEmpty();
+
+  req.sanitize('comment').blacklist('<>\{\}');
+  req.sanitize('violation').blacklist('<>\{\}\$:\(\);\'\"\/');
+
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('error', errors.map(err => err.msg));
+    res.json({status: 500, errors});
+    return;
+  }
+
+  next();
+}
+
+exports.flagReport = async (req, res) => {
+  if (req.user) {
+    const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)});
+
+    // block action if user already flagged
+    if (!report.flags.find(f => f.flagger.toString() === req.user._id.toString())) {
+      const flaggedUser = await User.findOne({_id: report.authorId});
+      const newFlag = {
+        flagger: req.user._id,
+        violation: req.body.violation,
+        comment: req.body.comment
+      }
+
+      // make private until further review if flagged 3 or more times
+      if (report.flags.length >= 3) {
+        await report.update({isPrivate: true});
+      }
+
+      // push the flag to the array
+      await report.update({$push: {flags: newFlag}});
+
+      // notify the user who created the report
+      await flaggedUser.update({$push: {notifications: {
+        notificationType: 'flag',
+        reportId: req.params.report
+      }}})
+
+      // send an email to content moderator account
+      await mail.send({
+        toEmail: 'checktheflowsabuse@gmail.com',
+        subject: 'Moderation Needed',
+        filename: 'moderator-email',
+        user: req.user,
+        violation: req.body.violation,
+        comment: req.body.comment,
+        report: report._id.toString()
+      });
+
+      res.json({status: 200});
+    } else {
+      res.json({status: 401, errors:[{msg: 'you already flagged this comment'}]});
+    }
+  } else {
+    res.json({status: 401, errors:[{msg: 'you need to <a href="/login">log in</a> to flag comments'}]});
+  }
+}
+
 exports.upvoteReport = async (req, res) => {
   if (req.user) {
     const vote = { vote: 1, userId: req.user._id};
@@ -301,7 +367,6 @@ exports.registerTags = async (req, res) => {
 
       if (tagFound) {
         await tagFound.update({$inc: {instances: 1}});
-        return;
       } else {
         await (new Tag({
           tag: req.body.tags[tag],
