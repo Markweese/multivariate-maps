@@ -83,9 +83,32 @@ router.post('/reports/downvote/:report',
   reportController.downvoteReport
 );
 
-router.post('/reports/comment/:report',
+router.post('/reports/comment/upvote/:report/:comment',
+  reportController.upvoteComment
+);
+
+router.post('/reports/comment/downvote/:report/:comment',
+  reportController.downvoteComment
+);
+
+router.post('/reports/comment/add/:report',
   reportController.validateComment,
   reportController.addComment
+);
+
+router.post('/reports/comment/register-tags',
+  reportController.cleanTags,
+  reportController.registerTags
+);
+
+router.post('/reports/comment/notify-tagged',
+  reportController.cleanNotification,
+  reportController.notifyTaggedUsers
+);
+
+router.post('/reports/comment/notify-commented',
+  reportController.cleanNotification,
+  reportController.notifyCommentedUser
 );
 
 router.get('/reports/station/:station',

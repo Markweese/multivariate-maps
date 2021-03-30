@@ -68,16 +68,25 @@
               </div>
             </div>
             <div class="info-section">
-              <h2 class="info-section__header">Comments <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="report.commentsOpen = !report.commentsOpen" :aria-expanded="report.commentsOpen">{{report.commentsOpen ? 'Close' : 'View Comments'}}<img :src="`${report.commentsOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
+              <h2 class="info-section__header">Comments <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="report.commentsOpen = !report.commentsOpen" :aria-expanded="report.commentsOpen">{{report.commentsOpen ? 'Close' : 'View Comments'}}<span v-if="report.comments.length && !report.commentsOpen"> ({{report.comments.length}})</span><img :src="`${report.commentsOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
               <div class="info-section__data" v-if="report.commentsOpen">
-                <div class="comment" v-if="report.comments.length">
-                  <p v-for="comment in report.comments">
-                    {{comment.comment}}
-                    <span class="author-line">- {{comment.author}} | {{getDisplayDate(comment.date)}}</span>
-                    <span class="score">{{comment.score}}</span>
-                  </p>
+                <div class="comment-block" v-if="report.comments.length" v-for="comment in report.comments">
+                  <div class="comment-block__left">
+                    <p class="comment-body" v-html="enrichComment(comment.comment)"></p>
+                    <span class="comment-author">- <a :href="`/users/user/${comment.author}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
+                  </div>
+                  <div class="comment-block__right">
+                    <button @click="upvoteComment(report._id, comment._id)" type="button" name="upvote">
+                      <img src="/images/icons/upvote-blue.png" alt="upvote icon"/>
+                    </button>
+                    <span class="comment-score">{{comment.score}}</span>
+                    <button @click="downvoteComment(report._id, comment._id)" type="button" name="downvote">
+                      <img src="/images/icons/downvote-blue.png" alt="downvote icon"/>
+                    </button>
+                  </div>
                 </div>
                 <button v-if="user && !report.writingComment" @click="report.writingComment = true" class="edit-button button button-green" type="button" name="Leave a comment">+ Add Comment</button>
+                <a v-if="!user" href="/login" class="button button-inactive" type="button" name="Log In">Log In To Comment</a>
                 <form v-if="user && report.writingComment" class="comment-box" method="post">
                   <textarea :id="`comment${report._id}`" name="comment" rows="8" cols="80" maxlength="30000" @focus="activateComment(report._id, $event)" @focusout="currentReport = null" @input="setComment($event)"></textarea>
                   <div class="comment-tag-dropdown" v-if="userOptions && userOptions.length">
@@ -88,8 +97,8 @@
                     </button>
                   </div>
                   <div class="comment-tag-dropdown" v-if="hashtagOptions && hashtagOptions.length">
-                    <button class="comment-tag" v-for="tag in hashtagOptions" type="button" :name="tag" v-on:click="autocomplete(user.name, report._id)">
-                      {{tag}}
+                    <button class="comment-tag" v-for="tag in hashtagOptions" type="button" :name="tag" v-on:click="autocomplete(tag, report._id)">
+                      #{{tag}}
                     </button>
                   </div>
                   <fieldset>
@@ -314,6 +323,7 @@
       submitComment(event, id) {
         event.preventDefault();
 
+        const commentId = `${this.user._id}-${Math.random().toString(36).substring(7)}`
         const hashRe = /(#)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
         const userRe = /(@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
         const comment = document.getElementById(`comment${id}`).value;
@@ -322,7 +332,8 @@
         const userTagsClean = userTags ? userTags.map(t => {return t.replace(/[\s|@]/g, '')}) : userTags;
         const hashTagsClean = hashTags ? hashTags.map(t => {return t.replace(/[\s|#]/g, '')}) : hashTags;
         const commentObject = {
-                                date: new Date(),
+                                commentId,
+                                date: new Date().toISOString(),
                                 author: this.user.name,
                                 authorId: this.user._id,
                                 replyTo: null,
@@ -331,10 +342,9 @@
                                 hashTags: hashTagsClean,
                                 userTags: userTagsClean
                               };
-                              console.log(commentObject);
         axios({
           method: 'post',
-          url: `/reports/comment/${id}`,
+          url: `/reports/comment/add/${id}`,
           data: commentObject
         })
         .then(res => {
@@ -343,12 +353,59 @@
             this.reports[rIndex].writingComment = false;
             this.reports[rIndex].comments.push(commentObject);
             this.flashMessages.appendChild(this.generateSuccess('Comment recorded'));
+            this.sendNotifications(hashTagsClean, userTagsClean, id, commentId);
           } else if (res.data.errors.length) {
              res.data.errors.forEach(e => {
                 this.flashMessages.appendChild(this.generateError(e.msg));
               });
           }
         });
+      },
+
+      sendNotifications(hashTags, userTags, id, commentId) {
+        const commentedUser = this.reports.find(r => r._id === id);
+
+        const sendObject =   {
+                date: new Date().toISOString(),
+                tags: hashTags,
+                userTags: userTags,
+                reportId: id,
+                commentId: commentId,
+                authorId: commentedUser.authorId
+              }
+
+        if (hashTags) {
+          axios({
+            method: 'post',
+            url: `/reports/comment/register-tags`,
+            data: sendObject
+          })
+          .catch(e => {
+            console.log(e);
+          })
+        }
+
+        if (userTags) {
+          axios({
+            method: 'post',
+            url: `/reports/comment/notify-tagged`,
+            data: sendObject
+          })
+          .catch(e => {
+            console.log(e);
+          })
+        }
+
+        if (commentedUser._id) {
+          axios({
+            method: 'post',
+            url: `/reports/comment/notify-commented`,
+            data: sendObject
+          })
+          .catch(e => {
+            console.log(e);
+          })
+        }
       },
 
       activateComment(id, e) {
@@ -385,6 +442,42 @@
 
         targetEl.value = targetEl.value.replace(re, '$1') + term;
         targetEl.focus();
+      },
+
+      enrichComment(comment) {
+        const hashRe = /(#)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
+        const userRe = /(@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
+
+        comment = comment.replace(hashRe, '<a href="/reports/tag/$2">$1$2</a>$3');
+        comment = comment.replace(userRe, '<a href="/users/user/$2">$1$2</a>$3');
+
+        return comment;
+      },
+
+      upvoteComment(reportId, commentId) {
+        axios.post(`/reports/comment/upvote/${reportId}/${commentId}`)
+          .then(res => {
+            if (res.data.status === 200) {
+              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
+            }
+
+            if (res.data.status === 401) {
+              this.flashMessages.appendChild(this.generateError(res.data.msg));
+            }
+          });
+      },
+
+      downvoteComment(reportId, commentId) {
+        axios.post(`/reports/comment/downvote/${reportId}/${commentId}`)
+          .then(res => {
+            if (res.data.status === 200) {
+              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
+            }
+
+            if (res.data.status === 401) {
+              this.flashMessages.appendChild(this.generateError(res.data.msg));
+            }
+          });
       }
     },
 

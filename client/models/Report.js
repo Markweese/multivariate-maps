@@ -93,6 +93,7 @@ const reportSchema = new Schema({
   comment: String,
   comments: [
     {
+      commentId: String,
       date: Date,
       author: String,
       authorId: String,
@@ -152,7 +153,8 @@ const reportSchema = new Schema({
   images: [
     {
       data: Buffer,
-      contentType: String
+      contentType: String,
+      caption: String
     }
   ],
   userTags: [

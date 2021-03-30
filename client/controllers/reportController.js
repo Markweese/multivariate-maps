@@ -201,6 +201,40 @@ exports.downvoteReport = async (req, res) => {
   }
 }
 
+exports.upvoteComment = async (req, res) => {
+  if (req.user) {
+    const vote = { vote: 1, userId: req.user._id};
+    const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)});
+    const comment = report.comments.find(c => c._id.toString() === req.params.comment);
+
+    if (comment.votes.find(v => v.userId === req.user._id.toString())){
+      res.json({status: 401, msg: 'vote already recorded'});
+    } else {
+      await Report.update({_id: mongoose.Types.ObjectId(req.params.report), 'comments._id': mongoose.Types.ObjectId(req.params.comment)}, {$push: {'comments.$.votes': vote}, $inc: {'comments.$.score': 1}});
+      res.json({status: 200, msg: 'vote recorded'});
+    }
+  } else {
+    res.json({status: 401, msg: 'you need to <a href="/login">log in</a> to vote'});
+  }
+}
+
+exports.downvoteComment = async (req, res) => {
+  if (req.user) {
+    const vote = { vote: -1, userId: req.user._id};
+    const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)});
+    const comment = report.comments.find(c => c._id.toString() === req.params.comment);
+
+    if (comment.votes.find(v => v.userId === req.user._id.toString())){
+      res.json({status: 401, msg: 'vote already recorded'});
+    } else {
+      await Report.update({_id: mongoose.Types.ObjectId(req.params.report), 'comments._id': mongoose.Types.ObjectId(req.params.comment)}, {$push: {'comments.$.votes': vote}, $inc: {'comments.$.score': -1}});
+      res.json({status: 200, msg: 'vote recorded'});
+    }
+  } else {
+    res.json({status: 401, msg: 'you need to <a href="/login">log in</a> to vote'});
+  }
+}
+
 exports.validateComment = (req, res, next) => {
   req.checkBody('date', 'improper date format').isDate();
   req.checkBody('author', 'no author provided').notEmpty();
@@ -233,6 +267,7 @@ exports.validateComment = (req, res, next) => {
 exports.addComment = async (req, res) => {
   if (req.user) {
     await Report.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.params.report)}, {$push: {comments: {
+      commentId: req.body.commentId,
       date: req.body.date,
       author: req.body.author,
       authorId: req.body.authorId,
@@ -249,7 +284,7 @@ exports.addComment = async (req, res) => {
 }
 
 exports.cleanTags = async (req, res, next) => {
-  if (req.body.tags > 0) {
+  if (req.body.tags.length > 0) {
     req.sanitize('tags.*').blacklist('<>\{\}\'\'\"\"\`\`\(\)#@$%^&*!?/\\[]:;|~');
     next();
   } else {
@@ -259,67 +294,80 @@ exports.cleanTags = async (req, res, next) => {
 
 // needs for loop solve
 
-// exports.registerTags = async (req, res) => {
-//   if (req.user) {
-//     req.body.tags.forEach(tag => {
-//       const tagFound = await Tag.findOne({tag: tag});
-//
-//       if (tagFound) {
-//         await tagFound.update({$inc: {instances: 1}});
-//       } else {
-//         await (new Tag({
-//           tag: tag,
-//           instances: 1
-//         })).save(function (err) {
-//             if (err) {
-//               console.log(err);
-//               return;
-//             } else {
-//               return;
-//             }
-//         });
-//       }
-//     });
-//   } else {
-//     console.log('unauthorized tag submission');
-//   }
-// }
-//
-// exports.cleanNotification async (req, res, next) => {
-//   if (req.body.userTags) {
-//     req.sanitize('userTags.*.id').blacklist('<>\{\}$');
-//     req.sanitize('userTags.*.notificationType').blacklist('<>\{\}$');
-//     req.sanitize('userTags.*.reportId').blacklist('<>\{\}$');
-//     req.sanitize('userTags.*.commentId').blacklist('<>\{\}$');
-//     next();
-//   }
-// }
-//
-// exports.notifyTaggedUsers = async (req, res) => {
-//   if (req.user) {
-//     req.body.userTags.forEach(user => {
-//       User.findOneAndUpdate({_id: mongoose.Types.ObjectId(user.id}, {$push: {notifications: {
-//         notificationType: 'tag',
-//         fromUser: req.user.name,
-//         reportId: req.body.reportId,
-//         commentId: req.body.commentId
-//       }}})
-//     });
-//
-//   } else {
-//     console.log('unauthorized user notification attempt');
-//   }
-// }
-//
-// exports.notifyCommentedUser = async (req, res) => {
-//   if (req.user) {
-//     User.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.body.authorId}, {$push: {notifications: {
-//       notificationType: 'comment',
-//       fromUser: req.user.name,
-//       reportId: req.body.reportId,
-//       commentId: req.body.commentId
-//     }}})
-//   } else {
-//     console.log('unauthorized user notification attempt');
-//   }
-// }
+exports.registerTags = async (req, res) => {
+  if (req.user && req.body.tags.length) {
+    for (const tag in req.body.tags) {
+      const tagFound = await Tag.findOne({tag: req.body.tags[tag]});
+
+      if (tagFound) {
+        await tagFound.update({$inc: {instances: 1}});
+        return;
+      } else {
+        await (new Tag({
+          tag: req.body.tags[tag],
+          instances: 1
+        })).save(function (err) {
+            if (err) {
+              console.log(err);
+            }
+        });
+      }
+
+      if (parseInt(tag) === req.body.tags.length - 1) {
+        return;
+      }
+    };
+  } else {
+    console.log('unauthorized tag submission');
+    return;
+  }
+}
+
+exports.cleanNotification = async (req, res, next) => {
+  if (req.body.userTags) {
+    req.sanitize('userTags.*.id').blacklist('<>\{\}$');
+    req.sanitize('userTags.*.notificationType').blacklist('<>\{\}$');
+    req.sanitize('reportId').blacklist('<>\{\}$');
+    req.sanitize('commentId').blacklist('<>\{\}$');
+    next();
+  } else {
+    return;
+  }
+}
+
+exports.notifyTaggedUsers = async (req, res) => {
+  if (req.user) {
+    for (const user in req.body.userTags) {
+      await User.findOneAndUpdate({name: req.body.userTags[user]}, {$push: {notifications: {
+        notificationType: 'tag',
+        fromUser: req.user.name,
+        reportId: req.body.reportId,
+        commentId: req.body.commentId
+      }}});
+
+      if (parseInt(user) === req.body.userTags.length - 1) {
+        return;
+      }
+    };
+
+  } else {
+    console.log('unauthorized user notification attempt');
+    return;
+  }
+}
+
+exports.notifyCommentedUser = async (req, res) => {
+  if (req.user) {
+    await User.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.body.authorId)}, {$push: {notifications: {
+      notificationType: 'comment',
+      fromUser: req.user.name,
+      reportId: req.body.reportId,
+      commentId: req.body.commentId
+    }}});
+
+    return;
+  } else {
+    console.log('unauthorized user notification attempt');
+    return;
+  }
+}
