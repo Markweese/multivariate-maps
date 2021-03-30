@@ -34,6 +34,14 @@ exports.validateReport = (req, res, next) => {
   req.checkBody('rememberBoat', 'issue saving boat settings').isBoolean();
   req.checkBody('created', 'unexpected date provided').isDate();
 
+  if (req.body.hashTags > 0) {
+    req.sanitize('hashTags.*').blacklist('<>\{\}\'\'\"\"\`\`\(\)#@$%^&*!?/\\[]:;|~');
+  }
+
+  if (req.body.userTags > 0) {
+    req.sanitize('userTags.*').blacklist('<>\{\}');
+  }
+
   if (req.body.fish.length > 0) {
     req.sanitize('flys.*.method').blacklist('<>\{\}\$:\(\);\'\"\/');
     req.sanitize('flys.*.name').blacklist('<>\{\}\$:\(\);\'\"\/');
@@ -142,12 +150,14 @@ exports.postReport = async (req, res) => {
         obstacles: req.body.obstacles,
         numCaught: req.body.numCaught,
         fish: req.body.fish,
-        comment: req.body.comment
-    })).save(function (err) {
+        comment: req.body.comment,
+        userTags: req.body.userTags,
+        hashTags: req.body.hashTags
+    })).save(function (err, report) {
         if (err) {
           res.json({status: 500, errors: [{msg: 'there, was an issue logging your report, please try again later'}]});
         } else {
-          res.json({status: 200});
+          res.json({status: 200, report});
         }
     });
   } else {

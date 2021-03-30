@@ -13,7 +13,8 @@
           <div class="report-header">
             <div class="report-header__left">
               <div class="avatar-photo --medium">
-                <img v-bind:src="`data:${report.photo.contentType};base64,${getBuff(report.photo.data.data)}`" alt="user photo">
+                <img v-if="report.photo" v-bind:src="`data:${report.photo.contentType};base64,${getBuff(report.photo.data.data)}`" alt="user photo">
+                <img v-else src="/images/photos/user-default.png" alt="user photo">
               </div>
               <div class="header-block">
                 <h3 class="header-block__title">{{report.title}}</h3>
@@ -53,7 +54,7 @@
             </div>
           </div>
           <div v-if="report.comment" class="report-body">
-            <p class="report-body__copy">{{trimComment(report.comment, 500)}}<a href="#"> ...see full report</a></p>
+            <p class="report-body__copy" v-html="enrichComment(report.comment)"></p>
           </div>
           <div class="report-data">
             <div class="info-section" v-if="report.activity.includes('fish') || report.activity.includes('both')">
@@ -98,14 +99,14 @@
                 <form v-if="user && report.writingComment" class="comment-box" method="post">
                   <textarea :id="`comment${report._id}`" name="comment" rows="8" cols="80" maxlength="30000" @focus="activateComment(report._id, $event)" @focusout="currentReport = null" @input="setComment($event)"></textarea>
                   <div class="comment-tag-dropdown" v-if="userOptions && userOptions.length">
-                    <button class="comment-tag" v-for="user in userOptions" type="button" :name="user.name" v-on:click="autocomplete(user.name, report._id)">
+                    <button class="comment-tag" v-for="user in userOptions" type="button" :name="user.name" v-on:click="autocompleteComment(user.name, report._id)">
                       <img class="avatar-photo --small" v-if="user.photo" v-bind:src="`data:${user.photo.contentType};base64,${getBuff(user.photo.data.data)}`" alt="user photo">
                       <img class="avatar-photo --small" v-else-if="user.name" src="/images/photos/user-default.png" alt="user photo">
                       {{user.name}}
                     </button>
                   </div>
                   <div class="comment-tag-dropdown" v-if="hashtagOptions && hashtagOptions.length">
-                    <button class="comment-tag" v-for="tag in hashtagOptions" type="button" :name="tag" v-on:click="autocomplete(tag, report._id)">
+                    <button class="comment-tag" v-for="tag in hashtagOptions" type="button" :name="tag" v-on:click="autocompleteComment(tag, report._id)">
                       #{{tag}}
                     </button>
                   </div>
@@ -138,13 +139,15 @@
       </div>
     </div>
     <PointViewer v-if="pointViewerOpen" v-on:deactivate="closePointViewer" v-bind:points="pointViewerPoints"></PointViewer>
-    <ReportCreator v-if="user && isReporting" v-on:deactivate="closeReport" v-bind:data="data" v-bind:user="user"></ReportCreator>
+    <ReportCreator v-if="user && isReporting" v-on:deactivate="closeReport" v-on:successfulCreate="successfulCreate" v-bind:data="data" v-bind:user="user" v-bind:usernames="usernames" v-bind:hashTags="hashTags"></ReportCreator>
     <ContentFlag v-if="user && flagReport" v-on:deactivate="closeFlagger" contentType="report" v-bind:contentId="flagReport" v-bind:user="user"></ContentFlag>
   </div>
 </template>
 <script>
   import axios from 'axios';
   import { FlashUtils } from '../mixins/flashUtils.js';
+  import { ImageUtils } from '../mixins/imageUtils.js';
+  import { CommentUtils } from '../mixins/commentUtils.js';
   import ContentFlag from '../components/ContentFlag.vue';
   import PointViewer from '../components/PointViewer.vue';
   import ReportCreator from '../components/ReportCreator.vue';
@@ -195,18 +198,15 @@
     },
 
     methods: {
-      getBuff(buffer) {
-        var binstr = Array.prototype.map.call(new Uint8Array(buffer), (ch) => {
-            return String.fromCharCode(ch);
-        }).join('');
-
-        return btoa(binstr);
-      },
       openReport() {
         this.isReporting = true;
       },
       closeReport() {
         this.isReporting = false;
+      },
+      successfulCreate(options) {
+        this.reports.unshift(options.report);
+        this.sendNotifications(options.hashTags, options.userTags, options.report._id);
       },
       closeFlagger() {
         this.flagReport = null;
@@ -334,17 +334,33 @@
           });
       },
 
-      submitComment(event, id) {
+      userFlagged(flags) {
+        return flags.find(f => f.flagger.toString() === this.user._id.toString());
+      },
+
+      userVoted(votes) {
+        if (votes) {
+          return votes.find(v => v.userId.toString() === this.user._id.toString());
+        } else {
+          return false;
+        }
+      },
+
+      userVote(votes) {
+        if (votes) {
+          return votes.find(v => v.userId.toString() === this.user._id.toString()).vote;
+        } else {
+          return null;
+        }
+      },
+
+      submitComment(event, reportId) {
         event.preventDefault();
 
+        const comment = document.getElementById(`comment${reportId}`).value;
         const commentId = `${this.user._id}-${Math.random().toString(36).substring(7)}`
-        const hashRe = /(#)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
-        const userRe = /(@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
-        const comment = document.getElementById(`comment${id}`).value;
-        const userTags = comment.match(userRe);
-        const hashTags = comment.match(hashRe);
-        const userTagsClean = userTags ? userTags.map(t => {return t.replace(/[\s|@]/g, '')}) : userTags;
-        const hashTagsClean = hashTags ? hashTags.map(t => {return t.replace(/[\s|#]/g, '')}) : hashTags;
+        const tags = this.parseTags(comment);
+
         const commentObject = {
                                 commentId,
                                 date: new Date().toISOString(),
@@ -353,164 +369,35 @@
                                 replyTo: null,
                                 score: 0,
                                 comment: comment,
-                                hashTags: hashTagsClean,
-                                userTags: userTagsClean
+                                hashTags: tags.hashTags,
+                                userTags: tags.userTags
                               };
+
         axios({
           method: 'post',
-          url: `/reports/comment/add/${id}`,
+          url: `/reports/comment/add/${reportId}`,
           data: commentObject
         })
         .then(res => {
           if (res.data.status === 200) {
-            const rIndex = this.reports.findIndex(r => r._id === id);
+            const rIndex = this.reports.findIndex(r => r._id === reportId);
             this.reports[rIndex].writingComment = false;
             this.reports[rIndex].comments.push(commentObject);
             this.flashMessages.appendChild(this.generateSuccess('Comment recorded'));
-            this.sendNotifications(hashTagsClean, userTagsClean, id, commentId);
+            this.sendNotifications(tags.hashTags, tags.userTags, reportId, commentId);
           } else if (res.data.errors.length) {
              res.data.errors.forEach(e => {
                 this.flashMessages.appendChild(this.generateError(e.msg));
               });
           }
         });
-      },
-
-      sendNotifications(hashTags, userTags, id, commentId) {
-        const commentedUser = this.reports.find(r => r._id === id);
-
-        const sendObject =   {
-                date: new Date().toISOString(),
-                tags: hashTags,
-                userTags: userTags,
-                reportId: id,
-                commentId: commentId,
-                authorId: commentedUser.authorId
-              }
-
-        if (hashTags) {
-          axios({
-            method: 'post',
-            url: `/reports/comment/register-tags`,
-            data: sendObject
-          })
-          .catch(e => {
-            console.log(e);
-          })
-        }
-
-        if (userTags) {
-          axios({
-            method: 'post',
-            url: `/reports/comment/notify-tagged`,
-            data: sendObject
-          })
-          .catch(e => {
-            console.log(e);
-          })
-        }
-
-        if (commentedUser._id) {
-          axios({
-            method: 'post',
-            url: `/reports/comment/notify-commented`,
-            data: sendObject
-          })
-          .catch(e => {
-            console.log(e);
-          })
-        }
-      },
-
-      activateComment(id, e) {
-        const targetEl = document.getElementById(`comment${id}`);
-        this.currentReport = id;
-
-        targetEl.focus();
-      },
-
-      setComment(e) {
-        const re = /(#|@)[^@]*$/;
-        const word = event.target.value.split(' ')[event.target.value.split(' ').length - 1];
-        const tag = re.exec(word);
-
-        if (tag) {
-            if (tag[1] === '@') {
-              this.hashtagOptions = null;
-              this.userOptions = this.usernames.filter(u => u.name && u.name.toLowerCase().includes(tag[0].substring(1).toLowerCase()));
-            } else if (tag[1] === '#') {
-              this.userOptions = null;
-              this.hashtagOptions = this.hashTags.filter(h => h.includes(tag[0].substring(1)));
-            } else {
-              this.userOptions = null;
-              this.hashtagOptions = null;
-            }
-        }
-      },
-
-      autocomplete(term, id) {
-        const re = /(#|@)[^#|@]*$/;
-        const targetEl = document.getElementById(`comment${id}`);
-
-        this.currentReport = id;
-        this.userOptions = null;
-        this.hashtagOptions = null;
-
-        targetEl.value = targetEl.value.replace(re, '$1') + term;
-        targetEl.focus();
-      },
-
-      enrichComment(comment) {
-        const hashRe = /(#)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
-        const userRe = /(@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
-
-        comment = comment.replace(hashRe, '<a href="/reports/tag/$2">$1$2</a>$3');
-        comment = comment.replace(userRe, '<a href="/users/user/$2">$1$2</a>$3');
-
-        return comment;
-      },
-
-      upvoteComment(reportId, commentId) {
-        axios.post(`/reports/comment/upvote/${reportId}/${commentId}`)
-          .then(res => {
-            if (res.data.status === 200) {
-              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
-            }
-
-            if (res.data.status === 401) {
-              this.flashMessages.appendChild(this.generateError(res.data.msg));
-            }
-          });
-      },
-
-      downvoteComment(reportId, commentId) {
-        axios.post(`/reports/comment/downvote/${reportId}/${commentId}`)
-          .then(res => {
-            if (res.data.status === 200) {
-              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
-            }
-
-            if (res.data.status === 401) {
-              this.flashMessages.appendChild(this.generateError(res.data.msg));
-            }
-          });
-      },
-
-      userFlagged(flags) {
-        return flags.find(f => f.flagger.toString() === this.user._id.toString());
-      },
-
-      userVoted(votes) {
-        return votes.find(v => v.userId.toString() === this.user._id.toString());
-      },
-
-      userVote(votes) {
-        return votes.find(v => v.userId.toString() === this.user._id.toString()).vote;
       }
     },
 
     mixins: [
-      FlashUtils
+      FlashUtils,
+      ImageUtils,
+      CommentUtils
     ],
 
     components: {

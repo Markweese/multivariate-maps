@@ -41,7 +41,7 @@ exports.registerForm = async (req, res) => {
 };
 
 exports.validateRegister = (req, res, next) => {
-  req.sanitize('name').blacklist('<>\{\}\$:\(\);\'\"\/');
+  req.sanitize('name').blacklist('<>\{\}\$:\(\);\'\"\/@#\s!$%^&*()_-+={}\|;:"?~\`');
   req.sanitize('email').blacklist('<>\{\}\$:\(\);\'\"\/');
   req.checkBody('name', 'You must supply a name').notEmpty();
   req.checkBody('origin', 'Supply A Home State').notEmpty();
