@@ -9,14 +9,61 @@ mixin header
         a.dropbtn(href="/explorer") Find Stations
     if user
       a.logo-block(href='/list')
+      if user.notifications
+        - const newNotifications = user.notifications.filter(n => !n.seen);
+        - const notificationsSorted = user.notifications.reverse()
+        button(data-jscript='notifications').notification-button.--mobile#notificationButtonMobile
+          if newNotifications && newNotifications.length > 0
+            span.notification-button__icon.--mobile #{newNotifications.length}
+          else
+            img(src="/images/icons/blue-check.png").notification-button__updated.--mobile
+        div.notification-dropdown.--mobile.--hidden#notificationDropdownMobile
+          each notification in notificationsSorted
+            if notification.notificationType === 'comment'
+              p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} commented on  
+                a(href=`/reports/${notification.reportId}?comment=${notification.commentId}`) your report
+            if notification.notificationType === 'tag'
+              p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} tagged you on 
+                if notification.commentId 
+                  a(href=`/reports/${notification.reportId}?comment=${notification.commentId}`) a comment
+                else 
+                  a(href=`/reports/${notification.reportId}`) a report
+            if notification.notificationType === 'flag'
+              p(class={'notification-item': true, '--seen': notification.seen}) Your report has been flagged 
+                a(href=`/reports/${notification.reportId}`) view report 
+                span or 
+                a(href=`mailto:checktheflowsapp@gmail.com`) contact us for more information.
     else
       a.logo-block(href='/')
     if user
       div.container
-        div.nav
+        div.nav.--relative
           a.dropbtn(href="/account") Account
         div.nav
           a.dropbtn(href="/logout") Logout
+        if user.notifications
+          - const newNotifications = user.notifications.filter(n => !n.seen);
+          button(data-jscript='notifications').notification-button#notificationButton
+            if newNotifications && newNotifications.length > 0
+              span.notification-button__icon #{newNotifications.length}
+            else
+              img(src="/images/icons/blue-check.png").notification-button__updated
+          div.notification-dropdown.--hidden#notificationDropdown
+            each notification in user.notifications
+              if notification.notificationType === 'comment'
+                p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} commented on  
+                  a(href=`/reports/${notification.reportId}?comment=${notification.commentId}`) your report
+              if notification.notificationType === 'tag'
+                p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} tagged you on 
+                  if notification.commentId 
+                    a(href=`/reports/${notification.reportId}?comment=${notification.commentId}`) a comment
+                  else 
+                    a(href=`/reports/${notification.reportId}`) a report
+              if notification.notificationType === 'flag'
+                p(class={'notification-item': true, '--seen': notification.seen}) Your report has been flagged 
+                  a(href=`/reports/${notification.reportId}`) view report 
+                  span or 
+                  a(href=`mailto:checktheflowsapp@gmail.com`) contact us for more information.
     else
       div.container
         div.nav

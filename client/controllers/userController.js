@@ -41,7 +41,7 @@ exports.registerForm = async (req, res) => {
 };
 
 exports.validateRegister = (req, res, next) => {
-  req.sanitize('name').blacklist('<>\{\}\$:\(\);\'\"\/@#\s!$%^&*()_-+={}\|;:"?~\`');
+  req.sanitize('name').blacklist('\[\]\.<>{}\$:\(\);\'"\/@#\s!%\^&\*_-\+=\|"\?~\\`');
   req.sanitize('email').blacklist('<>\{\}\$:\(\);\'\"\/');
   req.checkBody('name', 'You must supply a name').notEmpty();
   req.checkBody('origin', 'Supply A Home State').notEmpty();
@@ -103,8 +103,8 @@ exports.register = async (req, res) => {
     photo = {
       data: req.file.buffer,
       contentType: req.file.mimetype,
-      offsetX: req.body.offsetX[0],
-      offsetY: req.body.offsetY[0]
+      offsetX: req.body.offsetX,
+      offsetY: req.body.offsetY
     };
   }
 
@@ -265,4 +265,13 @@ exports.updateAccountEmail = async (req, res) => {
       }
     }
   }
+}
+
+exports.cleanNotifications = async (req, res) => {
+  try {
+      await User.findOneAndUpdate({_id: req.user._id}, {$set: {'notifications.$[].seen' : true}});
+  } catch(e) {
+    console.log(e);
+  }
+  res.json({msg:'hey'})
 }

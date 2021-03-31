@@ -26,6 +26,7 @@ router.get('/logout', authController.logout);
 
 
 router.get('/signup', userController.registerForm);
+
 router.post('/signup',
   userController.uploadProfilePhoto,
   userController.resizeProfilePhoto,
@@ -43,16 +44,20 @@ router.get('/account',
   userController.account
 );
 router.post('/account/update-basic',
+  authController.isLoggedIn,
   catchErrors(userController.updateAccountBasic)
 );
 router.post('/account/update-email',
+  authController.isLoggedIn,
   catchErrors(userController.updateAccountEmail)
 );
 router.post('/account/update-password',
+  authController.isLoggedIn,
   authController.confirmPassword,
   catchErrors(authController.updateAccountPassword)
 );
 router.post('/account/update-photo',
+  authController.isLoggedIn,
   userController.uploadProfilePhoto,
   userController.resizeProfilePhoto,
   catchErrors(userController.postProfilePhoto)
@@ -71,53 +76,68 @@ router.post('/account/reset/:token',
 // Rest Endpoints
 
 router.post('/site/:station/report',
+  authController.isLoggedIn,
   reportController.validateReport,
   reportController.postReport
 );
 
 router.post('/reports/flag/:report',
+  authController.isLoggedIn,
   reportController.validateFlag,
   reportController.flagReport
 );
 
 router.post('/reports/upvote/:report',
+  authController.isLoggedIn,
   reportController.upvoteReport
 );
 
 router.post('/reports/downvote/:report',
+  authController.isLoggedIn,
   reportController.downvoteReport
 );
 
 router.post('/reports/comment/upvote/:report/:comment',
+  authController.isLoggedIn,
   reportController.upvoteComment
 );
 
 router.post('/reports/comment/downvote/:report/:comment',
+  authController.isLoggedIn,
   reportController.downvoteComment
 );
 
 router.post('/reports/comment/add/:report',
+  authController.isLoggedIn,
   reportController.validateComment,
   reportController.addComment
 );
 
 router.post('/reports/comment/register-tags',
+  authController.isLoggedIn,
   reportController.cleanTags,
   reportController.registerTags
 );
 
 router.post('/reports/comment/notify-tagged',
+  authController.isLoggedIn,
   reportController.cleanNotification,
   reportController.notifyTaggedUsers
 );
 
 router.post('/reports/comment/notify-commented',
+  authController.isLoggedIn,
   reportController.cleanNotification,
   reportController.notifyCommentedUser
 );
 
 router.get('/reports/station/:station',
   reportController.getStationReports
+);
+
+router.post('/user/notifications/clean',
+  authController.isLoggedIn,
+  userController.cleanNotifications
 );
 
 

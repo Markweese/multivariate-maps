@@ -42,8 +42,9 @@
                 <!-- <button v-if="user._id === report.authorId" class="social-button social-button__edit" type="button" name="edit">
                   <img src="/images/icons/edit.png" alt="edit icon"/>
                 </button> -->
-                <button :disabled="userFlagged(report.flags)" @click="flagReport = report._id" :class="{'social-button social-button__flag': 1, '--filled': userFlagged(report.flags)}" type="button" name="flag">
-                  <img v-if="!userFlagged(report.flags)" src="/images/icons/flag.png" alt="flag icon"/>
+                <button :disabled="user && userFlagged(report.flags)" @click="flagReport = report._id" :class="{'social-button social-button__flag': 1, '--filled': userFlagged(report.flags)}" type="button" name="flag">
+                  <img v-if="!user" @click="flashMessages.appendChild(generateError('You need to <a href=`/login`>log in</a> to flag reports'))" src="/images/icons/flag.png" alt="flag icon"/>
+                  <img v-else-if="!userFlagged(report.flags)" src="/images/icons/flag.png" alt="flag icon"/>
                   <img v-else src="/images/icons/flag-white.png" alt="flag icon"/>
                 </button>
               </div>
@@ -305,41 +306,53 @@
       },
 
       upvoteReport(reportId) {
-        axios.post(`/reports/upvote/${reportId}`)
-          .then(res => {
-            if (res.data.status === 200) {
-              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
-            }
+        if (this.user) {
+          axios.post(`/reports/upvote/${reportId}`)
+            .then(res => {
+              if (res.data.status === 200) {
+                this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
+              }
 
-            if (res.data.status === 401) {
-              this.flashMessages.appendChild(this.generateError(res.data.msg));
-            }
+              if (res.data.status === 401) {
+                this.flashMessages.appendChild(this.generateError(res.data.msg));
+              }
 
-            this.openSocial = null;
-          });
+              this.openSocial = null;
+            });
+        } else {
+          this.flashMessages.appendChild(this.generateError('You need to <a href="/login">log in</a> to vote'));
+        }
       },
 
       downvoteReport(reportId) {
-        axios.post(`/reports/downvote/${reportId}`)
-          .then(res => {
-            if (res.data.status === 200) {
-              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
-            }
+        if (this.user) {
+          axios.post(`/reports/downvote/${reportId}`)
+            .then(res => {
+              if (res.data.status === 200) {
+                this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
+              }
 
-            if (res.data.status === 401) {
-              this.flashMessages.appendChild(this.generateError(res.data.msg));
-            }
+              if (res.data.status === 401) {
+                this.flashMessages.appendChild(this.generateError(res.data.msg));
+              }
 
-            this.openSocial = null;
-          });
+              this.openSocial = null;
+            });
+          } else {
+            this.flashMessages.appendChild(this.generateError('You need to <a href="/login">log in</a> to vote'));
+          }
       },
 
       userFlagged(flags) {
-        return flags.find(f => f.flagger.toString() === this.user._id.toString());
+        if (flags && this.user) {
+            return flags.find(f => f.flagger.toString() === this.user._id.toString());
+        } else {
+          return false;
+        }
       },
 
       userVoted(votes) {
-        if (votes) {
+        if (votes && this.user) {
           return votes.find(v => v.userId.toString() === this.user._id.toString());
         } else {
           return false;
@@ -347,7 +360,7 @@
       },
 
       userVote(votes) {
-        if (votes) {
+        if (votes && this.user) {
           return votes.find(v => v.userId.toString() === this.user._id.toString()).vote;
         } else {
           return null;

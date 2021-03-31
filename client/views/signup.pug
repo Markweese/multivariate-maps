@@ -4,15 +4,13 @@ block content
   form.form(id='signup' action='/signup' method='POST' data-checkusername=checkusername data-jscript='signup' enctype="multipart/form-data")
     h2 Sign Up
     label(for="photo") Choose a profile picture:
-    input(name='offsetX' type='number' class='--hidden' value=0)
-    input(name='offsetY' type='number' class='--hidden' value=0)
+    p.inputerr(id='imageErr')
+    input(name='offsetX' type='number' class='--hidden')
+    input(name='offsetY' type='number' class='--hidden')
     input(type="file" id="photo" name="photo" accept="image/png, image/jpeg")
-    div(class="photo-wrapper")
+    div(id="photoWrapper" class="photo-wrapper")
       div(id="photoPreview" aria-label="photo preview" tabindex="1")
-        if user
-          img(id="photoImage" src=`${user.photo ? 'data:' + user.photo.contentType + ';base64, ' + user.photo.data : 'images/photos/user-default.png'}` style=`left: ${user.photo.offsetX}px; top: ${user.photo.offsetY}px`)
-        else
-          img(id="photoImage" src='images/photos/user-default.png' style='width: 100px')
+        img(id="photoImage" style="top:0px; left:0px;" src='images/photos/user-default.png')
       button(class="crop-btn btn-up" aria-label="move up" onclick="cropImage(event, '#photoImage', 'top', -2)")
         img(src='/images/icons/arrow-up.png')
       button(class="crop-btn btn-right" aria-label="move right" onclick="cropImage(event, '#photoImage', 'left', 2)")
@@ -21,8 +19,6 @@ block content
         img(src='/images/icons/arrow-down.png')
       button(class="crop-btn btn-left" aria-label="move left" onclick="cropImage(event, '#photoImage', 'left', -2)")
         img(src='/images/icons/arrow-left.png')
-    input(name='offsetX' type='number' class='--hidden' value=0)
-    input(name='offsetY' type='number' class='--hidden' value=0)
     label(for='name') Username
     input(type='text' name='name' placeholder='username' required)
     p.inputerr(id='nameErr')
@@ -61,14 +57,22 @@ block content
       img = document.querySelector(img);
       
       if (axis === 'top') {
-        cropPositionY += mag;
-        img.style[`${axis}`] = `${cropPositionY}px`;
-        document.querySelector('input[name="offsetY"]').value = cropPositionY;
+        let currentPosY = parseInt(img.style[`${axis}`].split('px')[0]);
+        cropPositionY = (mag + currentPosY);
+        
+        if (cropPositionY <= 0 && img.height + cropPositionY >= 100) {
+          img.style[`${axis}`] = `${cropPositionY}px`;
+          document.querySelector('input[name="offsetY"]').value = cropPositionY;
+        }
       }
       
       if (axis === 'left') {
-        cropPositionX += mag;
-        img.style[`${axis}`] = `${cropPositionX}px`;
-        document.querySelector('input[name="offsetX"]').value = cropPositionX;
+        let currentPosX = parseInt(img.style[`${axis}`].split('px')[0]);
+        cropPositionX = (mag + currentPosX);
+        
+        if (cropPositionX <= 0 && img.width + cropPositionX >= 100) {
+          img.style[`${axis}`] = `${cropPositionX}px`;
+          document.querySelector('input[name="offsetX"]').value = cropPositionX;
+        }
       }
     };

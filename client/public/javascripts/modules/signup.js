@@ -1,6 +1,7 @@
 import { formUtils } from '../utils/formUtils';
 
 const signup = (() => {
+  let emailInput;
   let confirmInput;
   let usernameInput;
   let passwordInput;
@@ -11,12 +12,12 @@ const signup = (() => {
 
   const init = () => {
     imageInput = document.getElementById('photo');
+    emailInput = document.querySelector('input[name=email]');
     usernameInput = document.querySelector('input[name=name]');
     passwordInput = document.querySelector('input[name=new-password]');
     confirmInput = document.querySelector('input[name=confirm-password]');
     passwordStrengthBar = document.getElementById('passwordStrengthBar');
     passwordStrengthText = document.getElementById('passwordStrengthText');
-
     checkusername = JSON.parse(document.getElementById('signup').dataset.checkusername);
 
     checkusername.forEach((name,i) => {
