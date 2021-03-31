@@ -13,7 +13,8 @@
           <div class="report-header">
             <div class="report-header__left">
               <div class="avatar-photo --medium">
-                <img v-bind:src="`data:${report.photo.contentType};base64,${getBuff(report.photo.data.data)}`" alt="user photo">
+                <img v-if="report.photo" v-bind:src="`data:${report.photo.contentType};base64,${getBuff(report.photo.data.data)}`" alt="user photo">
+                <img v-else src="/images/photos/user-default.png" alt="user photo">
               </div>
               <div class="header-block">
                 <h3 class="header-block__title">{{report.title}}</h3>
@@ -23,23 +24,30 @@
               </div>
             </div>
             <div class="report-header__right">
-              <button v-on:click="openSocial ? openSocial = null : openSocial = report._id" :class="{'social-open': 1, '--active': openSocial === report._id}" type="button" name="options">
+              <button v-on:click="openSocial === report._id ? openSocial = null : openSocial = report._id" :class="{'social-open': 1, '--active': openSocial === report._id}" type="button" name="options">
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
               </button>
-              <button @click="upvoteReport(report._id)" :class="{'social-button': 1, 'social-button__upvote': 1, '--active': openSocial === report._id}" type="button" name="upvote">
-                <img src="/images/icons/upvote-blue.png" alt="upvote icon"/>
-              </button>
-              <button @click="downvoteReport(report._id)" :class="{'social-button': 1, 'social-button__downvote': 1, '--active': openSocial === report._id}" type="button" name="downvote">
-                <img src="/images/icons/downvote-blue.png" alt="downvote icon"/>
-              </button>
-              <button :class="{'social-button': 1, 'social-button__edit': 1, '--active': openSocial === report._id}" type="button" name="edit">
-                <img src="/images/icons/edit.png" alt="edit icon"/>
-              </button>
-              <button :class="{'social-button': 1, 'social-button__flag': 1, '--active': openSocial === report._id}" type="button" name="flag">
-                <img src="/images/icons/flag.png" alt="flag icon"/>
-              </button>
+              <div :class="{'social-buttons': 1, '--active': openSocial === report._id}">
+                <button :disabled="userVoted(report.votes)" @click="upvoteReport(report._id)" class="social-button social-button__upvote" type="button" name="upvote">
+                  <img v-if="!userVoted(report.votes)" src="/images/icons/upvote-blue.png" alt="upvote icon"/>
+                  <img v-else :src="userVote(report.votes) > 0 ? '/images/icons/upvote.png' : '/images/icons/upvote-inactive.png'" alt="upvote icon"/>
+                </button>
+                <button :disabled="userVoted(report.votes)" @click="downvoteReport(report._id)" class="social-button social-button__downvote" type="button" name="downvote">
+                  <img v-if="!userVoted(report.votes)" src="/images/icons/downvote-blue.png" alt="downvote icon"/>
+                  <img v-else :src="userVote(report.votes) < 0 ? '/images/icons/downvote.png' : '/images/icons/downvote-inactive.png'" alt="downvote icon"/>
+                </button>
+                <!-- Report Editin, needs work -->
+                <!-- <button v-if="user._id === report.authorId" class="social-button social-button__edit" type="button" name="edit">
+                  <img src="/images/icons/edit.png" alt="edit icon"/>
+                </button> -->
+                <button :disabled="user && userFlagged(report.flags)" @click="flagReport = report._id" :class="{'social-button social-button__flag': 1, '--filled': userFlagged(report.flags)}" type="button" name="flag">
+                  <img v-if="!user" @click="flashMessages.appendChild(generateError('You need to <a href=`/login`>log in</a> to flag reports'))" src="/images/icons/flag.png" alt="flag icon"/>
+                  <img v-else-if="!userFlagged(report.flags)" src="/images/icons/flag.png" alt="flag icon"/>
+                  <img v-else src="/images/icons/flag-white.png" alt="flag icon"/>
+                </button>
+              </div>
               <div class="activity-icons">
                 <img src="/images/icons/fish.png" v-if="report.activity.includes('fish')" alt="fishing report">
                 <img src="/images/icons/outfitters.png" v-if="report.activity.includes('float')" alt="floating report">
@@ -47,7 +55,7 @@
             </div>
           </div>
           <div v-if="report.comment" class="report-body">
-            <p class="report-body__copy">{{trimComment(report.comment, 500)}}<a href="#"> ...see full report</a></p>
+            <p class="report-body__copy" v-html="enrichComment(report.comment)"></p>
           </div>
           <div class="report-data">
             <div class="info-section" v-if="report.activity.includes('fish') || report.activity.includes('both')">
@@ -68,21 +76,43 @@
               </div>
             </div>
             <div class="info-section">
-              <h2 class="info-section__header">Comments <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="report.commentsOpen = !report.commentsOpen" :aria-expanded="report.commentsOpen">{{report.commentsOpen ? 'Close' : 'View Comments'}}<img :src="`${report.commentsOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
+              <h2 class="info-section__header">Comments <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="report.commentsOpen = !report.commentsOpen" :aria-expanded="report.commentsOpen">{{report.commentsOpen ? 'Close' : 'View Comments'}}<span v-if="report.comments.length && !report.commentsOpen"> ({{report.comments.length}})</span><img :src="`${report.commentsOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
               <div class="info-section__data" v-if="report.commentsOpen">
-                <div class="comment" v-if="report.comments.length">
-                  <p v-for="comment in report.comments">
-                    {{comment}}
-                    <span class="author-line">- {{comment.author}} | {{getDisplayDate(comment.date)}}</span>
-                    <span class="score">{{comment.score}}</span>
-                  </p>
+                <div class="comment-block" v-if="report.comments.length" v-for="comment in report.comments">
+                  <div class="comment-block__left">
+                    <p class="comment-body" v-html="enrichComment(comment.comment)"></p>
+                    <span class="comment-author">- <a :href="`/users/user/${comment.author}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
+                  </div>
+                  <div class="comment-block__right">
+                    <button :disabled="userVoted(comment.votes)" @click="upvoteComment(report._id, comment._id)" type="button" name="upvote">
+                      <img v-if="!userVoted(comment.votes)" src="/images/icons/upvote-blue.png" alt="upvote icon"/>
+                      <img v-else :src="userVote(comment.votes) > 0 ? '/images/icons/upvote.png' : '/images/icons/upvote-inactive.png'" alt="upvote icon"/>
+                    </button>
+                    <span class="comment-score">{{comment.score}}</span>
+                    <button :disabled="userVoted(comment.votes)" @click="downvoteComment(report._id, comment._id)" type="button" name="downvote">
+                      <img v-if="!userVoted(comment.votes)" src="/images/icons/downvote-blue.png" alt="downvote icon"/>
+                      <img v-else :src="userVote(comment.votes) < 0 ? '/images/icons/downvote.png' : '/images/icons/downvote-inactive.png'" alt="downvote icon"/>
+                    </button>
+                  </div>
                 </div>
                 <button v-if="user && !report.writingComment" @click="report.writingComment = true" class="edit-button button button-green" type="button" name="Leave a comment">+ Add Comment</button>
+                <a v-if="!user" href="/login" class="button button-inactive" type="button" name="Log In">Log In To Comment</a>
                 <form v-if="user && report.writingComment" class="comment-box" method="post">
-                  <textarea name="comment" rows="8" cols="80" maxlength="30000" @focus="activateComment(report._id, $event)" @focusout="currentReport = null" @input="setComment($event)"></textarea>
-                  <p class="text-overlay" v-html="currentReport === report._id ? currentComment: ''"></p>
+                  <textarea :id="`comment${report._id}`" name="comment" rows="8" cols="80" maxlength="30000" @focus="activateComment(report._id, $event)" @focusout="currentReport = null" @input="setComment($event)"></textarea>
+                  <div class="comment-tag-dropdown" v-if="userOptions && userOptions.length">
+                    <button class="comment-tag" v-for="user in userOptions" type="button" :name="user.name" v-on:click="autocompleteComment(user.name, report._id)">
+                      <img class="avatar-photo --small" v-if="user.photo" v-bind:src="`data:${user.photo.contentType};base64,${getBuff(user.photo.data.data)}`" alt="user photo">
+                      <img class="avatar-photo --small" v-else-if="user.name" src="/images/photos/user-default.png" alt="user photo">
+                      {{user.name}}
+                    </button>
+                  </div>
+                  <div class="comment-tag-dropdown" v-if="hashtagOptions && hashtagOptions.length">
+                    <button class="comment-tag" v-for="tag in hashtagOptions" type="button" :name="tag" v-on:click="autocompleteComment(tag, report._id)">
+                      #{{tag}}
+                    </button>
+                  </div>
                   <fieldset>
-                    <button @click="submitComment" type="submit" class="edit-button button button-blue --inline" name="submit comment">Submit</button>
+                    <button @click="submitComment($event, report._id)" type="submit" class="edit-button button button-blue --inline" name="submit comment">Submit</button>
                     <button @click="report.writingComment = false" class="edit-button button button-red --inline" type="button" name="Cancel">Cancel</button>
                   </fieldset>
                 </form>
@@ -110,12 +140,16 @@
       </div>
     </div>
     <PointViewer v-if="pointViewerOpen" v-on:deactivate="closePointViewer" v-bind:points="pointViewerPoints"></PointViewer>
-    <ReportCreator v-if="user && isReporting" v-on:deactivate="closeReport" v-bind:data="data" v-bind:user="user"></ReportCreator>
+    <ReportCreator v-if="user && isReporting" v-on:deactivate="closeReport" v-on:successfulCreate="successfulCreate" v-bind:data="data" v-bind:user="user" v-bind:usernames="usernames" v-bind:hashTags="hashTags"></ReportCreator>
+    <ContentFlag v-if="user && flagReport" v-on:deactivate="closeFlagger" contentType="report" v-bind:contentId="flagReport" v-bind:user="user"></ContentFlag>
   </div>
 </template>
 <script>
   import axios from 'axios';
   import { FlashUtils } from '../mixins/flashUtils.js';
+  import { ImageUtils } from '../mixins/imageUtils.js';
+  import { CommentUtils } from '../mixins/commentUtils.js';
+  import ContentFlag from '../components/ContentFlag.vue';
   import PointViewer from '../components/PointViewer.vue';
   import ReportCreator from '../components/ReportCreator.vue';
 
@@ -123,7 +157,8 @@
     props: [
       'data',
       'user',
-      'usernames'
+      'usernames',
+      'hashTags'
     ],
 
     data() {
@@ -136,8 +171,10 @@
         reports: null,
         allFish: [],
         allFlys: [],
+        flagReport: null,
         openSocial: null,
         userOptions: null,
+        hashtagOptions: null,
         isReporting: false,
         isLoadingReports: false,
         reportLoadError: null,
@@ -162,18 +199,18 @@
     },
 
     methods: {
-      getBuff(buffer) {
-        var binstr = Array.prototype.map.call(new Uint8Array(buffer), (ch) => {
-            return String.fromCharCode(ch);
-        }).join('');
-
-        return btoa(binstr);
-      },
       openReport() {
         this.isReporting = true;
       },
       closeReport() {
         this.isReporting = false;
+      },
+      successfulCreate(options) {
+        this.reports.unshift(options.report);
+        this.sendNotifications(options.hashTags, options.userTags, options.report._id);
+      },
+      closeFlagger() {
+        this.flagReport = null;
       },
       getDisplayDate(date) {
         const d = new Date(date);
@@ -269,69 +306,117 @@
       },
 
       upvoteReport(reportId) {
-        axios.post(`/reports/upvote/${reportId}`)
-          .then(res => {
-            if (res.data.status === 200) {
-              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
-            }
+        if (this.user) {
+          axios.post(`/reports/upvote/${reportId}`)
+            .then(res => {
+              if (res.data.status === 200) {
+                this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
+              }
 
-            if (res.data.status === 401) {
-              this.flashMessages.appendChild(this.generateError(res.data.msg));
-            }
+              if (res.data.status === 401) {
+                this.flashMessages.appendChild(this.generateError(res.data.msg));
+              }
 
-            this.openSocial = null;
-          });
+              this.openSocial = null;
+            });
+        } else {
+          this.flashMessages.appendChild(this.generateError('You need to <a href="/login">log in</a> to vote'));
+        }
       },
 
       downvoteReport(reportId) {
-        axios.post(`/reports/downvote/${reportId}`)
-          .then(res => {
-            if (res.data.status === 200) {
-              this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
-            }
+        if (this.user) {
+          axios.post(`/reports/downvote/${reportId}`)
+            .then(res => {
+              if (res.data.status === 200) {
+                this.flashMessages.appendChild(this.generateSuccess(res.data.msg));
+              }
 
-            if (res.data.status === 401) {
-              this.flashMessages.appendChild(this.generateError(res.data.msg));
-            }
+              if (res.data.status === 401) {
+                this.flashMessages.appendChild(this.generateError(res.data.msg));
+              }
 
-            this.openSocial = null;
-          });
+              this.openSocial = null;
+            });
+          } else {
+            this.flashMessages.appendChild(this.generateError('You need to <a href="/login">log in</a> to vote'));
+          }
       },
 
-      submitComment(event) {
-        event.preventDefault();
-      },
-
-      activateComment(id, e) {
-        this.currentReport = id;
-        this.currentComment = e.target.value.replace(/(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm, '<span class=input-highlight ref="$1$2">$1$2</span>$3');
-      },
-
-      setComment(e) {
-        const re = /(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
-        const word = event.target.value.split(' ')[event.target.value.split(' ').length - 1];
-        const isUserTag = word.includes('@');
-
-        this.currentComment = e.target.value.replace(re, '<span class=input-highlight ref="$1$2">$1$2</span>$3');
-
-        if (isUserTag) {
-          console.log(re.exec(e.target.value)[0]);
-          let cursorLocation = document.getElementById(/(#|@)(.*?)(\s|$|,|\.|\;|!|\?)/gm.exec(e.target.value)[0]);
-          this.usersOptions = this.usernames.filter(u => u.name && u.name.includes(word.substring(1)));
-          cursorLocation.innerHTML += ('<ul>' + this.usersOptions.reduce((acc, u) => {acc += `<li>${u.name}</li>`}) + '</ul>');
+      userFlagged(flags) {
+        if (flags && this.user) {
+            return flags.find(f => f.flagger.toString() === this.user._id.toString());
         } else {
-          this.userOptions = null;
+          return false;
         }
+      },
+
+      userVoted(votes) {
+        if (votes && this.user) {
+          return votes.find(v => v.userId.toString() === this.user._id.toString());
+        } else {
+          return false;
+        }
+      },
+
+      userVote(votes) {
+        if (votes && this.user) {
+          return votes.find(v => v.userId.toString() === this.user._id.toString()).vote;
+        } else {
+          return null;
+        }
+      },
+
+      submitComment(event, reportId) {
+        event.preventDefault();
+
+        const comment = document.getElementById(`comment${reportId}`).value;
+        const commentId = `${this.user._id}-${Math.random().toString(36).substring(7)}`
+        const tags = this.parseTags(comment);
+
+        const commentObject = {
+                                commentId,
+                                date: new Date().toISOString(),
+                                author: this.user.name,
+                                authorId: this.user._id,
+                                replyTo: null,
+                                score: 0,
+                                comment: comment,
+                                hashTags: tags.hashTags,
+                                userTags: tags.userTags
+                              };
+
+        axios({
+          method: 'post',
+          url: `/reports/comment/add/${reportId}`,
+          data: commentObject
+        })
+        .then(res => {
+          if (res.data.status === 200) {
+            const rIndex = this.reports.findIndex(r => r._id === reportId);
+            this.reports[rIndex].writingComment = false;
+            this.reports[rIndex].comments.push(commentObject);
+            this.flashMessages.appendChild(this.generateSuccess('Comment recorded'));
+            this.sendNotifications(tags.hashTags, tags.userTags, reportId, commentId);
+          } else if (res.data.errors.length) {
+             res.data.errors.forEach(e => {
+                this.flashMessages.appendChild(this.generateError(e.msg));
+              });
+          }
+        });
       }
     },
 
     mixins: [
-      FlashUtils
+      FlashUtils,
+      ImageUtils,
+      CommentUtils
     ],
 
     components: {
       ReportCreator,
-      PointViewer
+      PointViewer,
+      ContentFlag
     }
   }
 </script>

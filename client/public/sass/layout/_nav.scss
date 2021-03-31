@@ -76,6 +76,10 @@
 
 .nav {
 
+    &.--relative {
+      position: relative;
+    }
+
     .dropbtn {
       @include headerText;
 
@@ -104,6 +108,109 @@
     &:hover .dropdown-content{
       display:block;
     }
+}
+
+.notification {
+  &-button {
+    width: 80px;
+    height: 80px;
+    border: none;
+    background: none;
+    position: relative;
+
+    &.--mobile {
+      display: block;
+      width: min-content;
+      height: min-content;
+
+      @media #{$break-medium} {
+        display: none;
+      }
+    }
+
+    &__icon {
+      width: 40px;
+      padding: 10px;
+      display: block;
+      color: $color-white;
+      border-radius: 100%;
+      background: $color-red;
+
+      &.--blue {
+        background: $color-white;
+        border: 2px solid $color-blue;
+      }
+
+      &.--mobile {
+        width: 50px;
+        padding: 15px;
+        display: block;
+
+        @media #{$break-medium} {
+          display: none;
+        }
+      }
+    }
+
+    &__updated {
+      width: 30px;
+      padding: 2px;
+      color: $color-white;
+      border-radius: 100%;
+      background: $color-white;
+      border: 2px solid $color-blue;
+
+      &.--mobile {
+        width: 45px;
+        display: block;
+
+        @media #{$break-medium} {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &-item {
+    padding: 20px;
+    font-size: 18px;
+    background-color: $color-white;
+    border-bottom: 1px solid $color-alt;
+
+    &.--seen {
+      background-color: $color-lightest-gray;
+    }
+
+    a {
+      color: $color-blue;
+    }
+  }
+
+  &-dropdown {
+    top: 80px;
+    right: 0px;
+    height: calc(100vh - 80px);
+    max-width: 300px;
+    text-align: left;
+    overflow-y: scroll;
+    width: max-content;
+    position: absolute;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    &.--mobile {
+      top: 100px;
+      display: block;
+      height: calc(100vh - 100px);
+
+      @media #{$break-medium} {
+        display: none;
+      }
+    }
+
+    &.--hidden {
+      display: none;
+    }
+  }
 }
 
 .dropdown-content {

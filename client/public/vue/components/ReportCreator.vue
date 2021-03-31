@@ -176,7 +176,19 @@
           </div>
         </fieldset>
         <label for="comments">Trip Notes</label>
-        <textarea name="comments" rows="8" cols="80" maxlength="30000" v-model="comment"></textarea>
+        <textarea :id="`comment${user._id}`" name="comments" rows="8" cols="80" maxlength="30000" @input="setComment($event)" v-model="comment"></textarea>
+        <div class="comment-tag-dropdown" v-if="userOptions && userOptions.length">
+          <button class="comment-tag" v-for="u in userOptions" type="button" :name="u" v-on:click="autocompleteComment(u.name, user._id)">
+            <img class="avatar-photo --small" v-if="u.photo" v-bind:src="`data:${u.photo.contentType};base64,${getBuff(u.photo.data.data)}`" alt="user photo">
+            <img class="avatar-photo --small" v-else-if="u.name" src="/images/photos/user-default.png" alt="user photo">
+            {{u.name}}
+          </button>
+        </div>
+        <div class="comment-tag-dropdown" v-if="hashtagOptions && hashtagOptions.length">
+          <button class="comment-tag" v-for="tag in hashtagOptions" type="button" :name="tag" v-on:click="autocompleteComment(tag, user._id)">
+            #{{tag}}
+          </button>
+        </div>
         <label for="private">Make Report Private</label>
         <label class="switch">
           <input name="private" type="checkbox" v-model="isPrivate">
@@ -194,12 +206,16 @@
   import axios from 'axios';
   import species from '../../../data/species';
   import { FlashUtils } from '../mixins/flashUtils.js';
+  import { ImageUtils } from '../mixins/imageUtils.js';
+  import { CommentUtils } from '../mixins/commentUtils.js';
   import PointSelector from '../components/PointSelector.vue';
 
   export default {
     props: [
       'data',
-      'user'
+      'user',
+      'usernames',
+      'hashTags'
     ],
 
     data() {
@@ -233,6 +249,9 @@
         showObstacleInfo: false,
         pointSelectorOpen: false,
         pointSelectorContext: null,
+        userOptions: null,
+        hashtagOptions: null,
+        currentReport: null,
         flashMessages: document.querySelector('.flash-messages')
       }
     },
@@ -374,6 +393,8 @@
       submitReport(event) {
         event.preventDefault();
 
+        const tags = this.parseTags(this.comment);
+
         axios({
           method: 'post',
           url: `/site/${this.data.stationNumber}/report`,
@@ -409,12 +430,16 @@
             takeOutName: this.takeOutName,
             takeOutLocation: this.takeOutLocation,
             isPrivate: this.isPrivate,
-            rememberBoat: this.rememberBoat
+            rememberBoat: this.rememberBoat,
+            userTags: tags.userTags,
+            hashTags: tags.hashTags
           }
         })
         .then(res => {
           if (res.data.status === 200) {
             this.flashMessages.appendChild(this.generateSuccess('Successfully created report, <a href="/reports">view your reports</a>'));
+            res.data.report.photo = this.user.photo;
+            this.$emit('successfulCreate', {hashTags: tags.hashTags, userTags: tags.userTags, report: res.data.report});
             this.closeReport();
           } else if (res.data.errors.length) {
 
@@ -434,7 +459,9 @@
     },
 
     mixins: [
-      FlashUtils
+      FlashUtils,
+      ImageUtils,
+      CommentUtils
     ]
   }
 </script>

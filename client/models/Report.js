@@ -93,9 +93,10 @@ const reportSchema = new Schema({
   comment: String,
   comments: [
     {
-      type: String,
+      commentId: String,
       date: Date,
       author: String,
+      authorId: String,
       replyTo: String,
       score: {
         type: Number,
@@ -104,6 +105,7 @@ const reportSchema = new Schema({
       comment: String,
       flags: [
         {
+          flagger: String,
           violation: {
             type: String,
             enum: ['offensive', 'spam', 'inaccurate', 'needs moderator attention']
@@ -115,6 +117,16 @@ const reportSchema = new Schema({
         {
           userId: String,
           vote: Number
+        }
+      ],
+      hashTags: [
+        {
+          type: String
+        }
+      ],
+      userTags: [
+        {
+          type: String
         }
       ]
     }
@@ -132,9 +144,10 @@ const reportSchema = new Schema({
   views: Number,
   flags: [
     {
+      flagger: String,
       violation: {
         type: String,
-        enum: ['offensive', 'spam', 'inaccurate', 'needs moderator attention']
+        enum: ['offensive', 'spam', 'inaccurate', 'unethical', 'needs moderator attention']
       },
       comment: String
     }
@@ -142,7 +155,18 @@ const reportSchema = new Schema({
   images: [
     {
       data: Buffer,
-      contentType: String
+      contentType: String,
+      caption: String
+    }
+  ],
+  userTags: [
+    {
+      type: String
+    }
+  ],
+  hashTags: [
+    {
+      type: String
     }
   ]
 });

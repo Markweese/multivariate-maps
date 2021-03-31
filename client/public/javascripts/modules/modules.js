@@ -2,12 +2,14 @@ import { mobile } from './mobile';
 import { signup } from './signup';
 import { account } from './account';
 import { explorer } from './explorer';
+import { notifications } from './notifications';
 
 const modules = {
   signup,
   mobile,
   account,
-  explorer
+  explorer,
+  notifications
 };
 
 // run modules
