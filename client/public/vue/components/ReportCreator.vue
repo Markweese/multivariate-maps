@@ -242,7 +242,7 @@
         activitywritein: null,
         species: species,
         isPrivate: false,
-        rememberBoat: this.user.waterCraft.category ? true : false,
+        rememberBoat: this.user.waterCraft && this.user.waterCraft.category ? true : false,
         showFishInfo: false,
         showBoatInfo: false,
         showLaunchInfo: false,
