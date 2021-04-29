@@ -62,8 +62,8 @@
               <h2 class="info-section__header">Fishing Information <button class="button button-blue --inline" name="show fish information" aria-haspopup="true" @click="report.fishOpen = !report.fishOpen" :aria-expanded="report.fishOpen">{{report.fishOpen ? 'Close' : 'View'}}<img :src="`${report.fishOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
               <div class="info-section__data" v-if="report.fishOpen">
                 <p class="report-data__data-point"><strong>Number Caught: </strong><span v-if="report.numCaught">{{report.numCaught}}</span><span v-else class="--empty">none listed</span></p>
-                <p class="report-data__data-point"><strong>Species Reported: </strong><span v-if="report.fish.length" v-for="(species, index) in getSpecies(report.fish)">{{species}}</span><span v-else class="--empty">none listed</span></p>
-                <p class="report-data__data-point"><strong>Flies Used: </strong><span v-if="report.flys.length" v-for="(fly, index) in report.flys">{{fly.name}}</span><span v-else class="--empty">none listed</span></p>
+                <p class="report-data__data-point"><strong>Species Reported: </strong><span v-if="report.fish.length" v-for="(species, index) in getSpecies(report.fish)">{{species}}</span><span v-if="!report.fish.length" class="--empty">none listed</span></p>
+                <p class="report-data__data-point"><strong>Flies Used: </strong><span v-if="report.flys.length" v-for="(fly, index) in report.flys">{{fly.name}}</span><span v-if="!report.flys.length"class="--empty">none listed</span></p>
               </div>
             </div>
             <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
@@ -129,7 +129,7 @@
             </div> -->
           </div>
           <div class="report-actions">
-            <a href="" class="button button-blue button-small" type="button" name="see full report">View Report</a>
+            <a :href="`/report/${report._id}`" class="button button-blue button-small" type="button" name="see full report">View Report</a>
           </div>
         </div>
       </div>

@@ -269,9 +269,9 @@ exports.updateAccountEmail = async (req, res) => {
 
 exports.cleanNotifications = async (req, res) => {
   try {
-      await User.findOneAndUpdate({_id: req.user._id}, {$set: {'notifications.$[].seen' : true}});
+    await User.findOneAndUpdate({_id: req.user._id}, {$set: {'notifications.$[].seen' : true}});
+    return {status: 200};
   } catch(e) {
-    console.log(e);
+    return e;
   }
-  res.json({msg:'hey'})
 }

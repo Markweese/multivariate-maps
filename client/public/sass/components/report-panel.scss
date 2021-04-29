@@ -223,6 +223,12 @@
 
     .report-data {
 
+      &__data-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
       &__data-point {
         margin-bottom: 10px;
 
@@ -292,9 +298,35 @@
           }
         }
 
+        &__block {
+          padding: 10px 0;
+
+          table {
+            border: none;
+            padding: 10px;
+            background: $color-white;
+
+            .bl {
+              border-left: 1px solid black;
+            }
+
+            .bb {
+              border-bottom: 1px solid black;
+            }
+
+            td, th {
+              padding: 5px 10px;
+            }
+          }
+        }
+
         &__data {
           padding: 15px;
           background-color: $color-lightest-gray;
+
+          &.--white-bg {
+            background-color: white;
+          }
 
           .edit-button {
             width: 100%;
@@ -436,6 +468,7 @@
     height: 100%;
     position:fixed;
     top: 198px;
+    z-index: 200;
     height: calc(100vh - 198px);
 
     @media #{$break-medium} {

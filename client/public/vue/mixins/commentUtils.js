@@ -3,14 +3,18 @@ import axios from 'axios';
 const CommentUtils = {
   methods: {
     parseTags(comment) {
-      const hashRe = /(#)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
-      const userRe = /(@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
-      const userTags = comment.match(userRe);
-      const hashTags = comment.match(hashRe);
-      const userTagsClean = userTags ? userTags.map(t => {return t.replace(/[\s|@]/g, '')}) : userTags;
-      const hashTagsClean = hashTags ? hashTags.map(t => {return t.replace(/[\s|#]/g, '')}) : hashTags;
+      if (comment) {
+        const hashRe = /(#)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
+        const userRe = /(@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
+        const userTags = comment.match(userRe);
+        const hashTags = comment.match(hashRe);
+        const userTagsClean = userTags ? userTags.map(t => {return t.replace(/[\s|@]/g, '')}) : userTags;
+        const hashTagsClean = hashTags ? hashTags.map(t => {return t.replace(/[\s|#]/g, '')}) : hashTags;
 
-      return {hashTags: hashTagsClean, userTags: userTagsClean}
+        return {hashTags: hashTagsClean, userTags: userTagsClean}
+      } else {
+        return {hashTags: null, userTags: null}
+      }
     },
 
     sendNotifications(hashTags, userTags, id, commentId) {
@@ -24,8 +28,6 @@ const CommentUtils = {
               commentId: commentId ? commentId : null,
               authorId: commentedUser ? commentedUser.authorId : null
             }
-
-            console.log(sendObject)
 
       if (hashTags) {
         axios({
@@ -97,6 +99,7 @@ const CommentUtils = {
 
       if (this.comment) {
         this.comment = this.comment.replace(re, '$1') + term;
+        targetEl.focus();
       } else {
         targetEl.value = targetEl.value.replace(re, '$1') + term;
         targetEl.focus();

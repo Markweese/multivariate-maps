@@ -16,6 +16,9 @@ router.get('/explorer/new/:id', flowsController.pushValue);
 //station dashboard pages
 router.get('/site/:station', flowsController.loadStationDashboard);
 
+//station dashboard pages
+router.get('/report/:report', reportController.loadReportPage);
+
 router.post('/login',
   authController.login,
   authController.generateSessionToken

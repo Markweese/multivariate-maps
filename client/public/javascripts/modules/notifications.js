@@ -10,8 +10,12 @@ const notifications = (() => {
     document.getElementById('notificationDropdown').classList.toggle('--hidden');
     document.getElementById('notificationDropdownMobile').classList.toggle('--hidden');
     axios.post('/user/notifications/clean')
-      .then(res => {
-        console.log(res.data);
+      .then(() => {
+        document.querySelector('.notification-button__icon').style.display = 'none';
+        document.getElementById('notificationButton').querySelector('img').src = '/images/icons/alert-bell-active.png'
+      })
+      .catch(e => {
+        console.log(e);
       });
   }
 
