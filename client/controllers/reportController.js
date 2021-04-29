@@ -446,3 +446,18 @@ exports.notifyCommentedUser = async (req, res) => {
     return;
   }
 }
+
+exports.loadReportPage = async (req, res) => {
+  console.log(req.params.report);
+  const hashtags = await Tag.find({}, {'_id': 0, 'tag': 1});
+  const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1});
+  const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)});
+
+  if (report) {
+    const user = await User.findOne({_id: mongoose.Types.ObjectId(report.authorId)}, {photo: 1});
+    report.photo = user.photo;
+    res.render('reportPage', {report, user: req.user, usernames, hashtags: hashtags.map(t => t.tag)});
+  } else {
+    res.render('error');
+  }
+}

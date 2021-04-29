@@ -14,23 +14,24 @@ mixin header
         - const notificationsSorted = user.notifications.reverse()
         button(data-jscript='notifications').notification-button.--mobile#notificationButtonMobile
           if newNotifications && newNotifications.length > 0
+            img(src="/images/icons/alert-bell-active.png").notification-button__updated.--mobile
             span.notification-button__icon.--mobile #{newNotifications.length}
           else
-            img(src="/images/icons/blue-check.png").notification-button__updated.--mobile
+            img(src="/images/icons/alert-bell.png").notification-button__updated.--mobile
         div.notification-dropdown.--mobile.--hidden#notificationDropdownMobile
           each notification in notificationsSorted
             if notification.notificationType === 'comment'
               p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} commented on  
-                a(href=`/reports/${notification.reportId}?comment=${notification.commentId}`) your report
+                a(href=`/report/${notification.reportId}?comment=${notification.commentId}`) your report
             if notification.notificationType === 'tag'
               p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} tagged you on 
                 if notification.commentId 
-                  a(href=`/reports/${notification.reportId}?comment=${notification.commentId}`) a comment
+                  a(href=`/report/${notification.reportId}?comment=${notification.commentId}`) a comment
                 else 
-                  a(href=`/reports/${notification.reportId}`) a report
+                  a(href=`/report/${notification.reportId}`) a report
             if notification.notificationType === 'flag'
               p(class={'notification-item': true, '--seen': notification.seen}) Your report has been flagged 
-                a(href=`/reports/${notification.reportId}`) view report 
+                a(href=`/report/${notification.reportId}`) view report 
                 span or 
                 a(href=`mailto:checktheflowsapp@gmail.com`) contact us for more information.
     else
@@ -45,23 +46,24 @@ mixin header
           - const newNotifications = user.notifications.filter(n => !n.seen);
           button(data-jscript='notifications').notification-button#notificationButton
             if newNotifications && newNotifications.length > 0
+              img(src="/images/icons/alert-bell-active.png").notification-button__updated
               span.notification-button__icon #{newNotifications.length}
             else
-              img(src="/images/icons/blue-check.png").notification-button__updated
+              img(src="/images/icons/alert-bell.png").notification-button__updated
           div.notification-dropdown.--hidden#notificationDropdown
             each notification in user.notifications
               if notification.notificationType === 'comment'
                 p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} commented on  
-                  a(href=`/reports/${notification.reportId}?comment=${notification.commentId}`) your report
+                  a(href=`/report/${notification.reportId}?comment=${notification.commentId}`) your report
               if notification.notificationType === 'tag'
                 p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} tagged you on 
                   if notification.commentId 
-                    a(href=`/reports/${notification.reportId}?comment=${notification.commentId}`) a comment
+                    a(href=`/report/${notification.reportId}?comment=${notification.commentId}`) a comment
                   else 
-                    a(href=`/reports/${notification.reportId}`) a report
+                    a(href=`/report/${notification.reportId}`) a report
               if notification.notificationType === 'flag'
                 p(class={'notification-item': true, '--seen': notification.seen}) Your report has been flagged 
-                  a(href=`/reports/${notification.reportId}`) view report 
+                  a(href=`/report/${notification.reportId}`) view report 
                   span or 
                   a(href=`mailto:checktheflowsapp@gmail.com`) contact us for more information.
     else

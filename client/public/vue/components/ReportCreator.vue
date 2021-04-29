@@ -225,7 +225,7 @@
         allObstacles: [],
         title: null,
         comment: null,
-        date: null,
+        date: new Date().toJSON().slice(0,10),
         multiday: false,
         startDate: this.date,
         endDate: null,
@@ -262,8 +262,8 @@
 
     computed: {
       registeredPH() {
-        if (this.date && this.data.ph && this.data.ph.length) {
-          const startDate = new Date(this.date);
+        if (this.data.ph && this.data.ph.length) {
+          const startDate = this.date ? new Date(this.date) : new Date();
           const day = startDate.getDay() + 1;
           const month = startDate.getMonth() + 1;
           const result = this.data.ph.filter(ph => {ph.date === `${month}/${day}`});
@@ -274,8 +274,8 @@
         }
       },
       registeredCFS() {
-        if (this.date && this.data.cfs && this.data.cfs.length) {
-          const startDate = new Date(this.date);
+        if (this.data.cfs && this.data.cfs.length) {
+          const startDate = this.date ? new Date(this.date) : new Date();
           const day = startDate.getDate() + 1;
           const month = startDate.getMonth() + 1;
           const result = this.data.cfs.filter(cfs => cfs.date === `${month}/${day}`);
@@ -286,8 +286,8 @@
         }
       },
       registeredTemp() {
-        if (this.date && this.data.temp && this.data.temp.length) {
-          const startDate = new Date(this.date);
+        if (this.data.temp && this.data.temp.length) {
+          const startDate = this.date ? new Date(this.date) : new Date();
           const day = startDate.getDay() + 1;
           const month = startDate.getMonth() + 1;
           const result = this.data.temp.filter(temp => {temp.date === `${month}/${day}`});
@@ -298,8 +298,8 @@
         }
       },
       registeredConductance() {
-        if (this.date && this.data.conductance && this.data.conductance.length) {
-          const startDate = new Date(this.date);
+        if (this.data.conductance && this.data.conductance.length) {
+          const startDate = this.date ? new Date(this.date) : new Date();
           const day = startDate.getDay() + 1;
           const month = startDate.getMonth() + 1;
           const result = this.data.conductance.filter(conductance => {conductance.date === `${month}/${day}`});
@@ -394,6 +394,7 @@
         event.preventDefault();
 
         const tags = this.parseTags(this.comment);
+        const currentDate = new Date().toJSON().slice(0,10);
 
         axios({
           method: 'post',
@@ -401,7 +402,7 @@
           data: {
             stationNumber: this.data.stationNumber,
             title: this.title,
-            startDate: this.date,
+            startDate: this.date ? this.date : currentDate,
             endDate: this.endDate,
             conditions: {
               cfs: this.registeredCFS,
@@ -412,7 +413,7 @@
             author: this.user.name,
             authorId: this.user._id,
             state: this.data.state,
-            created: new Date().toJSON().slice(0,10).replace(/-/g,'/'),
+            created: currentDate,
             activity: this.activity === 'fishfloat' ? 'both' : this.activity,
             activitywritein: this.activitywritein,
             numCaught: this.allFish.length,
