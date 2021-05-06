@@ -3,6 +3,10 @@
   margin: $c-space;
   border-top: 1px solid $color-light-gray;
 
+  &__back-button {
+      padding: 15px;
+  }
+
   &__header {
     padding-top: 15px;
     margin-bottom: 15px;
@@ -80,12 +84,7 @@
         align-items: center;
 
         .avatar-photo {
-          display: none;
           margin-right: 15px;
-
-          @media #{$break-medium} {
-            display: block;
-          }
         }
 
         .header-block {

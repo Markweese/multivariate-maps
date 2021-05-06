@@ -1,6 +1,9 @@
 <template>
   <div class="report-panel">
     <div v-if="report" class="report-panel__report">
+      <div class="report-panel__back-button">
+        <a class="text-button --blue" :href="`/site/${report.stationNumber}`">« Back</a>
+      </div>
       <div class="report-header">
         <div class="report-header__left">
           <div class="avatar-photo --medium">
