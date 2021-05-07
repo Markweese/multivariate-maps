@@ -448,7 +448,6 @@ exports.notifyCommentedUser = async (req, res) => {
 }
 
 exports.loadReportPage = async (req, res) => {
-  console.log(req.params.report);
   const hashtags = await Tag.find({}, {'_id': 0, 'tag': 1});
   const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1});
   const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)});

@@ -50,8 +50,10 @@ const formUtils = {
   verifyUsername: (e, checkusername) => {
     if(checkusername.includes(e.target.value.toLowerCase())) {
       document.getElementById('nameErr').innerHTML = 'username already in use';
+      document.getElementById('registerButton').disabled = true;
     } else {
       document.getElementById('nameErr').innerHTML = '';
+      document.getElementById('registerButton').disabled = false;
     }
   },
   showImage: (e, input) => {

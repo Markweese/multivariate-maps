@@ -20,7 +20,7 @@ router.get('/site/:station', flowsController.loadStationDashboard);
 router.get('/report/:report', reportController.loadReportPage);
 
 //user profile pages
-router.get('/user/:user', reportController.loadReportPage);
+router.get('/user/:user', userController.loadUserPage);
 
 router.post('/login',
   authController.login,

@@ -275,3 +275,14 @@ exports.cleanNotifications = async (req, res) => {
     return e;
   }
 }
+
+exports.loadUserPage = async (req, res) => {
+  const user = await User.findOne({name: req.params.user});
+  console.log(user._id)
+  console.log(req.user.id)
+  if (req.user && req.user._id === user._id) {
+    console.log('user')
+  } else {
+    console.log('not user')
+  }
+}

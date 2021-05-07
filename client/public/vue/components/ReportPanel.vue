@@ -81,7 +81,7 @@
                 <div class="comment-block" v-if="report.comments.length" v-for="comment in report.comments">
                   <div class="comment-block__left">
                     <p class="comment-body" v-html="enrichComment(comment.comment)"></p>
-                    <span class="comment-author">- <a :href="`/users/user/${comment.author}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
+                    <span class="comment-author">- <a :href="`/user/${comment.author}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
                   </div>
                   <div class="comment-block__right">
                     <button :disabled="userVoted(comment.votes)" @click="upvoteComment(report._id, comment._id)" type="button" name="upvote">
