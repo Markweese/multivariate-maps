@@ -9,6 +9,15 @@
   background-repeat: no-repeat;
   border: 2px solid $color-blue;
 
+  &.--large{
+    width: 150px;
+    height: 150px;
+
+    img {
+      width: 150px;
+    }
+  }
+
   &.--medium {
     width: 75px;
     height: 75px;

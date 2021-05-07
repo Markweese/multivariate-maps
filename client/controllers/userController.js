@@ -278,11 +278,13 @@ exports.cleanNotifications = async (req, res) => {
 
 exports.loadUserPage = async (req, res) => {
   const user = await User.findOne({name: req.params.user});
-  console.log(user._id)
-  console.log(req.user.id)
-  if (req.user && req.user._id === user._id) {
-    console.log('user')
+
+  if (req.user && user && req.user._id.toString() === user._id.toString()) {
+    res.render('userPage', {user, viewinguser: req.user, dashboard: 'true'});
+  } else if (user) {
+    user.reports = user.reports.filter(r => !r.isPrivate);
+    res.render('userPage', {user, viewinguser: req.user, dashboard: 'false'});
   } else {
-    console.log('not user')
+    res.render('userPage', {viewinguser: req.user});
   }
 }

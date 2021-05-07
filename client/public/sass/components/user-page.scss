@@ -1,0 +1,15 @@
+.user-page {
+  padding: $p-pad;
+
+  &__header {
+    padding: $c-pad;
+
+    .avatar-photo {
+      display: inline-block;
+    }
+
+    .stats-overview {
+      display: inline-block;
+    }
+  }
+}
