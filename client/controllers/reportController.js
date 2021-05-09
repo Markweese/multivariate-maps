@@ -99,10 +99,11 @@ exports.validateReport = (req, res, next) => {
 }
 
 exports.postReport = async (req, res) => {
-  if (req.body.rememberBoat === true) {
+  const user = User.findOne({_id: req.user._id});
 
+  if (req.body.rememberBoat === true && user) {
     try {
-      await User.findOneAndUpdate({_id: req.user._id}, {$set: { waterCraft: {
+      await user.update({$set: { waterCraft: {
             category: req.body.watercraft,
             writein: req.body.watercraftwritein,
             make: req.body.watercraftmake,
@@ -153,10 +154,11 @@ exports.postReport = async (req, res) => {
         comment: req.body.comment,
         userTags: req.body.userTags,
         hashTags: req.body.hashTags
-    })).save(function (err, report) {
+    })).save(async function (err, report) {
         if (err) {
           res.json({status: 500, errors: [{msg: 'there, was an issue logging your report, please try again later'}]});
         } else {
+          await user.update({$push: {reports: report._id}});
           res.json({status: 200, report});
         }
     });

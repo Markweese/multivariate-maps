@@ -9,7 +9,18 @@
     }
 
     .stats-overview {
+      color: $color-gray;
       display: inline-block;
+
+      .header {
+        font-size: 20px;
+      }
+
+      .activities {
+        img {
+          width: 30px;
+        }
+      }
     }
   }
 }

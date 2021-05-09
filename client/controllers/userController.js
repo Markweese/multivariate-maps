@@ -280,10 +280,10 @@ exports.loadUserPage = async (req, res) => {
   const user = await User.findOne({name: req.params.user});
 
   if (req.user && user && req.user._id.toString() === user._id.toString()) {
-    res.render('userPage', {user, viewinguser: req.user, dashboard: 'true'});
+    res.render('userPage', {userprofile: user, viewinguser: req.user, dashboard: 'true'});
   } else if (user) {
     user.reports = user.reports.filter(r => !r.isPrivate);
-    res.render('userPage', {user, viewinguser: req.user, dashboard: 'false'});
+    res.render('userPage', {userprofile: user, viewinguser: req.user, dashboard: 'false'});
   } else {
     res.render('userPage', {viewinguser: req.user});
   }
