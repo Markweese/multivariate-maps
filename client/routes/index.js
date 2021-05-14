@@ -21,6 +21,7 @@ router.get('/report/:report', reportController.loadReportPage);
 
 //user profile pages
 router.get('/user/:user', userController.loadUserPage);
+router.get('/user/reports/:user', userController.getUserReports);
 
 router.post('/login',
   authController.login,

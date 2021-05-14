@@ -12,8 +12,8 @@
             <img v-if="user.activity === 'fish' || user.activity === 'both'" src="/images/icons/fish.png" alt="fishing"/>
             <img v-if="user.activity === 'float' || user.activity === 'both'" src="/images/icons/outfitters.png" alt="floating"/>
           </div>
-          <p v-if="user.reports.length">Reports Created: {{user.reports.length}}</p>
-          <p v-if="(user.activity === 'fish' || user.activity === 'both') && user.reports">Fish Caught: {{fishCount}}</p>
+          <p v-if="user.reports.length">Trips Logged: {{user.reports.length}}</p>
+          <p v-if="(user.activity === 'fish' || user.activity === 'both') && reports">Fish Caught: {{fishCount}}</p>
         </div>
       </div>
     </div>
@@ -42,8 +42,11 @@
     data() {
       return {
         user: null,
+        reports: null,
         viewingUser: null,
-        isDashboard: null
+        isDashboard: null,
+        isLoadingReports: false,
+        reportLoadError: null
       }
     },
 
@@ -53,9 +56,7 @@
 
     computed: {
       fishCount() {
-        return this.user.reports.reduce((acc, r) => {
-          acc + r.fish.length;
-        });
+        return this.reports.reduce((acc, r) => acc + r.fish.length, 0);
       }
     },
 
@@ -69,6 +70,48 @@
         this.user = user ? JSON.parse(user) : null;
         this.isDashboard = dashboard === 'true' ? true : false;
         this.viewingUser = viewingUser ? JSON.parse(viewingUser) : null;
+
+        if (this.user && this.user.reports) {
+          this.getReports();
+        }
+      },
+
+      getReports() {
+        this.isLoadingReports = true;
+
+        axios.get(`/user/reports/${this.user._id}`)
+          .then(res => {
+            if (res.data.status === 200) {
+              this.reports = res.data.data.map(r => {
+                r.navOpen = false;
+                r.fishOpen = false;
+                r.boatOpen = false;
+                r.commentsOpen = false;
+                r.writingComment = false;
+
+                return r;
+              })
+              .sort((a,b) => {
+                a = new Date(a.startDate);
+                b = new Date(b.startDate);
+
+                if (a < b) {
+                  return 1;
+                }
+
+                if (b > a) {
+                  return -1;
+                }
+              });
+            }
+
+            this.isLoadingReports = false;
+          })
+          .catch(e => {
+            console.log(e);
+            this.isLoadingReports = false;
+            this.reportLoadError = 'We had an issue loading reports, please refresh the page.';
+          });
       }
     },
 

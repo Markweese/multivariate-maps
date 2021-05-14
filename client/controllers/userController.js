@@ -1,6 +1,7 @@
 const states = require('../data/states');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const Report = mongoose.model('Report');
 const FormData = require('form-data');
 const crypto = require('crypto');
 const promisify = require('es6-promisify');
@@ -277,14 +278,28 @@ exports.cleanNotifications = async (req, res) => {
 }
 
 exports.loadUserPage = async (req, res) => {
-  const user = await User.findOne({name: req.params.user});
+  if (mongoose.Types.ObjectId.isValid(req.params.user)) {
+    const user = await User.findOne({_id: mongoose.Types.ObjectId(req.params.user)});
 
-  if (req.user && user && req.user._id.toString() === user._id.toString()) {
-    res.render('userPage', {userprofile: user, viewinguser: req.user, dashboard: 'true'});
-  } else if (user) {
-    user.reports = user.reports.filter(r => !r.isPrivate);
-    res.render('userPage', {userprofile: user, viewinguser: req.user, dashboard: 'false'});
+    if (user) {
+      res.render('userPage', {userprofile: user, viewinguser: req.user, dashboard: 'false'});
+    } else {
+      res.render('userPage', {viewinguser: {}});
+    }
   } else {
-    res.render('userPage', {viewinguser: req.user});
+    res.render('userPage', {viewinguser: {}});
+  }
+}
+
+exports.getUserReports = async (req, res) => {
+  let reports = await Report.find({authorId: req.params.user});
+
+  if (req.user && req.user._id.toString() === req.params.user) {
+    res.json({status: 200, data: reports});
+  } else if (reports) {
+    reports = reports.filter(r => !r.isPrivate);
+    res.json({status: 200, data: reports});
+  } else {
+    res.json({status: 200, data: []});
   }
 }
