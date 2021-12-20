@@ -110,7 +110,7 @@ const CommentUtils = {
       const hashRe = /(#)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
       const userRe = /(@)(.*?)(\s|$|,|\.|\;|!|\?)/gm;
 
-      comment = comment.replace(hashRe, '<a href="/reports/tag/$2">$1$2</a>$3');
+      comment = comment.replace(hashRe, '<a href="/tag/$2">$1$2</a>$3');
       comment = comment.replace(userRe, '<a href="/user/$2">$1$2</a>$3');
 
       return comment;

@@ -1,9 +1,6 @@
 <template>
   <div class="report-panel">
     <div v-if="report" class="report-panel__report">
-      <div class="report-panel__back-button">
-        <a class="text-button --blue" :href="`/site/${report.stationNumber}`">« Back</a>
-      </div>
       <div class="report-header">
         <div class="report-header__left">
           <div class="avatar-photo --medium">
@@ -12,7 +9,7 @@
           </div>
           <div class="header-block">
             <h3 class="header-block__title">{{report.title}}</h3>
-            <a :href="`/user/${report.authorId}`" class="header-block__author --link">{{report.author}}</a>
+            <a :href="`/user/${report.author}`" class="header-block__author --link">{{report.author}}</a>
             <p class="header-block__author" v-if="getDisplayDate(report.startDate) !== '12/32/1969'">{{getDisplayDate(report.startDate)}}</p>
             <p v-if="report.conditions"><span v-if="report.conditions.cfs && report.conditions.cfs > 0">{{Math.round(report.conditions.cfs)}} CFS</span><span v-if="report.conditions.temp">, {{Math.round(report.conditions.temp)}} °F</span></p>
           </div>
@@ -216,7 +213,7 @@
             <div class="comment-block" v-if="report.comments.length" v-for="comment in report.comments">
               <div class="comment-block__left">
                 <p class="comment-body" v-html="enrichComment(comment.comment)"></p>
-                <span class="comment-author">- <a :href="`/user/${comment.authorId}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
+                <span class="comment-author">- <a :href="`/user/${comment.author}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
               </div>
               <div class="comment-block__right">
                 <button :disabled="userVoted(comment.votes)" @click="upvoteComment(report._id, comment._id)" type="button" name="upvote">

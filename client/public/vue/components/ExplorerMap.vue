@@ -39,6 +39,12 @@
     },
 
     mounted: function(){
+      // TODO: rip out google maps and implement GeoJSON utilities: https://docs.mapbox.com/mapbox-gl-js/example/geojson-line/
+      // mapboxgl.accessToken = 'pk.eyJ1IjoibWFya2JyZXdlciIsImEiOiJja3hkdGpvNHQxYTdyMnF0aHl0emsyajltIn0.oNkq4DvIu2A68CEE0lPFkw';
+      // var map = new mapboxgl.Map({
+      //   container: 'map',
+      //   style: 'mapbox://styles/mapbox/streets-v11'
+      // });
       this.googleMap = new google.maps.Map(document.getElementById('map'), this.mapOptions);
       this.renderPins();
     },

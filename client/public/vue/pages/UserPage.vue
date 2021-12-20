@@ -12,10 +12,13 @@
             <img v-if="user.activity === 'fish' || user.activity === 'both'" src="/images/icons/fish.png" alt="fishing"/>
             <img v-if="user.activity === 'float' || user.activity === 'both'" src="/images/icons/outfitters.png" alt="floating"/>
           </div>
-          <p v-if="user.reports.length">Trips Logged: {{user.reports.length}}</p>
-          <p v-if="(user.activity === 'fish' || user.activity === 'both') && reports">Fish Caught: {{fishCount}}</p>
+          <p v-if="reports && reports.length">Trips Logged: <span>{{reports.length}}</span></p>
+          <p v-if="reports && states.length">Regular Haunts: <span v-for="(state, index) in statesReported">{{state}}{{index + 1 !== statesReported.length ? ', ' : ''}}</span></p>
+          <p v-if="['fish', 'both'].includes(user.activity) && reports">Primary Species: <span v-for="(species, index) in primarySpecies">{{species}}{{index + 1 !== primarySpecies.length ? ', ' : ''}}</span></p>
+          <p v-if="['float', 'both'].includes(user.activity) && user.waterCraft">Boat: <span>{{user.waterCraft.length}} foot {{user.waterCraft.make}} {{user.waterCraft.model}}</span></p>
         </div>
       </div>
+      <ReportPanel v-if="reports" v-bind:slimView="true" v-bind:data='reports' v-bind:user='user' v-bind:usernames='usernames' v-bind:hashTags='hashTags'/>
     </div>
     <!-- invalid username -->
     <div v-else>
@@ -32,16 +35,21 @@
 </template>
 <script type="text/javascript">
   import axios from 'axios';
+  import states from '../../data/states';
   import { FlashUtils } from '../mixins/flashUtils.js';
   import { ImageUtils } from '../mixins/imageUtils.js';
   import ContentFlag from '../components/ContentFlag.vue';
   import PointViewer from '../components/PointViewer.vue';
+  import ReportPanel from '../components/ReportPanel.vue';
   import { CommentUtils } from '../mixins/commentUtils.js';
 
   export default {
     data() {
       return {
         user: null,
+        states: states,
+        hashTags: null,
+        usernames: null,
         reports: null,
         viewingUser: null,
         isDashboard: null,
@@ -55,8 +63,33 @@
     },
 
     computed: {
-      fishCount() {
-        return this.reports.reduce((acc, r) => acc + r.fish.length, 0);
+      statesReported() {
+        const uniqueStates = [];
+        this.reports.forEach(r => {
+          const state = this.states.find(s => s.fip === r.state);
+
+          if (!uniqueStates.includes(state.name)) {
+            uniqueStates.push(state.name);
+          }
+        });
+
+        return uniqueStates;
+      },
+      homeStateName() {
+        const state = this.states.find(s => s.abbr === this.user.origin);
+        return state.name;
+      },
+      primarySpecies() {
+        const uniqueSpecies = [];
+        this.reports.forEach(r => {
+          r.fish.forEach(f => {
+            if (!uniqueSpecies.includes(f.species)) {
+              uniqueSpecies.push(f.species);
+            }
+          });
+        });
+
+        return uniqueSpecies;
       }
     },
 
@@ -64,10 +97,14 @@
       fetchData() {
         let dataElement = document.querySelector('#dataPasser')
         let user = dataElement.dataset.user;
+        let hashTags = dataElement.dataset.hashtags;
+        let usernames = dataElement.dataset.usernames;
         let dashboard = dataElement.dataset.dashboard;
         let viewingUser = dataElement.dataset.viewinguser;
 
         this.user = user ? JSON.parse(user) : null;
+        this.hashTags = hashTags ? JSON.parse(hashTags) : null;
+        this.usernames = usernames ? JSON.parse(usernames) : null;
         this.isDashboard = dashboard === 'true' ? true : false;
         this.viewingUser = viewingUser ? JSON.parse(viewingUser) : null;
 
@@ -104,7 +141,6 @@
                 }
               });
             }
-
             this.isLoadingReports = false;
           })
           .catch(e => {
@@ -123,7 +159,8 @@
 
     components: {
       PointViewer,
-      ContentFlag
+      ContentFlag,
+      ReportPanel
     }
   }
 </script>

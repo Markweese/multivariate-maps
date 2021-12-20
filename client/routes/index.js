@@ -18,6 +18,7 @@ router.get('/site/:station', flowsController.loadStationDashboard);
 
 //report pages
 router.get('/report/:report', reportController.loadReportPage);
+router.get('/tag/:tag', reportController.loadTaggedReports);
 
 //user profile pages
 router.get('/user/:user', userController.loadUserPage);

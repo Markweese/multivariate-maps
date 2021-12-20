@@ -1,5 +1,6 @@
 const states = require('../data/states');
 const mongoose = require('mongoose');
+const Tag = mongoose.model('Tag');
 const User = mongoose.model('User');
 const Report = mongoose.model('Report');
 const FormData = require('form-data');
@@ -278,11 +279,13 @@ exports.cleanNotifications = async (req, res) => {
 }
 
 exports.loadUserPage = async (req, res) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.user)) {
-    const user = await User.findOne({_id: mongoose.Types.ObjectId(req.params.user)});
-
+  if (req.params.user) {
+    const user = await User.findOne({name: req.params.user});
     if (user) {
-      res.render('userPage', {userprofile: user, viewinguser: req.user, dashboard: 'false'});
+      const hashtags = await Tag.find({}, {'_id': 0, 'tag': 1});
+      const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1});
+
+      res.render('userPage', {userprofile: user, viewinguser: req.user, dashboard: 'false', hashtags, usernames});
     } else {
       res.render('userPage', {viewinguser: {}});
     }

@@ -1,4 +1,4 @@
-.user-page {
+.tag-page {
   padding: $p-pad;
 
   &__header {
@@ -17,6 +17,7 @@
 
       .header {
         font-size: 20px;
+        color: $color-blue;
       }
 
       .activities {
