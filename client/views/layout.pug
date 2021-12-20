@@ -5,6 +5,7 @@ html
     title= "River Collective"
     link(rel='stylesheet', href='/dist/style.css')
     link(rel="shortcut icon" type="image/png" href="/images/brand/logo-icon.png")
+    link(href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet')
     meta(name="viewport" content="width=device-width, initial-scale=1")
     meta(content="text/html;charset=utf-8" http-equiv="Content-Type")
     meta(content="utf-8" http-equiv="encoding")
@@ -27,4 +28,5 @@ html
     block scripts
       script(src="https://www.google.com/recaptcha/api.js?render=reCAPTCHA_site_key")
       script(src=`https://maps.googleapis.com/maps/api/js?key=${process.env.MAP_KEY}&libraries=places`)
+      script(src='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js')
       script(src="/dist/App.bundle.js")

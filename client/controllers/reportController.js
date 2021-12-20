@@ -99,10 +99,11 @@ exports.validateReport = (req, res, next) => {
 }
 
 exports.postReport = async (req, res) => {
-  if (req.body.rememberBoat === true) {
+  const user = User.findOne({_id: req.user._id});
 
+  if (req.body.rememberBoat === true && user) {
     try {
-      await User.findOneAndUpdate({_id: req.user._id}, {$set: { waterCraft: {
+      await user.update({$set: { waterCraft: {
             category: req.body.watercraft,
             writein: req.body.watercraftwritein,
             make: req.body.watercraftmake,
@@ -153,10 +154,11 @@ exports.postReport = async (req, res) => {
         comment: req.body.comment,
         userTags: req.body.userTags,
         hashTags: req.body.hashTags
-    })).save(function (err, report) {
+    })).save(async function (err, report) {
         if (err) {
           res.json({status: 500, errors: [{msg: 'there, was an issue logging your report, please try again later'}]});
         } else {
+          await user.update({$push: {reports: report._id}});
           res.json({status: 200, report});
         }
     });
@@ -448,16 +450,33 @@ exports.notifyCommentedUser = async (req, res) => {
 }
 
 exports.loadReportPage = async (req, res) => {
-  console.log(req.params.report);
   const hashtags = await Tag.find({}, {'_id': 0, 'tag': 1});
   const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1});
-  const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)});
 
-  if (report) {
+  if (mongoose.Types.ObjectId.isValid(req.params.report)) {
+    const report = await Report.findOne({_id: mongoose.Types.ObjectId(req.params.report)});
+
+    if (report) {
+      const user = await User.findOne({_id: mongoose.Types.ObjectId(report.authorId)}, {photo: 1});
+      report.photo = user.photo;
+      res.render('reportPage', {report, user: req.user, usernames, hashtags: hashtags.map(t => t.tag)});
+    } else {
+      res.render('reportPage', {});
+    }
+  } else {
+    res.render('reportPage', {});
+  }
+}
+
+exports.loadTaggedReports = async (req, res) => {
+  const reports = await Report.find({hashTags: {$in: [`${req.params.tag}`]}})
+  const promises = await reports.map(async report => {
     const user = await User.findOne({_id: mongoose.Types.ObjectId(report.authorId)}, {photo: 1});
     report.photo = user.photo;
-    res.render('reportPage', {report, user: req.user, usernames, hashtags: hashtags.map(t => t.tag)});
-  } else {
-    res.render('error');
-  }
+
+    return report;
+  })
+
+  const reportsEnhanced = await Promise.all(promises)
+  res.render('tagPage', {reports: reportsEnhanced, user: req.user});
 }

@@ -16,8 +16,13 @@ router.get('/explorer/new/:id', flowsController.pushValue);
 //station dashboard pages
 router.get('/site/:station', flowsController.loadStationDashboard);
 
-//station dashboard pages
+//report pages
 router.get('/report/:report', reportController.loadReportPage);
+router.get('/tag/:tag', reportController.loadTaggedReports);
+
+//user profile pages
+router.get('/user/:user', userController.loadUserPage);
+router.get('/user/reports/:user', userController.getUserReports);
 
 router.post('/login',
   authController.login,

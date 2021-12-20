@@ -19,6 +19,7 @@ const userSchema = new Schema({
     type: String,
     required: 'Please supply a name',
     trim: true,
+    unique: true
   },
   origin: {type: String},
   stations: [String],

@@ -69,6 +69,14 @@ form {
         display: block;
       }
     }
+
+    &:disabled {
+      background-color: $color-light-gray;
+
+      &:hover {
+        background-color: $color-light-gray;
+      }
+    }
   }
 
   .inputerr {

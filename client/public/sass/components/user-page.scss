@@ -1,0 +1,38 @@
+.user-page {
+  padding: $p-pad;
+
+  &__header {
+    padding: 20px 10px;
+    display: flex;
+    align-items: center;
+
+    .avatar-photo {
+      display: inline-block;
+    }
+
+    .stats-overview {
+      margin-left: 15px;
+      color: $color-gray;
+      display: inline-block;
+
+      .header {
+        font-size: 20px;
+      }
+
+      .activities {
+        img {
+          width: 30px;
+        }
+      }
+
+      p {
+        font-size: 16px;
+        font-weight: bold;
+
+        span {
+          font-weight: normal;
+        }
+      }
+    }
+  }
+}

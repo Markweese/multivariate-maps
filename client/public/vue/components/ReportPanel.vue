@@ -1,8 +1,8 @@
 <template>
   <div class='report-panel'>
     <div class="report-panel__header">
-      <h2>Trip Reports</h2>
-      <button v-if="user && !isReporting" v-on:click="openReport" class="button button-green button-small">+ Write A Report</button>
+      <h2>{{customTitle ? customTitle : 'Trip Reports'}}</h2>
+      <button v-if="user && !isReporting && !slimView" v-on:click="openReport" class="button button-green button-small">+ Write A Report</button>
     </div>
     <div class="report-panel__list">
       <div v-if='isLoadingReports' class='station-list__loader'><p>Loading Reports</p><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div></div>
@@ -12,18 +12,18 @@
         <div v-for="report in pageItems" :key="report._id" class="report-panel__report" v-if="report.score > -10">
           <div class="report-header">
             <div class="report-header__left">
-              <div class="avatar-photo --medium">
+              <div v-if="displayUserPhotos || !slimView" class="avatar-photo --medium">
                 <img v-if="report.photo" v-bind:src="`data:${report.photo.contentType};base64,${getBuff(report.photo.data.data)}`" alt="user photo">
                 <img v-else src="/images/photos/user-default.png" alt="user photo">
               </div>
               <div class="header-block">
                 <h3 class="header-block__title">{{report.title}}</h3>
-                <p class="header-block__author">{{report.author}}</p>
+                <a class="header-block__author --link" :href="`/user/${report.author}`">{{report.author}}</a>
                 <p class="header-block__author" v-if="getDisplayDate(report.startDate) !== '12/32/1969'">{{getDisplayDate(report.startDate)}}</p>
                 <p v-if="report.conditions"><span v-if="report.conditions.cfs && report.conditions.cfs > 0">{{Math.round(report.conditions.cfs)}} CFS</span><span v-if="report.conditions.temp">, {{Math.round(report.conditions.temp)}} °F</span></p>
               </div>
             </div>
-            <div class="report-header__right">
+            <div class="report-header__right" v-if="!slimView">
               <button v-on:click="openSocial === report._id ? openSocial = null : openSocial = report._id" :class="{'social-open': 1, '--active': openSocial === report._id}" type="button" name="options">
                 <div class="dot"></div>
                 <div class="dot"></div>
@@ -57,7 +57,7 @@
           <div v-if="report.comment" class="report-body">
             <p class="report-body__copy" v-html="enrichComment(report.comment)"></p>
           </div>
-          <div class="report-data">
+          <div class="report-data" v-if="!slimView">
             <div class="info-section" v-if="report.activity.includes('fish') || report.activity.includes('both')">
               <h2 class="info-section__header">Fishing Information <button class="button button-blue --inline" name="show fish information" aria-haspopup="true" @click="report.fishOpen = !report.fishOpen" :aria-expanded="report.fishOpen">{{report.fishOpen ? 'Close' : 'View'}}<img :src="`${report.fishOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
               <div class="info-section__data" v-if="report.fishOpen">
@@ -66,7 +66,7 @@
                 <p class="report-data__data-point"><strong>Flies Used: </strong><span v-if="report.flys.length" v-for="(fly, index) in report.flys">{{fly.name}}</span><span v-if="!report.flys.length"class="--empty">none listed</span></p>
               </div>
             </div>
-            <div class="info-section" v-if="report.activity.includes('float') || report.activity.includes('both')">
+            <div class="info-section" v-if="['float', 'both'].includes(report.activity) && !slimView">
               <h2 class="info-section__header">Float Information <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="report.navOpen = !report.navOpen" :aria-expanded="report.navOpen">{{report.navOpen ? 'Close' : 'View'}}<img :src="`${report.navOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
               <div class="info-section__data" v-if="report.navOpen">
                 <p class="report-data__data-point"><strong>Obstacles: </strong><span v-if="report.obstacles.length">{{report.obstacles.length}}</span><span v-else class="--empty">none listed</span></p>
@@ -75,13 +75,13 @@
                 <button v-if="report.obstacles.length || report.putIn.coordinates || report.takeOut.coordinates" type="button" class="text-button --blue" name="view on map" @click="openPointViewer(report)">See on map</button>
               </div>
             </div>
-            <div class="info-section">
+            <div class="info-section" v-if="!slimView">
               <h2 class="info-section__header">Comments <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="report.commentsOpen = !report.commentsOpen" :aria-expanded="report.commentsOpen">{{report.commentsOpen ? 'Close' : 'View Comments'}}<span v-if="report.comments.length && !report.commentsOpen"> ({{report.comments.length}})</span><img :src="`${report.commentsOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
               <div class="info-section__data" v-if="report.commentsOpen">
                 <div class="comment-block" v-if="report.comments.length" v-for="comment in report.comments">
                   <div class="comment-block__left">
                     <p class="comment-body" v-html="enrichComment(comment.comment)"></p>
-                    <span class="comment-author">- <a :href="`/users/user/${comment.author}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
+                    <span class="comment-author">- <a :href="`/user/${comment.author}`">{{comment.author}}</a> on {{getDisplayDate(comment.date)}}</span>
                   </div>
                   <div class="comment-block__right">
                     <button :disabled="userVoted(comment.votes)" @click="upvoteComment(report._id, comment._id)" type="button" name="upvote">
@@ -130,6 +130,7 @@
           </div>
           <div class="report-actions">
             <a :href="`/report/${report._id}`" class="button button-blue button-small" type="button" name="see full report">View Report</a>
+            <a v-if="slimView" :href="`/site/${report.stationNumber}`" class="text-button --blue" type="button" name="see station page">View Station Page</a>
           </div>
         </div>
       </div>
@@ -158,7 +159,10 @@
       'data',
       'user',
       'usernames',
-      'hashTags'
+      'hashTags',
+      'slimView',
+      'customTitle',
+      'displayUserPhotos'
     ],
 
     data() {
@@ -185,7 +189,11 @@
     },
 
     mounted() {
-      this.getReports();
+      if (this.slimView) {
+        this.reports = this.data;
+      } else {
+        this.getReports();
+      }
     },
 
     computed: {
@@ -294,6 +302,8 @@
                 if (b > a) {
                   return -1;
                 }
+
+                return 0;
               });
             }
 
