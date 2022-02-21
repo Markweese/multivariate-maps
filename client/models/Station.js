@@ -22,6 +22,12 @@ const stationSchema = new mongoose.Schema({
   stationNumber: {
     type: String
   },
+  gnisName: {
+    type: String
+  },
+  gnisId: {
+    type: Number
+  },
   //georeferences the station on Google Map
   coordinates: [{
     type: Number
@@ -83,7 +89,8 @@ const stationSchema = new mongoose.Schema({
 
   stationSchema.index({
     name: 'text',
-    state: 'text'
+    state: 'text',
+    gnisId: -1
   });
 
   module.exports = mongoose.model('Station', stationSchema);

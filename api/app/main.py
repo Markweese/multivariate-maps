@@ -1,10 +1,12 @@
 import os
+import json
 import flask
 import logging
 from flask import request
 from pymongo import MongoClient
 from bson.json_util import dumps
 from flask import request, render_template
+from river_module import river as river_module
 from snotel_module import snotel as snotel_module
 from station_module import station as station_module
 from station_utils import station_utils as station_utils
@@ -203,6 +205,27 @@ def reservoir_refresh():
     except Exception as e:
         logging.error(request.path, exc_info=True)
         return fail_res
+
+    client.close()
+
+# using this as a placeholder for any other population stuff on the db
+# @app.route('/gnis/populate', methods=['GET'])
+# def populate_rivers():
+#     client = MongoClient(connection_string)
+#     river = river_module(client)
+#     authentication = authentication_module(client)
+#
+#     if authentication.is_super_admin(request) == False:
+#         return auth_failure_res
+
+    # try:
+    #     thing = river.populate_gnis('hey')
+    #     jsonified = json.dumps(thing)
+    #     return jsonified
+    # except Exception as e:
+    #     return str(e)
+    #     logging.error(request.path, exc_info=True)
+    #     return fail_res
 
     client.close()
 

@@ -18,6 +18,8 @@ const reportSchema = new Schema({
   stationNumber: {
     type: String
   },
+  gnisId: String,
+  segmentId: String,
   activity: {
     type: String,
     enum: [null, 'float', 'fish', 'both', 'other']
