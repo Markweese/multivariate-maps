@@ -4,7 +4,7 @@
       <button v-if="pointSelected" @click="$emit('coordinateOut', selectedLatLng)" class="button button-green button-green--large" type="button" name="add point">Add {{context.name}} Point +</button>
       <button @click="$emit('coordinateOut', null)" class="button button-red" type="button" name="close map" @keydown="trapFocus($event, 'top')">Close Map X</button>
     </div>
-    <div id="selectorMap" class="__google-map">
+    <div id="selectorMap" class="__mapbox-map">
     </div>
   </div>
 </template>

@@ -3,7 +3,7 @@
     <div class="selector-map--controls">
       <button @click="$emit('deactivate')" class="button button-red" type="button" name="close map" @keydown="trapFocus($event, 'top')">Close Map X</button>
     </div>
-    <div id="viewerMap" class="__google-map">
+    <div id="viewerMap" class="__mapbox-map">
     </div>
   </div>
 </template>

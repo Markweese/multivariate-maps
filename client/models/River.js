@@ -6,7 +6,6 @@ const geoJsonLineString = new mongoose.Schema({
   type: {
     type: String,
     enum: ['FeatureCollection'],
-    required: true
   },
   features: [
     {
@@ -43,12 +42,10 @@ const riverSchema = new mongoose.Schema({
   name: {
     type: String
   },
-  //this forms the basis of all data binding to SNOTEL, reservoirs, and weather monitoring systems
-  huc: {
-    type: String
-  },
   //lots of identical river names, this allows us to pare down the number of results
   states: [String],
+  // hucs, because why not
+  hucs: [String],
   //links to all stations, reports, orgs, observations, etc...
   gnisId: {
     type: Number
@@ -56,7 +53,7 @@ const riverSchema = new mongoose.Schema({
   // array of 2 point arrays - index 1 = start point, index 2 = end point
   segments: [[ Number ]],
   //geojson for line geometry
-  mainLine: [[ Number ]]
+  mainLine: geoJsonLineString
 });
 
   riverSchema.index({

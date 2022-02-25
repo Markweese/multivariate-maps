@@ -1,17 +1,16 @@
 //______map styles__________
 .explorer {
-  padding: 15px;
-
   .instruction-prompt {
     padding: 30px;
     text-align: center;
+    color: $color-gray;
     background-color: $color-lightest-gray;
   }
 
   .map {
     padding: 20px;
 
-    & .__google-map {
+    & .__mapbox-map {
       height: 500px;
     }
 

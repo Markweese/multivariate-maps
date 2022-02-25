@@ -6,7 +6,7 @@ from flask import request
 from pymongo import MongoClient
 from bson.json_util import dumps
 from flask import request, render_template
-from river_module import river as river_module
+from search_module import search as search_module
 from snotel_module import snotel as snotel_module
 from station_module import station as station_module
 from station_utils import station_utils as station_utils
@@ -102,8 +102,8 @@ def station_refresh_all():
     utils = station_utils(client)
     authentication = authentication_module(client)
 
-    if authentication.is_super_admin(request) == False:
-        return auth_failure_res
+    # if authentication.is_super_admin(request) == False:
+    #     return auth_failure_res
 
     try:
         stations = utils.get_user_stations()
@@ -208,27 +208,6 @@ def reservoir_refresh():
 
     client.close()
 
-# using this as a placeholder for any other population stuff on the db
-# @app.route('/gnis/populate', methods=['GET'])
-# def populate_rivers():
-#     client = MongoClient(connection_string)
-#     river = river_module(client)
-#     authentication = authentication_module(client)
-#
-#     if authentication.is_super_admin(request) == False:
-#         return auth_failure_res
-
-    # try:
-    #     thing = river.populate_gnis('hey')
-    #     jsonified = json.dumps(thing)
-    #     return jsonified
-    # except Exception as e:
-    #     return str(e)
-    #     logging.error(request.path, exc_info=True)
-    #     return fail_res
-
-    client.close()
-
 ######################## Begin Non-cron job API routes for application consumption ##########################
 
 @app.route('/stations/state/<fip>', methods=['GET'])
@@ -256,6 +235,20 @@ def get_stations(id):
     except Exception as e:
         logging.error(request.path, exc_info=True)
         return fail_res
+
+    client.close()
+
+@app.route('/search/all', methods=['GET'])
+def search_assets():
+    client = MongoClient(connection_string)
+    search = search_module(client)
+    term = request.args.get('term')
+
+    if term and len(term) >= 3:
+        output = search.search_assets(term)
+        return dumps(output)
+    else:
+        return {'stations': [], 'rivers': [], 'rapids': [], 'reservoirs': []}
 
     client.close()
 
