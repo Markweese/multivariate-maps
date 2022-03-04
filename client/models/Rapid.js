@@ -35,25 +35,21 @@ const geoJsonLineString = new mongoose.Schema({
       }
     }
   ]
-})
+});
 
-const riverSchema = new mongoose.Schema({
-  //for indexing and searching by text filter.
+const rapidSchema = new mongoose.Schema({
   name: {
     type: String
   },
-  //lots of identical river names, this allows us to pare down the number of results
-  states: [String],
-  // hucs, because why not
-  hucs: [String],
-  //links to all stations, reports, orgs, observations, etc...
+  state: String,
   gnisId: {
     type: Number
   },
-  // array of 2 point arrays - index 1 = start point, index 2 = end point
-  segments: geoJsonLineString,
-  //geojson for line geometry
-  mainLine: geoJsonLineString
+  // TODO:array of n point arrays - allowing people to draw their lines through rapid sections would be cool.
+  runs: geoJsonLineString,
+  coordinates: [{
+    type: Number
+  }],
 });
 
   riverSchema.index({
