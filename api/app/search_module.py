@@ -30,15 +30,15 @@ class search:
         rivers = self.client[os.environ['MONGO_DB']].rivers.find(
             {'name': {'$regex': term, '$options' :'i'}},
             {'name': 1, 'gnisId': 1, 'states': 1}
-        ).limit(10);
+        );
         reservoirs = self.client[os.environ['MONGO_DB']].reservoirs.find(
             {'name': {'$regex': term, '$options' :'i'}},
             {'name': 1, 'resId': 1}
-        ).limit(10);
+        );
         stations = self.client[os.environ['MONGO_DB']].stations.find(
             {'name': {'$regex': term, '$options' :'i'}},
             {'name': 1, 'stationNumber': 1, 'gnisId': 1}
-        ).limit(10);
+        );
 
         output_obj['stations'] = list(stations)
         output_obj['rivers'] = list(rivers)

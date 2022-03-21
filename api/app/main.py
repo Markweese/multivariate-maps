@@ -102,8 +102,8 @@ def station_refresh_all():
     utils = station_utils(client)
     authentication = authentication_module(client)
 
-    # if authentication.is_super_admin(request) == False:
-    #     return auth_failure_res
+    if authentication.is_super_admin(request) == False:
+        return auth_failure_res
 
     try:
         stations = utils.get_user_stations()

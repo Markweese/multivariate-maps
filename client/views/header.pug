@@ -5,13 +5,13 @@ mixin header
     div.container
       div.nav
         a.dropbtn(href="/list") My List
-      div.nav
-        a.dropbtn(href="/explorer") Search
+      div#searchBar
     if user
       a.logo-block(href='/list')
       if user.notifications
         - const newNotifications = user.notifications.filter(n => !n.seen);
         - const notificationsSorted = user.notifications.reverse()
+        div#searchBarMobile
         button(data-jscript='notifications').notification-button.--mobile#notificationButtonMobile
           if newNotifications && newNotifications.length > 0
             img(src="/images/icons/alert-bell-active.png").notification-button__updated.--mobile
@@ -44,6 +44,7 @@ mixin header
           a.dropbtn(href="/logout") Logout
         if user.notifications
           - const newNotifications = user.notifications.filter(n => !n.seen);
+          div#searchBarMobile
           button(data-jscript='notifications').notification-button#notificationButton
             if newNotifications && newNotifications.length > 0
               img(src="/images/icons/alert-bell-active.png").notification-button__updated

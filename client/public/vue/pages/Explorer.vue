@@ -1,14 +1,14 @@
 <template>
   <div class="explorer">
-    <!-- <div class="view-toggle">
+    <div class="view-toggle">
       <button v-on:click="toggleView('map')" v-bind:class="{'button': true, 'button-small': true, 'toggle': true, '--toggle-active': isMap}" aria-label="toggle map">
         Map
       </button>
       <button v-on:click="toggleView('list')" v-bind:class="{'button': true, 'button-small': true, 'toggle': true, '--toggle-active': !isMap}" aria-label="toggle list">
         List
       </button>
-    </div> -->
-    <!-- <div class="filter-list">
+    </div>
+    <div class="filter-list">
       <button v-on:click="toggleStateDropdown()" class="button button-small __filter-drop" v-bind:aria-expanded='stateDropdownOpen'>
         <span v-if="activeState">{{activeState}} ▾</span>
         <span v-else>Select State ▾</span>
@@ -20,45 +20,10 @@
           </ul>
         </div>
       </button>
-    </div> -->
-    <!-- <div v-if="subset && !loading" class="data-display">
+    </div>
+    <div v-if="subset && !loading" class="data-display">
       <ExplorerMap v-if="isMap" v-bind:user="user" v-bind:selection="selection" v-bind:subset="subset"/>
       <ExplorerList v-if="!isMap" v-bind:user="user" v-bind:selection="selection" v-bind:subset="subset"/>
-    </div> -->
-    <div class="search-bar">
-      <div class="search">
-        <input v-on:input="searchWithText($event)" class="search__input" type="text" placeholder="Search Rivers..." name="search" id="searchRiver"/>
-      </div>
-    </div>
-    <div class="search-panel">
-      <div v-if='loading' class='station-list__loader'><p>Loading Results</p><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div></div>
-      <div style="display: flex; flex-wrap: wrap;" v-else-if="anyResults">
-        <div v-if="searchResults.rivers.length" class="search__results--category">
-          <h3>Rivers</h3>
-          <ul>
-            <li v-for="river in searchResults.rivers" tabindex="0">
-              <a class="search__results--item" :href="`/site/${river.gnisId}`"><img src="/images/icons/river_result_icon.png" alt="river icon"/>{{river.name}} - {{getStateObj(river.states)}}</a>
-            </li>
-          </ul>
-        </div>
-        <div v-if="searchResults.stations.length" class="search__results--category">
-          <h3>Gages</h3>
-          <ul>
-            <li v-for="station in searchResults.stations" tabindex="0">
-              <a class="search__results--item" :href="`/site/${station.stationNumber}`"><img src="/images/icons/station_result_icon.png" alt="station icon"/>{{station.name}}</a>
-            </li>
-          </ul>
-        </div>
-        <div v-if="searchResults.reservoirs.length" class="search__results--category">
-          <h3>Reservoirs</h3>
-          <ul>
-            <li v-for="reservoir in searchResults.reservoirs" tabindex="0">
-              <a class="search__results--item" :href="`/site/${reservoir.resId}`"><img src="/images/icons/reservoir_result_icon.png" alt="reservoir icon"/>{{reservoir.name}}</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <p v-else>Search for rivers, stations, reservoir, rapids, reports...</p>
     </div>
   </div>
 </template>
