@@ -1,6 +1,7 @@
  const mongoose = require('mongoose');
  const Tag = mongoose.model('Tag');
  const User = mongoose.model('User');
+ const River = mongoose.model('River');
  const Report = mongoose.model('Report');
  const Station = mongoose.model('Station');
  const Snowpack = mongoose.model('Snowpack');
@@ -19,6 +20,26 @@
      let reservoir = await Reservoir.find({huc: cfs.huc});
 
      res.render('stationPage', {cfs, snotel, reservoir, user: req.user, usernames, hashtags: hashtags.map(t => t.tag)});
+   } else {
+     res.render('error');
+   }
+ }
+
+ exports.loadRiverPage = async (req, res) => {
+   let snowpacks;
+   let reservoirs;
+   const river = await River.findOne({gnisId: req.params.river});
+   const stations = await Station.find({gnisId: req.params.river});
+   const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1});
+   // TODO: add resevoirs, snowpacks, campgrounds, boat launches, POIs, and rapids
+
+   if (river) {
+     if (stations.length) {
+       snowpacks = await Snowpack.find({'huc': stations[0].huc});
+       reservoirs = await Reservoir.find({'huc': stations[0].huc});
+     }
+
+     res.render('riverPage', {river, stations, snowpacks, reservoirs, user: req.user})
    } else {
      res.render('error');
    }

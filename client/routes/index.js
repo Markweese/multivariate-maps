@@ -16,6 +16,9 @@ router.get('/explorer/new/:id', flowsController.pushValue);
 //station dashboard pages
 router.get('/site/:station', flowsController.loadStationDashboard);
 
+//river pages
+router.get('/river/:river', flowsController.loadRiverPage);
+
 //report pages
 router.get('/report/:report', reportController.loadReportPage);
 router.get('/tag/:tag', reportController.loadTaggedReports);

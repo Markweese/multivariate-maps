@@ -11,7 +11,7 @@ mixin header
       if user.notifications
         - const newNotifications = user.notifications.filter(n => !n.seen);
         - const notificationsSorted = user.notifications.reverse()
-        div#searchBarMobile
+        div#searchBar
         button(data-jscript='notifications').notification-button.--mobile#notificationButtonMobile
           if newNotifications && newNotifications.length > 0
             img(src="/images/icons/alert-bell-active.png").notification-button__updated.--mobile
@@ -44,7 +44,6 @@ mixin header
           a.dropbtn(href="/logout") Logout
         if user.notifications
           - const newNotifications = user.notifications.filter(n => !n.seen);
-          div#searchBarMobile
           button(data-jscript='notifications').notification-button#notificationButton
             if newNotifications && newNotifications.length > 0
               img(src="/images/icons/alert-bell-active.png").notification-button__updated

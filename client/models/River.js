@@ -48,7 +48,7 @@ const riverSchema = new mongoose.Schema({
   hucs: [String],
   //links to all stations, reports, orgs, observations, etc...
   gnisId: {
-    type: Number
+    type: String
   },
   // array of 2 point arrays - index 1 = start point, index 2 = end point
   segments: geoJsonLineString,

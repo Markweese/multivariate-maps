@@ -1,4 +1,13 @@
 //______map styles__________
+.map {
+  height: 100vh;
+  padding: 20px;
+
+  & .__mapbox-map {
+    height: 100vh;
+  }
+}
+
 .explorer {
   .instruction-prompt {
     padding: 30px;
@@ -8,10 +17,11 @@
   }
 
   .map {
+    height: 100vh;
     padding: 20px;
 
     & .__mapbox-map {
-      height: 500px;
+      height: 100vh;
     }
 
     & .__popup {

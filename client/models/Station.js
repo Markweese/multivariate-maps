@@ -26,7 +26,7 @@ const stationSchema = new mongoose.Schema({
     type: String
   },
   gnisId: {
-    type: Number
+    type: String
   },
   //georeferences the station on Google Map
   coordinates: [{
