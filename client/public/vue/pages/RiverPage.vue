@@ -6,10 +6,14 @@
 </template>
 <script>
 import axios from 'axios';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { HistoricComparisons } from '../mixins/generalUtils.js';
 
 export default {
   data() {
     return {
+      map: null,
       user: null,
       river: null,
       stations: null,
@@ -29,32 +33,38 @@ export default {
 
   mounted: function(){
     mapboxgl.accessToken = 'pk.eyJ1IjoibWFya2JyZXdlciIsImEiOiJja3hkdGpvNHQxYTdyMnF0aHl0emsyajltIn0.oNkq4DvIu2A68CEE0lPFkw';
-    const map = new mapboxgl.Map({
+    this.map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v11',
       center: [this.stations[0].coordinates[1], this.stations[0].coordinates[0]],
       zoom: 15
     });
 
-    map.on('load', () => {
-      map.addSource('route', {
-        'type': 'geojson',
-        'data': this.geometry,
+    if (this.map) {
+      this.map.on('load', () => {
+        this.map.addSource('route', {
+          'type': 'geojson',
+          'data': this.geometry,
+        });
+        this.map.addLayer({
+          'id': 'route',
+          'type': 'line',
+          'source': 'route',
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': '#888',
+            'line-width': 8
+          }
+        });
       });
-      map.addLayer({
-        'id': 'route',
-        'type': 'line',
-        'source': 'route',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': '#888',
-          'line-width': 8
-        }
-      });
-      });
+
+      this.addStationPoints();
+      // this.addSnowpackPoints();
+      // this.addReservoirPoints();
+    }
   },
 
   methods: {
@@ -80,15 +90,40 @@ export default {
       axios.get(upstreamGeometryUrl)
       .then(res => {
         this.geometry.features = this.geometry.features.concat(res.data.features);
-        console.log(this.geometry.features)
       });
 
       axios.get(downstreamGeometryUrl)
       .then(res => {
         this.geometry.features = this.geometry.features.concat(res.data.features);
-        console.log(this.geometry.features)
       });
-    }
-  }
+    },
+    addStationPoints() {
+      this.stations.forEach(station => {
+        // create a HTML element for each feature
+        const percentileResult = this.currentReadingPercentile(station.cfs);
+        const el = document.createElement('div');
+        const html = `
+          <svg id='station-${station.stationNumber}' width='100%' height='400px'>
+            <!-- pattern -->
+            <defs>
+              <pattern id='image' x='0%' y='0%' height='100%' width='100%' viewBox='0 0 512 512'>
+                <image x='0%' y='0%' width='510' height='510' xlink:href='/images/icons/river_result_icon.png'></image>
+              </pattern>
+            </defs>
+
+            <circle id='sd' class='medium' cx='5%' cy='40%' r='5%' fill='url(#image)' stroke='${percentileResult.color}' stroke-width='0.5%' />
+          </svg>`;
+        el.innerHTML = html;
+        new mapboxgl.Marker(el).setLngLat([station.coordinates[1], station.coordinates[0]]).addTo(this.map);
+      })
+    },
+    addSnowpackPoints() {
+    },
+    addReservoirPoints() {
+    },
+  },
+  mixins: [
+    HistoricComparisons
+  ],
 }
 </script>

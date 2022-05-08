@@ -45,6 +45,31 @@ const HistoricComparisons = {
   },
 
   methods: {
+    currentReadingPercentile(dataset) {
+      console.log(dataset);
+      let sorter = [];
+      const point = dataset[dataset.length - 1];
+      const fields = ['min', 'ten', 'twenty', 'thirty', 'fifty', 'seventy', 'eighty', 'ninety', 'max', 'reading'];
+
+      if(point && point.reading) {
+        for(let key in point){
+          if(fields.includes(key)) {
+              sorter.push({key, val: point[key]});
+          }
+        }
+
+        sorter.sort((a,b) => {return a.val - b.val});
+
+        let location = sorter.findIndex(item => item.key === 'reading');
+        let shiftLocation = location > 4 ? location - 1 : location;
+
+        // levels is an external JSON object that stores qualitative overviews
+        return levels[shiftLocation];
+      } else {
+        return {color: '#888'};
+      }
+    },
+
     compareHistoric(data) {
       let lastStat = data[data.length-2] ? data[data.length-2].reading : null;
       let currentStat = data[data.length-1] ? data[data.length-1].reading : null;
