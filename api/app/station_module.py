@@ -111,11 +111,17 @@ class station:
         stations = list(self.client[os.environ['MONGO_DB']].stations.find({'state': fip}, {'name': 1, 'stationNumber': 1, 'coordinates': 1, 'cfs': 1}))
         return stations
 
-    # get_station
-    # get and return station by id
+    # get_stations
+    # get and return use stations by user id
     def get_stations(self, id):
         # paginate response by processing ?p= parameter, this should speed up pageload
         user = list(self.client[os.environ['MONGO_DB']].users.find({'_id': ObjectId(id)}))
         stations = list(self.client[os.environ['MONGO_DB']].stations.find({'stationNumber': {'$in': user[0]['stations']}}, {'name': 1, 'stationNumber': 1, 'coordinates': 1, 'cfs': 1, 'temp': 1}))
 
+        return stations
+
+    # get_station
+    # get and return station by id
+    def get_station(self, id):
+        stations = list(self.client[os.environ['MONGO_DB']].stations.find({'stationNumber': id}, {'_id': 0, 'name': 1, 'stationNumber': 1, 'coordinates': 1, 'cfs': 1, 'temp': 1}))
         return stations

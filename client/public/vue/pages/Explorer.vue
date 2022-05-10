@@ -22,7 +22,6 @@
       </button>
     </div>
     <div v-if="subset && !loading" class="data-display">
-      <ExplorerMap v-if="isMap" v-bind:user="user" v-bind:selection="selection" v-bind:subset="subset"/>
       <ExplorerList v-if="!isMap" v-bind:user="user" v-bind:selection="selection" v-bind:subset="subset"/>
     </div>
   </div>
@@ -31,7 +30,6 @@
   // import map and list components for the explorer
   import axios from 'axios';
   import stateMap from '../../data/stateMap';
-  import ExplorerMap from '../components/ExplorerMap.vue';
   import ExplorerList from '../components/ExplorerList.vue';
 
   export default {
@@ -138,7 +136,6 @@
     },
 
     components: {
-      ExplorerMap,
       ExplorerList
     }
   }

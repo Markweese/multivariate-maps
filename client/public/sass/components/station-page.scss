@@ -31,6 +31,12 @@
     }
   }
 
+  &__inactive {
+    padding: 40px;
+    color: #888;
+    text-align: center;
+  }
+
   &__filters {
     display: flex;
     justify-content: space-evenly;

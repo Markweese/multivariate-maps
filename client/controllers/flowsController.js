@@ -7,6 +7,7 @@
  const Snowpack = mongoose.model('Snowpack');
  const Reservoir = mongoose.model('Reservoir');
  const axios = require('axios');
+ const mail = require('../handlers/mail');
 
  //route unregistered user to custom page
  exports.loadStationDashboard = async (req,res) => {
@@ -66,10 +67,45 @@
 
      if (added) {
        var message = added.name;
-
        req.flash('success', `<span class="--loaded">Successfully added <a href="/site/${req.params.id}">${message}</a> to your list</span>`);
-       res.redirect('/list');
      }
+   }
+ }
+
+ exports.addStationToList = async (req,res, next) => {
+   //inform non users to create accounts
+   if(!req.user){
+     req.flash('info', 'You must be logged in to save or track stations');
+     res.redirect('/login');
+     return;
+   } else {
+     await User.update( {email: req.user.email}, { $push: {stations: req.params.id} } );
+     var added = await Station.findOne( {stationNumber: req.params.id} );
+
+     if (added) {
+       var message = added.name;
+       req.flash('success', `<span class="--loaded">Successfully added <a href="/site/${req.params.id}">${message}</a> to your list</span>`);
+     }
+   }
+ }
+
+ exports.flagStation = async (req,res, next) => {
+   //inform non users to create accounts
+   if(!req.user){
+     return;
+   } else {
+     const station = await Station.findOne( {stationNumber: req.params.id} );
+     await station.update( {stationNumber: req.params.id}, { $set: {flagged: true} } );
+     const flagged = await Station.findOne( {stationNumber: req.params.id} );
+     mail.send({
+       toEmail: 'checktheflowsabuse@gmail.com',
+       subject: 'Station Flagged',
+       filename: 'qa-request',
+       station: flagged.name,
+       stationNumber: flagged.stationNumber,
+     });
+     return;
+
    }
  }
 

@@ -46,7 +46,6 @@ const HistoricComparisons = {
 
   methods: {
     currentReadingPercentile(dataset) {
-      console.log(dataset);
       let sorter = [];
       const point = dataset[dataset.length - 1];
       const fields = ['min', 'ten', 'twenty', 'thirty', 'fifty', 'seventy', 'eighty', 'ninety', 'max', 'reading'];

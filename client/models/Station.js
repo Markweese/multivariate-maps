@@ -84,7 +84,8 @@ const stationSchema = new mongoose.Schema({
     hundred: Number,
   }],
   //logs element interaction
-  views: Number
+  views: Number,
+  flagged: Boolean
 });
 
   stationSchema.index({

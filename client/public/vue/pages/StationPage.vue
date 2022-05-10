@@ -4,12 +4,6 @@
       <h1>
         {{usgsData.name}}
       </h1>
-      <p>
-        <a :href='googleUrl(usgsData.coordinates)' target='blank' aria-label='view on google map'>{{round(usgsData.coordinates[0], 3)}}, {{round(usgsData.coordinates[1], 3)}}</a>
-      </p>
-      <div v-if="!checkCFS(usgsData.cfs) && user">
-        <a v-on:click="trackStation(usgsData)" style="color: white; text-decoration: none; margin-top: 10px;" class="button button-green button-medium" v-bind:aria-label="`Begin tracking ${usgsData.name}`">+ Begin Tracking</a>
-      </div>
     </div>
     <div v-if="activePanel" class='station-page__filters'>
       <a v-if='dataPresent.usgs' v-on:click='activatePanel("usgs")' v-on:keyup='processKeyEvent($event, "usgs")' :class='buttonClass.usgs' role='button' aria-label='view stream flow data' tabindex='0'>FLOWS</a>
@@ -30,7 +24,11 @@
         <p>Reservoir</p>
       </div> -->
     </div>
-
+    <div class="station-page__inactive" v-if="usgsData.flagged">
+      <p>
+        This station appears to be missing some data, and it is probably no longer active. To confirm, visit the <a :href="`https://nwis.waterdata.usgs.gov/usa/nwis/uv/?cb_00060=on&format=gif_default&site_no=${usgsData.stationNumber}&period=&begin_date=2020-09-01&end_date=2022-05-09`" class="text-button --blue">{{usgsData.name}} USGS page</a>. If this message was delivered in error, please reach out to us <a href="mailto:checktheflows+qa@gmail.com" class="text-button --blue">@checktheflows</a>
+      </p>
+    </div>
     <Timeseries v-if='activePanel === "usgs" && usgsData.cfs.length' v-bind:data='usgsData' v-bind:context='"cfs"' units='CFS'/>
     <ReportPanel v-if='activePanel === "usgs"' v-bind:data='usgsData' v-bind:user='user' v-bind:usernames='usernames' v-bind:hashTags='hashTags'/>
     <div v-if='activePanel === "snotel"' v-for='item in snotelData'>
@@ -39,7 +37,8 @@
     <!-- <div v-if='activePanel === "reservoir"' v-for='item in reservoirData'>
       <BarGraph v-if='item.storage.length' v-bind:data='item' v-bind:context='"storage"' units='M³'/>
     </div> -->
-    <a v-if="checkCFS(usgsData.cfs) && user && !isTracked(usgsData.stationNumber)" v-bind:href="`/explorer/${usgsData.stationNumber}`" class="button button-green button-medium --button-shadow station-page__add-station" v-bind:aria-label="`Add ${usgsData.name} to list`">+ Add To List</a>
+    <a v-if="!usgsData.flagged && user && !isTracked" v-on:click="trackStation(usgsData.stationNumber, usgsData.name)" class="button button-green button-medium --button-shadow station-page__add-station" v-bind:aria-label="`Add ${usgsData.name} to list`">+ Begin Tracking</a>
+    <a v-else-if="!usgsData.flagged && user && !isTrackedByUser(usgsData.stationNumber)" v-bind:href="`/explorer/${usgsData.stationNumber}`" class="button button-green button-medium --button-shadow station-page__add-station" v-bind:aria-label="`Add ${usgsData.name} to list`">+ Add To List</a>
   </div>
 </template>
 <script>
@@ -49,6 +48,7 @@ import BarGraph from '../components/BarGraph.vue';
 import { FlashUtils } from '../mixins/flashUtils.js';
 import Timeseries from '../components/Timeseries.vue';
 import ReportPanel from '../components/ReportPanel.vue';
+import { DataHandlers } from '../mixins/dataHandlers.js';
 
 export default {
   data() {
@@ -60,12 +60,14 @@ export default {
       snotelData: null,
       reservoirData: null,
       activePanel: null,
+      isTracked: false,
       flashMessages: document.querySelector('.flash-messages')
 		}
 	},
 
 	created: function(){
 		this.fetchData();
+    this.getTrackingStatus(this.usgsData.stationNumber);
 	},
 
   computed: {
@@ -97,7 +99,7 @@ export default {
         snotel: this.activePanel === 'snotel' ? `${baseClassSnotel} -active` : baseClassSnotel,
         reservoir: this.activePanel === 'reservoir' ? `${baseClassReservoir} -active` : baseClassReservoir
       }
-    }
+    },
   },
 
 	methods: {
@@ -119,34 +121,8 @@ export default {
       this.activePanel = this.usgsData.cfs.length ? 'usgs' : this.snotelData.length ? 'snotel' : this.reservoirData.length ? 'reservoir' : null;
 		},
 
-    trackStation(station) {
-      let errorMessage = this.generateFlashMessage(station.stationNumber, station.name, 'error');
-      let compileMessage = this.generateFlashMessage(station.stationNumber, station.name, 'pending');
-      let successMessage = this.generateFlashMessage(station.stationNumber, station.name, 'success');
-
-      this.flashMessages.appendChild(compileMessage);
-
-      axios.get(`/api/station/new/${station.stationNumber}`, {
-        headers: {
-          'user': this.user.email,
-          'token': this.user.sessionToken
-        }
-      })
-        .then(res => {
-          compileMessage.remove();
-          this.flashMessages.appendChild(successMessage);
-        }).catch(e => {
-          compileMessage.remove();
-          this.flashMessages.appendChild(errorMessage);
-        });
-    },
-
     activatePanel(panel) {
       this.activePanel = panel;
-    },
-
-    googleUrl(coordinates) {
-      return `https://www.google.com/maps/place/${coordinates[0]},${coordinates[1]}`;
     },
 
     round(value, place) {
@@ -157,18 +133,7 @@ export default {
       if(event.keyCode === 13) {
         this.activatePanel(context);
       }
-    },
-
-    isTracked(station) {
-      return this.user && this.user.stations.includes(station);
-    },
-
-    checkCFS(cfs) {
-      let today = new Date;
-      let dateCompare = `${today.getMonth() + 1}/${today.getDate()}`;
-
-      return cfs.length > 0 && cfs[cfs.length - 1].date === dateCompare;
-    },
+    }
   },
 
   components: {
@@ -178,7 +143,8 @@ export default {
   },
 
   mixins: [
-    FlashUtils
+    FlashUtils,
+    DataHandlers
   ]
 }
 </script>

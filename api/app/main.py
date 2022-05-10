@@ -65,7 +65,13 @@ def station_new(id):
         snotel.populate_daily(id, True)
         snotel.populate_year(id, True)
 
-        return success_res
+        output = station.get_station(id)
+
+        return dict(
+            code=1,
+            message='success',
+            response=output
+        )
     except Exception as e:
         logging.error(request.path, exc_info=True)
         return fail_res
@@ -80,8 +86,8 @@ def station_refresh():
     station = station_module(client)
     authentication = authentication_module(client)
 
-    # if authentication.is_super_admin(request) == False:
-    #     return auth_failure_res
+    if authentication.is_super_admin(request) == False:
+        return auth_failure_res
 
     try:
         station.refresh_stations()
@@ -102,8 +108,8 @@ def station_refresh_all():
     utils = station_utils(client)
     authentication = authentication_module(client)
 
-    # if authentication.is_super_admin(request) == False:
-    #     return auth_failure_res
+    if authentication.is_super_admin(request) == False:
+        return auth_failure_res
 
     try:
         stations = utils.get_user_stations()
@@ -208,7 +214,7 @@ def reservoir_refresh():
 
     client.close()
 
-######################## Begin Non-cron job API routes for application consumption ##########################
+######################## GET ONLY routes for application consumption ##########################
 
 @app.route('/stations/state/<fip>', methods=['GET'])
 def get_state(fip):
@@ -251,6 +257,14 @@ def search_assets():
         return {'stations': [], 'rivers': [], 'rapids': [], 'reservoirs': []}
 
     client.close()
+
+@app.route('/stations/tracked', methods=['GET'])
+def get_tracked():
+    client = MongoClient(connection_string)
+    utils = station_utils(client)
+    output = utils.get_user_stations()
+
+    return dumps(output)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

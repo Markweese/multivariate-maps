@@ -1,0 +1,7 @@
+extends email-layout
+
+block content
+  h1(style='text-align:left;') QA needed
+  p Issue: #{subject}
+  p Station: #{station}
+  a(href=`https://rivercollective.com/site${stationNumber}`) Site Link

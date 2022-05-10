@@ -31,7 +31,7 @@ const FlashUtils = {
     generateSuccessHTML(id, name) {
       return `<div class="flash flash--success">
                 <p class="flash__text --loaded">
-                  Successfully compiled <a href="/site/${id}">${name}</a>, would you like to <a href='/explorer/${id}'>add to your list</a>?
+                  Successfully compiled <a href="/site/${id}">${name}</a>
                 </p>
                 <button class="flash__remove" onclick="this.parentElement.remove()">×</button>
               </div>`

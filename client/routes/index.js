@@ -151,5 +151,8 @@ router.post('/user/notifications/clean',
   userController.cleanNotifications
 );
 
+// Station actions
+router.post('/station/add/:id', flowsController.addStationToList);
+router.post('/station/flag/:id', flowsController.flagStation);
 
 module.exports = router;
