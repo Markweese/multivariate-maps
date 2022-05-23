@@ -19,13 +19,18 @@
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 
+    .search__input {
+      width: 100%;
+      padding: 10px;
+    }
+
     .search__results {
       padding: 10px;
 
       li {
-        padding: 5px;
+        padding: 10px 5px;
 
-        &:focus {
+        &:focus, &:hover {
           background-color: $color-alt;
         }
       }
