@@ -1,13 +1,14 @@
 mixin mobileNav
-  button.arrow
-  div.mobile-menu(data-jscript='mobile')
-    a.menu-item(href="/") Homepage
-    a.menu-item(href="/explorer") Explorer
-    a.menu-item.menu-divider Account
-    if user
-        a.menu-item(href="/list") My List
-        a.menu-item(href="/account") My Account
-        a.menu-item(href="/logout") Logout
-    else
-        a.menu-item(href="/login") Login
-        a.menu-item(href="/signup") Sign Up
+  div.container.--show-mobile.--hide-bp-tab.--start
+    button.arrow
+    div.mobile-menu(data-jscript='mobile')
+      a.menu-item(href="/") Homepage
+      a.menu-item(href="/explorer") Explorer
+      a.menu-item.menu-divider Account
+      if user
+          a.menu-item(href="/list") My List
+          a.menu-item(href="/account") My Account
+          a.menu-item(href="/logout") Logout
+      else
+          a.menu-item(href="/login") Login
+          a.menu-item(href="/signup") Sign Up

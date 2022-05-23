@@ -1,5 +1,9 @@
 .search {
 
+  &__button {
+      border: none;
+      background: none;
+  }
 
   .search-interface {
     left: 0;
@@ -8,7 +12,7 @@
     height: 100vh;
     position: absolute;
 
-    @media #{$break-medium} {
+    @media #{$break-tablet} {
       top: 79px;
     }
 
@@ -25,7 +29,7 @@
       text-align: left;
       margin-top: 10px;
 
-      @media #{$break-medium} {
+      @media #{$break-tablet} {
         width: 33%;
         display: inline;
         margin-top: 0;
@@ -52,7 +56,7 @@
           text-align: left;
           display: inline-block;
 
-          @media #{$break-medium} {
+          @media #{$break-tablet} {
             width: 50%;
           }
 

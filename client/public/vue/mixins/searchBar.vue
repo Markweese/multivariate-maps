@@ -1,7 +1,7 @@
 <template>
   <div class="search">
     <div class="nav">
-      <button class="dropbtn" @click="showSearch = !showSearch">
+      <button :class="{'search__button': true, 'dropbtn': !isMobile}" @click="showSearch = !showSearch">
         <img src="/images/icons/magnifying-glass.png" :style="iconStyle">
         <span v-if="!isMobile" style="font-size: 14pt;">{{showSearch ? 'Close' : 'Search'}}</span>
       </button>
@@ -67,7 +67,7 @@
     ],
     computed: {
       iconStyle() {
-        if (this.isMobile) return 'width: 45px; margin-right: 10px;'
+        if (this.isMobile) return 'width: 40px; margin-right: 10px;'
         else return 'width: 14px; margin-right: 10px;'
       },
       anyResults() {

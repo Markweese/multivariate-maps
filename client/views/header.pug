@@ -2,43 +2,46 @@ include ./mobileNav
 mixin header
   div.nav-bar
     +mobileNav
-    div.container
+    div.container.--start
       div.nav
         a.dropbtn(href="/list") My List
       div#searchBar
     if user
-      a.logo-block(href='/list')
+      div.container.--show-mobile.--center
+        a.logo-block(href='/list')
       if user.notifications
         - const newNotifications = user.notifications.filter(n => !n.seen);
         - const notificationsSorted = user.notifications.reverse()
-        div#searchBar
-        button(data-jscript='notifications').notification-button.--mobile#notificationButtonMobile
-          if newNotifications && newNotifications.length > 0
-            img(src="/images/icons/alert-bell-active.png").notification-button__updated.--mobile
-            span.notification-button__icon.--mobile #{newNotifications.length}
-          else
-            img(src="/images/icons/alert-bell.png").notification-button__updated.--mobile
-        div.notification-dropdown.--mobile.--hidden#notificationDropdownMobile
-          each notification in notificationsSorted
-            if notification.notificationType === 'comment'
-              p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} commented on  
-                a(href=`/report/${notification.reportId}?comment=${notification.commentId}`) your report
-            if notification.notificationType === 'tag'
-              p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} tagged you on 
-                if notification.commentId 
-                  a(href=`/report/${notification.reportId}?comment=${notification.commentId}`) a comment
-                else 
-                  a(href=`/report/${notification.reportId}`) a report
-            if notification.notificationType === 'flag'
-              p(class={'notification-item': true, '--seen': notification.seen}) Your report has been flagged 
-                a(href=`/report/${notification.reportId}`) view report 
-                span or 
-                a(href=`mailto:checktheflowsapp@gmail.com`) contact us for more information.
+        div.container.--show-mobile.--hide-bp-tab.--end
+          div#searchBarMobile
+          button(data-jscript='notifications').notification-button.--mobile#notificationButtonMobile
+            if newNotifications && newNotifications.length > 0
+              img(src="/images/icons/alert-bell-active.png").notification-button__updated.--mobile
+              span.notification-button__icon.--mobile #{newNotifications.length}
+            else
+              img(src="/images/icons/alert-bell.png").notification-button__updated.--mobile
+          div.notification-dropdown.--mobile.--hidden#notificationDropdownMobile
+            each notification in notificationsSorted
+              if notification.notificationType === 'comment'
+                p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} commented on  
+                  a(href=`/report/${notification.reportId}?comment=${notification.commentId}`) your report
+              if notification.notificationType === 'tag'
+                p(class={'notification-item': true, '--seen': notification.seen}) #{notification.fromUser} tagged you on 
+                  if notification.commentId 
+                    a(href=`/report/${notification.reportId}?comment=${notification.commentId}`) a comment
+                  else 
+                    a(href=`/report/${notification.reportId}`) a report
+              if notification.notificationType === 'flag'
+                p(class={'notification-item': true, '--seen': notification.seen}) Your report has been flagged 
+                  a(href=`/report/${notification.reportId}`) view report 
+                  span or 
+                  a(href=`mailto:checktheflowsapp@gmail.com`) contact us for more information.
     else
-      a.logo-block(href='/')
+      div.container.--show-mobile.--center
+        a.logo-block(href='/')
     if user
-      div.container
-        div.nav.--relative
+      div.container.--end
+        div.nav
           a.dropbtn(href="/account") Account
         div.nav
           a.dropbtn(href="/logout") Logout
@@ -67,7 +70,7 @@ mixin header
                   span or 
                   a(href=`mailto:checktheflowsapp@gmail.com`) contact us for more information.
     else
-      div.container
+      div.container.--end
         div.nav
           a.dropbtn(href="/login") Login
         div.nav

@@ -14,7 +14,7 @@
   justify-content: space-between;
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
 
-  @media #{$break-medium} {
+  @media #{$break-tablet} {
     padding: 0;
   }
 
@@ -26,7 +26,7 @@
     background-position: center;
     background-image: url('/images/brand/logo-icon.png');
 
-    @media #{$break-medium} {
+    @media #{$break-tablet} {
       margin-right: 0px;
     }
   }
@@ -46,19 +46,44 @@
       transform: rotate(180deg);
     }
 
-    @media #{$break-medium} {
+    @media #{$break-tablet} {
       display: none;
     }
   }
 }
 
 .container {
+    width: 33%;
     display:none;
 
-    @media #{$break-medium} {
+    @media #{$break-tablet} {
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
+    }
+
+    &.--show-mobile {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    &.--hide-bp-tab {
+      @media #{$break-tablet} {
+        display: none;
+      }
+    }
+
+    &.--end {
+      justify-content: flex-end;
+    }
+
+    &.--start {
+      justify-content: flex-start;
+    }
+
+    &.--center {
+      justify-content: center;
     }
 
     a.drop-item {
@@ -96,7 +121,7 @@
         margin-left: 5px;
       }
 
-      @media #{$break-medium} {
+      @media #{$break-tablet} {
         display:block;
       }
     }
@@ -123,7 +148,7 @@
       width: min-content;
       height: min-content;
 
-      @media #{$break-medium} {
+      @media #{$break-tablet} {
         display: none;
       }
     }
@@ -147,7 +172,7 @@
       &.--mobile {
         display: block;
 
-        @media #{$break-medium} {
+        @media #{$break-tablet} {
           display: none;
         }
       }
@@ -165,7 +190,7 @@
         width: 45px;
         display: block;
 
-        @media #{$break-medium} {
+        @media #{$break-tablet} {
           display: none;
         }
       }
@@ -204,11 +229,11 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 
     &.--mobile {
-      top: 100px;
+      top: 90px;
       display: block;
       height: calc(100vh - 100px);
 
-      @media #{$break-medium} {
+      @media #{$break-tablet} {
         display: none;
       }
     }
