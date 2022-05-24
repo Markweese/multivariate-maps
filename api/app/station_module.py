@@ -125,3 +125,11 @@ class station:
     def get_station(self, id):
         stations = list(self.client[os.environ['MONGO_DB']].stations.find({'stationNumber': id}, {'_id': 0, 'name': 1, 'stationNumber': 1, 'coordinates': 1, 'cfs': 1, 'temp': 1}))
         return stations
+
+    def tag_reports(self):
+        tagged_stations = list(self.client[os.environ['MONGO_DB']].stations.find({'gnisId': {'$exists': True}}))
+
+        for station in tagged_stations:
+            self.client[os.environ['MONGO_DB']].reports.update({'stationNumber': station['stationNumber'] }, { '$set': {'gnisId': station['gnisId']}}, multi=True);
+
+        return 'updated'

@@ -32,7 +32,17 @@
    const river = await River.findOne({gnisId: req.params.river});
    const stations = await Station.find({gnisId: req.params.river});
    const usernames = await User.find({}, {'_id':1, 'name':1, 'photo': 1});
+   const reports = await Report.find({gnisId: req.params.river, isPrivate: false});
+   const promises = await reports.map(async report => {
+     const user = await User.findOne({_id: mongoose.Types.ObjectId(report.authorId)}, {photo: 1});
+     report.photo = user.photo;
+
+     return report;
+   })
+
+   const reportsEnhanced = await Promise.all(promises)
    // TODO: add resevoirs, snowpacks, campgrounds, boat launches, POIs, and rapids
+
 
    if (river) {
      if (stations.length) {
@@ -40,7 +50,7 @@
        reservoirs = await Reservoir.find({'huc': stations[0].huc});
      }
 
-     res.render('riverPage', {river, stations, snowpacks, reservoirs, user: req.user})
+     res.render('riverPage', {river, stations, reports: reportsEnhanced, snowpacks, reservoirs, user: req.user})
    } else {
      res.render('error');
    }
@@ -118,8 +128,7 @@
    }
 
    if (!req.user.stations.length){
-     req.flash('info', 'No stations found for this account, use the explorer to find and add stations ↓');
-     res.redirect('/explorer');
+     req.flash('info', 'Use the search bar in the top left to find rivers of interest.');
      return;
    }
 
@@ -130,8 +139,7 @@
 exports.requestUserStations = async (req, res) => {
   //if they don't have any stations on their user account...
   if(!req.params.stations){
-    req.flash('info', 'No stations found for this account, use the explorer to find and add stations ↓');
-    res.redirect('/explorer');
+    req.flash('info', 'Use the search bar in the top left to find rivers of interest.');
   }
 
   const cfs = await Station.find({stationNumber: {$in: req.params.stations}});

@@ -2,6 +2,28 @@
   <div class="map">
     <div id="map" class="__mapbox-map">
     </div>
+    <div ref="reportList" :class="{'map__right-panel': true, '--closed': !rightPanelOpen}">
+      <ReportPanel
+        v-if="reports"
+        :hideEditingTools="true"
+        :data="reports"
+        :user="user"
+        :displayUserPhotos="true"
+        :hidePagination="true"
+        :buttonFullWidth="true"
+        customTitle=" "
+      />
+      <span v-else>no reports available</span>
+    </div>
+    <button
+      @click="toggleRightPanel"
+      type="toggle"
+      class="map__right-panel--toggle button button-blue button-blue--small"
+      name="toggle report viewer"
+    >
+        <img src="/images/icons/book.png" alt="reports icon">
+        {{rightPanelOpen ? 'Hide' : 'View'}} Reports
+    </button>
   </div>
 </template>
 <script>
@@ -10,16 +32,20 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { FlashUtils } from '../mixins/flashUtils.js';
 import { DataHandlers } from '../mixins/dataHandlers.js';
 import { HistoricComparisons } from '../mixins/generalUtils.js';
+import ReportPanel from '../components/ReportPanel.vue';
 
 export default {
   data() {
     return {
       map: null,
       user: null,
+      usernames: null,
       river: null,
+      reports: null,
       stations: null,
       snowpacks: null,
       reservoirs: null,
+      rightPanelOpen: false,
       trackedStations: null,
       geometry: {
         type: "FeatureCollection",
@@ -64,13 +90,17 @@ export default {
     fetchData() {
       let dataElement = document.querySelector('#dataPasser');
       let user = dataElement.dataset.user;
+      let usernames = dataElement.dataset.usernames;
       let river = dataElement.dataset.river;
+      let reports = dataElement.dataset.reports;
       let stations = dataElement.dataset.stations;
       let snowpacks = dataElement.dataset.snowpacks;
       let reservoirs = dataElement.dataset.reservoirs;
 
       this.user = user ? JSON.parse(user) : null;
+      this.usernames = usernames ? JSON.parse(usernames) : null;
       this.river = river ? JSON.parse(river) : null;
+      this.reports = reports ? JSON.parse(reports) : null;
       this.stations = stations ? JSON.parse(stations) : null;
       this.snowpacks = snowpacks ? JSON.parse(snowpacks) : null;
       this.reservoirs = reservoirs ? JSON.parse(reservoirs) : null;
@@ -206,11 +236,22 @@ export default {
           <a href="/signup" class="button button-blue --full-width __popup--view-button" value="Sign Up" class="button">Sign Up</a>`
       }
     },
+
+    toggleRightPanel() {
+      this.rightPanelOpen = !this.rightPanelOpen
+
+      if (this.rightPanelOpen) {
+        this.$refs.reportList.focus();
+      }
+    }
   },
   mixins: [
     FlashUtils,
     DataHandlers,
     HistoricComparisons
   ],
+  components: {
+    ReportPanel
+  }
 }
 </script>

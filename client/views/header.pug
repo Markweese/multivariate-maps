@@ -8,7 +8,7 @@ mixin header
       div#searchBar
     if user
       div.container.--show-mobile.--center
-        a.logo-block(href='/list')
+        a.logo-block(href='/')
       if user.notifications
         - const newNotifications = user.notifications.filter(n => !n.seen);
         - const notificationsSorted = user.notifications.reverse()
@@ -42,7 +42,7 @@ mixin header
     if user
       div.container.--end
         div.nav
-          a.dropbtn(href="/account") Account
+          a.dropbtn(href=`/user/${user.name}`) Account
         div.nav
           a.dropbtn(href="/logout") Logout
         if user.notifications

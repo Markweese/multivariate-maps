@@ -2,7 +2,13 @@
   <div class='report-panel'>
     <div class="report-panel__header">
       <h2>{{customTitle ? customTitle : 'Trip Reports'}}</h2>
-      <button v-if="user && !isReporting && !slimView" v-on:click="openReport" class="button button-green button-small">+ Write A Report</button>
+      <button
+        v-if="user && !isReporting && !slimView"
+        v-on:click="openReport"
+        class='button button-green button-small'
+      >
+          + Write A Report
+      </button>
     </div>
     <div class="report-panel__list">
       <div v-if='isLoadingReports' class='station-list__loader'><p>Loading Reports</p><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div><div class="dots"></div></div>
@@ -129,20 +135,33 @@
             </div> -->
           </div>
           <div class="report-actions">
-            <a :href="`/report/${report._id}`" class="button button-blue button-small" type="button" name="see full report">View Report</a>
+            <a
+              :href="`/report/${report._id}`"
+              :class="{
+                'button': true,
+                'button-blue': true,
+                'button-small': true,
+                '--full-width': buttonFullWidth
+              }"
+              type="button"
+              name="see full report">
+                View Report
+              </a>
             <a v-if="slimView" :href="`/site/${report.stationNumber}`" class="text-button --blue" type="button" name="see station page">View Station Page</a>
           </div>
         </div>
       </div>
-      <div v-if="reports && numPages > 1" class="report-pagination">
+      <div v-if="reports && !hidePagination && numPages > 1" class="report-pagination">
         <button class="button button-blue --inline prev" type="button" v-if="currentPage !== 1" @click="currentPage --">Newer</button>
         <button v-for="page in numPages" :class="{'report-pagination__indicator': 1, '--active-page': page === currentPage}" @click="currentPage = page"></button>
         <button class="button button-blue --inline" type="button" v-if="currentPage !== numPages" @click="currentPage ++">Older</button>
       </div>
     </div>
-    <PointViewer v-if="pointViewerOpen" v-on:deactivate="closePointViewer" v-bind:points="pointViewerPoints"></PointViewer>
-    <ReportCreator v-if="user && isReporting" v-on:deactivate="closeReport" v-on:successfulCreate="successfulCreate" v-bind:data="data" v-bind:user="user" v-bind:usernames="usernames" v-bind:hashTags="hashTags"></ReportCreator>
-    <ContentFlag v-if="user && flagReport" v-on:deactivate="closeFlagger" contentType="report" v-bind:contentId="flagReport" v-bind:user="user"></ContentFlag>
+    <template v-if="!hideEditingTools">
+      <PointViewer v-if="pointViewerOpen" v-on:deactivate="closePointViewer" v-bind:points="pointViewerPoints"></PointViewer>
+      <ReportCreator v-if="user && isReporting" v-on:deactivate="closeReport" v-on:successfulCreate="successfulCreate" v-bind:data="data" v-bind:user="user" v-bind:usernames="usernames" v-bind:hashTags="hashTags"></ReportCreator>
+      <ContentFlag v-if="user && flagReport" v-on:deactivate="closeFlagger" contentType="report" v-bind:contentId="flagReport" v-bind:user="user"></ContentFlag>
+    </template>
   </div>
 </template>
 <script>
@@ -158,11 +177,14 @@
     props: [
       'data',
       'user',
+      'hidePagination',
+      'buttonFullWidth',
       'usernames',
       'hashTags',
       'slimView',
       'customTitle',
-      'displayUserPhotos'
+      'displayUserPhotos',
+      'hideEditingTools'
     ],
 
     data() {
@@ -189,8 +211,21 @@
     },
 
     mounted() {
-      if (this.slimView) {
-        this.reports = this.data;
+      if (this.data) {
+        this.reports = this.data.sort((a,b) => {
+          a = new Date(a.startDate);
+          b = new Date(b.startDate);
+
+          if (a < b) {
+            return 1;
+          }
+
+          if (a > b) {
+            return -1;
+          }
+
+          return 0;
+        });
       } else {
         this.getReports();
       }
@@ -202,6 +237,10 @@
         return Math.ceil(this.reports.length / pp);
       },
       pageItems() {
+        if (this.hidePagination) {
+          return this.reports
+        }
+
         return this.reports.slice((this.currentPage - 1) * 3, ((this.currentPage - 1) * 3) + 3 )
       }
     },
@@ -299,7 +338,7 @@
                   return 1;
                 }
 
-                if (b > a) {
+                if (a > b) {
                   return -1;
                 }
 
