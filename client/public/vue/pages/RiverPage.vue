@@ -1,6 +1,6 @@
 <template>
   <div class="map">
-    <div id="map" class="__mapbox-map">
+    <div id="map" ref="mapContainer" class="__mapbox-map">
     </div>
     <div ref="reportList" :class="{'map__right-panel': true, '--closed': !rightPanelOpen}">
       <ReportPanel
@@ -12,6 +12,9 @@
         :hidePagination="true"
         :buttonFullWidth="true"
         customTitle=" "
+        :emitReportOnHover="true"
+        @activateReport="updateActiveReport($event)"
+        @deactivateReport="deactivateReport()"
       />
       <span v-else>no reports available</span>
     </div>
@@ -30,6 +33,7 @@
 import axios from 'axios';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { FlashUtils } from '../mixins/flashUtils.js';
+import { ImageUtils } from '../mixins/imageUtils.js';
 import { DataHandlers } from '../mixins/dataHandlers.js';
 import { HistoricComparisons } from '../mixins/generalUtils.js';
 import ReportPanel from '../components/ReportPanel.vue';
@@ -47,6 +51,8 @@ export default {
       reservoirs: null,
       rightPanelOpen: false,
       trackedStations: null,
+      activeReportId: null,
+      activeReportMarker: null,
       geometry: {
         type: "FeatureCollection",
         features: []
@@ -87,6 +93,33 @@ export default {
   },
 
   methods: {
+    deactivateReport() {
+      this.activeReportId = null;
+      this.activeReportMarker.remove();
+    },
+    updateActiveReport(report) {
+      if (this.activeReportId === report._id) return;
+
+      const el = document.createElement('div');
+      const iconHTML=`
+        <div class="point_icon user" style="border-color: #dfdfdf">
+          <img src="data:${report.photo.contentType};base64,${this.getBuff(report.photo.data.data)}"/>
+        </div>`
+      el.innerHTML = iconHTML;
+
+      if (this.activeReportMarker) {
+        this.activeReportMarker.remove();
+      }
+
+      this.activeReportId = report._id;
+      this.activeReportMarker = new mapboxgl.Marker(el)
+        .setLngLat([report.coordinates[1], report.coordinates[0]])
+        .addTo(this.map);
+
+      this.map.flyTo({
+        center: [report.coordinates[1], report.coordinates[0]]
+      });
+    },
     fetchData() {
       let dataElement = document.querySelector('#dataPasser');
       let user = dataElement.dataset.user;
@@ -242,11 +275,18 @@ export default {
 
       if (this.rightPanelOpen) {
         this.$refs.reportList.focus();
+        this.$refs.mapContainer.classList.add('--crunch');
+        this.map.resize();
+      } else {
+        this.$refs.mapContainer.focus();
+        this.$refs.mapContainer.classList.remove('--crunch');
+        this.map.resize();
       }
     }
   },
   mixins: [
     FlashUtils,
+    ImageUtils,
     DataHandlers,
     HistoricComparisons
   ],

@@ -43,7 +43,12 @@
   }
 
   & .__mapbox-map {
+    width: 100%;
     height: calc(100% - 82px);
+
+    &.--crunch {
+      width: 50%;
+    }
   }
 
   .point_icon {
@@ -61,6 +66,15 @@
 
     &.station {
       background-image: url('/images/icons/river_result_icon.png');
+    }
+
+    &.user {
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+        border: 2px solid $color-main;
+      }
     }
 
     &.reservoir {

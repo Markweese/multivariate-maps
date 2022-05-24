@@ -21,18 +21,6 @@
         margin-bottom: 0;
       }
     }
-
-    button {
-      width: 100%;
-      display: block;
-      margin-left: 0;
-
-      @media #{$break-medium} {
-        width: initial;
-        display: inline;
-        margin-left: 10px;
-      }
-    }
   }
 
   &__list {

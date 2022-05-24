@@ -30,7 +30,7 @@
       </p>
     </div>
     <Timeseries v-if='activePanel === "usgs" && usgsData.cfs.length' v-bind:data='usgsData' v-bind:context='"cfs"' units='CFS'/>
-    <ReportPanel v-if='activePanel === "usgs"' v-bind:data='usgsData' v-bind:user='user' v-bind:usernames='usernames' v-bind:hashTags='hashTags'/>
+    <ReportPanel v-if='activePanel === "usgs"' v-bind:stationNumber='usgsData.stationNumber' v-bind:user='user' v-bind:usernames='usernames' v-bind:hashTags='hashTags'/>
     <div v-if='activePanel === "snotel"' v-for='item in snotelData'>
       <BarGraph v-if='item.swe.length' v-bind:data='item' v-bind:context='"swe"' units='IN'/>
     </div>

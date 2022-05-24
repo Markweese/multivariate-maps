@@ -15,7 +15,13 @@
       <div v-else-if="reportLoadError" class='report-panel__no-reports'>{{reportLoadError}}</div>
       <p class='report-panel__no-reports' v-else-if="!reports || reports.length === 0">No reports to show</p>
       <div v-if="reports && reports.length > 0">
-        <div v-for="report in pageItems" :key="report._id" class="report-panel__report" v-if="report.score > -10">
+        <div v-for="report in pageItems"
+          :key="report._id"
+          class="report-panel__report"
+          v-if="report.score > -10"
+          @mouseover="emitReportOnHover ? $emit('activateReport', report) : ''"
+          @mouseleave="emitReportOnHover ? $emit('deactivateReport', report) : ''"
+        >
           <div class="report-header">
             <div class="report-header__left">
               <div v-if="displayUserPhotos || !slimView" class="avatar-photo --medium">
@@ -82,7 +88,20 @@
               </div>
             </div>
             <div class="info-section" v-if="!slimView">
-              <h2 class="info-section__header">Comments <button class="button button-blue --inline" name="show navigation information" aria-haspopup="true" @click="report.commentsOpen = !report.commentsOpen" :aria-expanded="report.commentsOpen">{{report.commentsOpen ? 'Close' : 'View Comments'}}<span v-if="report.comments.length && !report.commentsOpen"> ({{report.comments.length}})</span><img :src="`${report.commentsOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/></button></h2>
+              <h2 class="info-section__header">Comments
+                <button
+                  class="button button-blue --inline"
+                  name="show navigation information"
+                  aria-haspopup="true"
+                  @click="report.commentsOpen = !report.commentsOpen"
+                  :aria-expanded="report.commentsOpen"
+                >
+                    {{report.commentsOpen ? 'Close' : 'View Comments'}}
+                  <span v-if="report.comments.length && !report.commentsOpen">
+                    ({{report.comments.length}})
+                  </span><img :src="`${report.commentsOpen ? '/images/icons/upvote-white.png' : '/images/icons/downvote-white.png'}`" alt="close"/>
+                </button>
+              </h2>
               <div class="info-section__data" v-if="report.commentsOpen">
                 <div class="comment-block" v-if="report.comments.length" v-for="comment in report.comments">
                   <div class="comment-block__left">
@@ -177,6 +196,7 @@
     props: [
       'data',
       'user',
+      'stationNumber',
       'hidePagination',
       'buttonFullWidth',
       'usernames',
@@ -184,7 +204,8 @@
       'slimView',
       'customTitle',
       'displayUserPhotos',
-      'hideEditingTools'
+      'hideEditingTools',
+      'emitReportOnHover'
     ],
 
     data() {
@@ -211,7 +232,9 @@
     },
 
     mounted() {
-      if (this.data) {
+    if(this.stationNumber) {
+       this.getReports();
+     } else if (this.data) {
         this.reports = this.data.sort((a,b) => {
           a = new Date(a.startDate);
           b = new Date(b.startDate);
@@ -226,8 +249,6 @@
 
           return 0;
         });
-      } else {
-        this.getReports();
       }
     },
 
@@ -318,7 +339,7 @@
       getReports() {
         this.isLoadingReports = true;
 
-        axios.get(`/reports/station/${this.data.stationNumber}`)
+        axios.get(`/reports/station/${this.stationNumber}`)
           .then(res => {
             if (res.data.status === 200) {
               this.reports = res.data.data.map(r => {
