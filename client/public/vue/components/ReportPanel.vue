@@ -61,8 +61,8 @@
                 </button>
               </div>
               <div class="activity-icons">
-                <img src="/images/icons/fish.png" v-if="report.activity.includes('fish')" alt="fishing report">
-                <img src="/images/icons/outfitters.png" v-if="report.activity.includes('float')" alt="floating report">
+                <img src="/images/icons/fish.png" v-if="report.activity.includes('fish') || report.activity.includes('both')" alt="fishing report">
+                <img src="/images/icons/outfitters.png" v-if="report.activity.includes('float') || report.activity.includes('both')" alt="floating report">
               </div>
             </div>
           </div>
@@ -235,20 +235,7 @@
     if(this.stationNumber) {
        this.getReports();
      } else if (this.data) {
-        this.reports = this.data.sort((a,b) => {
-          a = new Date(a.startDate);
-          b = new Date(b.startDate);
-
-          if (a < b) {
-            return 1;
-          }
-
-          if (a > b) {
-            return -1;
-          }
-
-          return 0;
-        });
+        this.setReports(this.data);
       }
     },
 
@@ -342,29 +329,7 @@
         axios.get(`/reports/station/${this.stationNumber}`)
           .then(res => {
             if (res.data.status === 200) {
-              this.reports = res.data.data.map(r => {
-                r.navOpen = false;
-                r.fishOpen = false;
-                r.boatOpen = false;
-                r.commentsOpen = false;
-                r.writingComment = false;
-
-                return r;
-              })
-              .sort((a,b) => {
-                a = new Date(a.startDate);
-                b = new Date(b.startDate);
-
-                if (a < b) {
-                  return 1;
-                }
-
-                if (a > b) {
-                  return -1;
-                }
-
-                return 0;
-              });
+              this.setReports(res.data.data)
             }
 
             this.isLoadingReports = false;
@@ -473,6 +438,31 @@
                 this.flashMessages.appendChild(this.generateError(e.msg));
               });
           }
+        });
+      },
+      setReports(reports) {
+        this.reports = reports.map(r => {
+          r.navOpen = false;
+          r.fishOpen = false;
+          r.boatOpen = false;
+          r.commentsOpen = false;
+          r.writingComment = false;
+
+          return r;
+        })
+        .sort((a,b) => {
+          a = new Date(a.startDate);
+          b = new Date(b.startDate);
+
+          if (a < b) {
+            return 1;
+          }
+
+          if (a > b) {
+            return -1;
+          }
+
+          return 0;
         });
       }
     },
