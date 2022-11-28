@@ -10,7 +10,7 @@
       <div><span style="background-color: #a2d7d8"></span>{{summaryStats.growthP0}}</div>
     </div>
     <div v-if="summaryStats" id="color-legend" class="legend --bottom">
-      <h4>ZHVI ($/Property)</h4>
+      <h4>ZHVI (Typical home value)</h4>
       <div class="radius-circle-wrapper"><span class="radius-circle" style="width: 30px; height: 30px"></span>{{summaryStats.zhivP100}}</div>
       <div class="radius-circle-wrapper"><span class="radius-circle" style="width: 20px; height: 20px"></span>{{summaryStats.zhivP90}}</div>
       <div class="radius-circle-wrapper"><span class="radius-circle" style="width: 15px; height: 15px"></span>{{summaryStats.zhivP50}}</div>
