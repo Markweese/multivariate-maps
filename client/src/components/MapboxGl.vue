@@ -102,15 +102,15 @@ export default {
               ['linear'],
               ['get', 'growth'],
               this.summaryStats.growthP0,
-              '#de5842',
+              '#a2d7d8',
               this.summaryStats.growthP10,
-              '#fcd059',
+              '#bfe1bf',
               this.summaryStats.growthP50,
               '#ededea',
               this.summaryStats.growthP90,
-              '#bfe1bf',
+              '#fcd059',
               this.summaryStats.growthP100,
-              '#a2d7d8'
+              '#de5842'
             ],
             'circle-radius': [
               'interpolate', ['linear'], ['get', 'zhvi'],
