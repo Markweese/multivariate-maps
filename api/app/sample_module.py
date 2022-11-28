@@ -78,7 +78,7 @@ class sample:
     #      }
     #   ]
     # }
-    def get_region_data(self, start_month = '2022-07-01', end_month = '2022-10-01'):
+    def get_region_data(self, start_month, end_month):
         # start_month = datetime.strptime(start_month, '%Y-%m-%d')
         # end_month = datetime.strptime(end_month, '%Y-%m-%d')
         # Only work on copies, use index for date scan

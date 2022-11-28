@@ -47,7 +47,9 @@ def docs():
 @app.route('/regions/all', methods=['GET'])
 def get_regions():
     try:
-        output = sample.get_region_data()
+        start_month = request.args.get('start_month')
+        end_month = request.args.get('end_month')
+        output = sample.get_region_data(start_month, end_month)
 
         return jsonify(dict(
             code=1,
