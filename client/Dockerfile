@@ -1,16 +1,9 @@
-FROM node:12.19.0-alpine
+FROM node:alpine
 
-# set /app as working directory on the VM
-WORKDIR "/app"
+RUN mkdir /app
+WORKDIR /app
+COPY . /app
 
-# copy package.json
-COPY package.json .
 
-# install deps
-RUN npm install
-
-# copy over everything else
-COPY . .
-
-# run webpack and prod scripts
-CMD ["npm", "run", "prod"]
+EXPOSE 3000
+CMD ["npm", "run", "dev"]
