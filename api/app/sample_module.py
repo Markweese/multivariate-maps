@@ -36,6 +36,12 @@ class sample:
         self.utils = utils()
         print('init sample_utils')
 
+    def get_metro_data(self, metros, start_month, end_month):
+        metros = metros.split('|')
+        df_copy = self.df.loc[start_month:end_month]
+        df_copy = df_copy[df_copy['RegionName'].isin(metros)].sort_values(by=['RegionName', 'datemonth'], ascending=[True, True])
+
+        return df_copy.to_dict(orient='records')
     # get_region_data
     # read region data from the CSV
     # params:
