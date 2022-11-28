@@ -12,7 +12,17 @@
   "dependencies": {
     "axios": "^1.2.0",
     "mapbox-gl": "^2.11.0",
-    "vue": "^3.2.45"
+    "vue": "^3.2.45",
+    "vega": "^5.22.1",
+    "vega-embed": "^6.21.0",
+    "vega-event-selector": "^3.0.0",
+    "vega-expression": "^5.0.0",
+    "vega-interpreter": "^1.0.4",
+    "vega-lite": "4.0.2",
+    "vega-tooltip": "^0.27.0",
+    "vega-typings": "^0.22.3",
+    "vega-util": "^1.17.0",
+    "d3-format": "^1.4.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",

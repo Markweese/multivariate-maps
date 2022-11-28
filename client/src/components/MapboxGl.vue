@@ -10,7 +10,7 @@
       <div><span style="background-color: #a2d7d8"></span>{{summaryStats.growthP0}}</div>
     </div>
     <div v-if="summaryStats" id="color-legend" class="legend --bottom">
-      <h4>ZHVI (Typical home value)</h4>
+      <h4>ZHVI (Typical value)</h4>
       <div class="radius-circle-wrapper"><span class="radius-circle" style="width: 30px; height: 30px"></span>{{summaryStats.zhivP100}}</div>
       <div class="radius-circle-wrapper"><span class="radius-circle" style="width: 20px; height: 20px"></span>{{summaryStats.zhivP90}}</div>
       <div class="radius-circle-wrapper"><span class="radius-circle" style="width: 15px; height: 15px"></span>{{summaryStats.zhivP50}}</div>
@@ -24,7 +24,6 @@
 import axios from 'axios';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import SummaryTable from './SummaryTable.vue';
-import ChartSection from './ChartSection.vue';
 
 export default {
   name: 'MapboxGl',
@@ -35,10 +34,19 @@ export default {
     summaryStats: Object,
   },
   components: {
-    SummaryTable,
-    ChartSection
+    SummaryTable
   },
   methods: {
+    addListeners() {
+      this.map.on('click', 'metro-growth', (e) => {
+        // Change the cursor style as a UI indicator.
+        const name = e.features[0].properties.regionName;
+
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+        this.$emit('update:metro-selection', name);
+      });
+    },
     addPopups() {
       // Create a popup, but don't add it to the map yet.
       const popup = new mapboxgl.Popup({
@@ -122,6 +130,7 @@ export default {
       });
 
       this.addPopups();
+      this.addListeners();
     }
   },
   data() {
