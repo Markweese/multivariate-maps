@@ -107,6 +107,7 @@ class sample:
                 update_obj['zhvi_min'] = this_zhvi + update_obj['usd_growth_min']
                 update_obj['zhvi_mean'] = this_zhvi + update_obj['usd_growth_mean']
                 update_obj['zhvi_max'] = this_zhvi + update_obj['usd_growth_max']
+                update_obj['datemonth'] = '2022-{}-01'.format(next_month) 
 
                 # set current_zhvi to forecasted zhvi mean
                 current_zhvi[update_obj['RegionName']] = update_obj['zhvi_mean']
@@ -122,6 +123,7 @@ class sample:
                 update_obj['zhvi_min'] = this_zhvi + update_obj['usd_growth_min']
                 update_obj['zhvi_mean'] = this_zhvi + update_obj['usd_growth_mean']
                 update_obj['zhvi_max'] = this_zhvi + update_obj['usd_growth_max']
+                update_obj['datemonth'] = '2023-{}-01'.format(next_month) 
 
                 # set current_zhvi to forecasted zhvi mean
                 current_zhvi[update_obj['RegionName']] = update_obj['zhvi_mean']

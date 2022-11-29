@@ -1,0 +1,29 @@
+
+version: '3'
+services:
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3050:80'
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./api
+    volumes:
+      - ./api:/app
+    environment:
+      - ENVIRONMENT=develop
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MAP_KEY=AIzaSyBLjdkt3PPXaXImvodlVp4e9a8tCDkd3wc
