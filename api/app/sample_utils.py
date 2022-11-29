@@ -139,3 +139,18 @@ class sample_utils:
         # remove date field
         output_df = output_df.drop('date', axis=1)
         output_df.to_csv('app/data/sample_data.csv', index=False, header=True)
+
+    def map_features_to_geojson(self, properties):
+        return {
+            'type' : 'Feature',
+            'properties' : {
+             'regionName': properties['RegionName'],
+             'zhvi': properties['zhvi'],
+             'growth': properties['growth'],
+             'usdGrowth': properties['usd_growth']
+            },
+            'geometry' : {
+                'type' : 'Point',
+                'coordinates' : [ properties['lng'], properties['lat'] ]
+            }
+        }

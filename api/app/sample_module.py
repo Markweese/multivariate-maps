@@ -24,6 +24,7 @@ class sample:
     df = pd.read_csv('app/data/zhvi_parsed.csv')
     df['date'] = pd.to_datetime(df['datemonth'])
     df = df.set_index(['date'])
+    df = df.dropna(subset=['zhvi'])
 
     # Copy the region map data for the session
     metro_map = pd.read_csv('app/data/metro_map.csv')
@@ -40,6 +41,37 @@ class sample:
         metros = metros.split('|')
         df_copy = self.df.loc[start_month:end_month]
         df_copy = df_copy[df_copy['RegionName'].isin(metros)].sort_values(by=['RegionName', 'datemonth'], ascending=[True, True])
+
+        return df_copy.to_dict(orient='records')
+
+    def get_forecast_data(self, metros, start_month, end_month):
+        metros = metros.split('|')
+        df_copy = self.df.loc[start_month:end_month]
+        df_copy['month'] = pd.to_datetime(df_copy['datemonth']).dt.month
+        df_copy = df_copy[df_copy['RegionName'].isin(metros)].sort_values(by=['RegionName', 'datemonth'], ascending=[True, True])
+        df_copy = df_copy.groupby(['RegionName', 'month']).agg({
+            'zhvi': {
+                'min': np.min,
+                'mean': np.mean,
+                'max': np.max
+            },
+            'growth': {
+                'min': np.min,
+                'mean': np.mean,
+                'max': np.max
+            },
+            'usd_growth': {
+                'min': np.min,
+                'mean': np.mean,
+                'max': np.max
+            }
+        }).reset_index()
+
+        # compress the multiindex into single column names
+        df_copy.columns = df_copy.columns.map('_'.join)
+
+        # creates some wonkiness in the header, remap the unnested level1 indices to a non _ name
+        df_copy = df_copy.rename(columns={"RegionName_": "RegionName", "month_": "month"})
 
         return df_copy.to_dict(orient='records')
     # get_region_data

@@ -80,5 +80,24 @@ def get_metros():
         logging.error(request.path, exc_info=True)
         return fail_res
 
+@app.route('/metros/forecast', methods=['GET'])
+def get_forecast():
+    try:
+        start_month = request.args.get('start_month')
+        end_month = request.args.get('end_month')
+        metros = request.args.get('metros')
+
+        output = sample.get_forecast_data(metros, start_month, end_month)
+
+        return jsonify(dict(
+            code=1,
+            message='success',
+            response=output
+        ))
+    except Exception as e:
+        print(e)
+        logging.error(request.path, exc_info=True)
+        return fail_res
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
