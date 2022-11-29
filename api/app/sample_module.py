@@ -44,17 +44,21 @@ class sample:
 
         return df_copy.to_dict(orient='records')
 
-    def get_forecast_data(self, metros, start_month, end_month):
+    #  returns 1 yr of forecasted data in the following format
+    #  {
+    #    datemonth: date
+    #    mean_zhvi: float
+    #    max_zhvi: float
+    #    max_zhvi: float
+    #  }
+    def get_forecast_data(self, metros, current_date='2022-11-01'):
+        print(current_date)
         metros = metros.split('|')
-        df_copy = self.df.loc[start_month:end_month]
+        df_copy = self.df.loc['2012-01-01':current_date]
+        current_date = datetime.strptime(current_date, '%Y-%m-%d')
         df_copy['month'] = pd.to_datetime(df_copy['datemonth']).dt.month
         df_copy = df_copy[df_copy['RegionName'].isin(metros)].sort_values(by=['RegionName', 'datemonth'], ascending=[True, True])
         df_copy = df_copy.groupby(['RegionName', 'month']).agg({
-            'zhvi': {
-                'min': np.min,
-                'mean': np.mean,
-                'max': np.max
-            },
             'growth': {
                 'min': np.min,
                 'mean': np.mean,
@@ -73,7 +77,61 @@ class sample:
         # creates some wonkiness in the header, remap the unnested level1 indices to a non _ name
         df_copy = df_copy.rename(columns={"RegionName_": "RegionName", "month_": "month"})
 
-        return df_copy.to_dict(orient='records')
+        forecasted_growth = df_copy.to_dict(orient='records')
+
+        # get current month zhvi values
+        current_zhvi = {}
+        df_current = self.df
+        df_current = df_current.loc[
+            (
+                (pd.to_datetime(df_current['datemonth']).dt.month == current_date.month) &
+                (pd.to_datetime(df_current['datemonth']).dt.year == current_date.year)
+            ) &
+            (df_current['RegionName'].isin(metros))
+        ]
+
+        # assign the current zhvi to the local zhvi
+        for metro in df_current.to_dict(orient='records'):
+            current_zhvi[metro['RegionName']] = metro['zhvi']
+
+        # set current month and remainder for each zhvi and populate metros
+        for zhvi in current_zhvi:
+            remainder = 10
+            next_month = 11
+
+            # loop over the months starting at the next month
+            while next_month <= 12:
+                # calculate mean/min/max zhvi: zhvi + current_zhvi * growth [mean/min/max]
+                update_obj = next(item for item in forecasted_growth if item['RegionName'] == zhvi and item['month'] == next_month)
+                this_zhvi = current_zhvi[update_obj['RegionName']]
+                update_obj['zhvi_min'] = this_zhvi + update_obj['usd_growth_min']
+                update_obj['zhvi_mean'] = this_zhvi + update_obj['usd_growth_mean']
+                update_obj['zhvi_max'] = this_zhvi + update_obj['usd_growth_max']
+
+                # set current_zhvi to forecasted zhvi mean
+                current_zhvi[update_obj['RegionName']] = update_obj['zhvi_mean']
+                # increment month
+                next_month = next_month + 1
+
+            # start from the front and work through remainder
+            next_month = 1
+            while remainder > 0:
+                # calculate mean/min/max zhvi: zhvi + current_zhvi * growth [mean/min/max]
+                update_obj = next(item for item in forecasted_growth if item['RegionName'] == zhvi and item['month'] == next_month)
+                this_zhvi = current_zhvi[update_obj['RegionName']]
+                update_obj['zhvi_min'] = this_zhvi + update_obj['usd_growth_min']
+                update_obj['zhvi_mean'] = this_zhvi + update_obj['usd_growth_mean']
+                update_obj['zhvi_max'] = this_zhvi + update_obj['usd_growth_max']
+
+                # set current_zhvi to forecasted zhvi mean
+                current_zhvi[update_obj['RegionName']] = update_obj['zhvi_mean']
+
+                # increment month
+                next_month = next_month + 1
+
+                # decrement remainder
+                remainder = remainder - 1
+        return forecasted_growth
     # get_region_data
     # read region data from the CSV
     # params:

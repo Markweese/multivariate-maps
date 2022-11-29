@@ -83,11 +83,10 @@ def get_metros():
 @app.route('/metros/forecast', methods=['GET'])
 def get_forecast():
     try:
-        start_month = request.args.get('start_month')
-        end_month = request.args.get('end_month')
+        current_date = request.args.get('current_date')
         metros = request.args.get('metros')
 
-        output = sample.get_forecast_data(metros, start_month, end_month)
+        output = sample.get_forecast_data(metros, current_date)
 
         return jsonify(dict(
             code=1,
