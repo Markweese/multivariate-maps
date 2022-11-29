@@ -16,4 +16,5 @@ A visualization application built around a light base of reusable map, chart, an
 - /client: the front end application, built with [vite](https://vitejs.dev/guide/) and written in Vue/JS. Visualization libraries include
   - [mapbox](https://www.mapbox.com/mobile-maps-sdk)
   - [vegalite](https://vega.github.io/vega-lite/usage/embed.html)
+  - Some [D3](https://d3js.org/) utility functions
 - /ngnix: included for production releases, definitly overkill for a dev environment.
