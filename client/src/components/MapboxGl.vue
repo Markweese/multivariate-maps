@@ -162,7 +162,7 @@ export default {
 </script>
 <style scoped>
   #map {
-    height: calc(100vh - 150px);
+    height: calc(100vh - 130px);
   }
 
   .legend {

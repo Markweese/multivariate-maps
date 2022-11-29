@@ -112,7 +112,6 @@ export function multiLineChart(
       },
     ],
   };
-
   return vegaEmbed(el, chartPOC, {
     defaultStyle: false,
     logLevel: 1, // Disables some unnecessary logs https://vegawidget.github.io/vegawidget/reference/vega_embed.html
