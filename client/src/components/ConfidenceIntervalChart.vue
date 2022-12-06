@@ -121,7 +121,7 @@ export default {
         this.numberFormat,
         this.upperField,
         this.lowerField,
-        this.highlightedField,
+        this.highlightedField
       );
     }
   },

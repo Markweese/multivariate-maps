@@ -23,7 +23,6 @@ export function confidenceIntervalChart(
   chartColors,
   gridLines,
   interpolation,
-  pValue,
   compressTooltip = false,
   showErrorBand = true,
   displayFields,

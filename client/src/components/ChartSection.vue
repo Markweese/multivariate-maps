@@ -42,27 +42,7 @@
       </multi-line-chart>
   </template>
   <template v-if="analysisType === 'forecasted'">
-    <multi-line-chart
-      v-if="chartData"
-      :chart-data="chartData"
-      :chart-gridLines="false"
-      field="zhvi_mean"
-      chart-title="ZHVI"
-      y-axis-title="$"
-      pivot="RegionName"
-    >
-    </multi-line-chart>
-    <multi-line-chart
-      v-if="chartData"
-      :chart-data="chartData"
-      :chart-gridLines="false"
-      field="growth_mean"
-      chart-title="Growth"
-      y-axis-title="%"
-      pivot="RegionName"
-    >
-    </multi-line-chart>
-    <!-- <confidence-interval-chart
+    <confidence-interval-chart
       v-if="chartData"
       :chart-data="chartData"
       :chart-gridLines="false"
@@ -81,13 +61,26 @@
       :chart-gridLines="false"
       pivot="RegionName"
       field="growth_mean"
-      chart-title="Growth"
+      chart-title="Growth (%)"
       y-axis-title="%"
       upperField="growth_max"
       lowerField="growth_min"
       highlightedField="growth_mean"
     >
-    </confidence-interval-chart> -->
+    </confidence-interval-chart>
+    <confidence-interval-chart
+      v-if="chartData"
+      :chart-data="chartData"
+      :chart-gridLines="false"
+      pivot="RegionName"
+      field="usd_growth_mean"
+      chart-title="Growth ($)"
+      y-axis-title="$"
+      upperField="usd_growth_max"
+      lowerField="usd_growth_min"
+      highlightedField="usd_growth_mean"
+    >
+    </confidence-interval-chart>
 </template>
   </div>
 </template>
@@ -118,6 +111,7 @@ export default {
     position: absolute;
     transition: left .5s;
     background-color: #fff;
+    overflow: scroll;
     height: calc(100vh - 130px);
   }
 
@@ -142,7 +136,7 @@ export default {
     border-radius: 0px;
   }
   .hot-markets {
-    max-height: calc(100vh - 130px);
+    height: calc(100vh - 130px);
     overflow-y: scroll;
   }
 </style>
