@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import mapboxReducer from './slices/mapSlice'
+import filterReducer from './slices/filterSlice'
 
 const store = configureStore({
   reducer: {
     mapbox: mapboxReducer,
+    filter: filterReducer,
   },
 })
 
